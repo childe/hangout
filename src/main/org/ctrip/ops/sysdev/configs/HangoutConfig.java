@@ -9,17 +9,30 @@ public class HangoutConfig {
 	public static Map parse(String filename) {
 		HashMap configs = new HashMap();
 
-		ArrayList<Map> inputs = new ArrayList<Map>();
-		final HashMap kafkaInput = new HashMap();
-		kafkaInput.put("topic", "metric_thrift.15s");
-		kafkaInput.put("groupID", "hangout");
-		kafkaInput.put("zk", "192.168.81.156:2181");
-		
-		inputs.add(new HashMap() {
+		final HashMap kafkaInput1 = new HashMap();
+		kafkaInput1.put("topic", "metric_thrift.15s");
+		kafkaInput1.put("groupID", "hangout");
+		kafkaInput1.put("zk", "192.168.81.156:2181");
+
+		final HashMap kafkaInput2 = new HashMap();
+		kafkaInput2.put("topic", "metric_thrift.1m");
+		kafkaInput2.put("groupID", "hangout");
+		kafkaInput2.put("zk", "192.168.81.156:2181");
+
+		ArrayList<Map> inputs = new ArrayList<Map>() {
 			{
-				put("kafka", kafkaInput);
+				add(new HashMap() {
+					{
+						put("kafka", kafkaInput1);
+					}
+				});
+				add(new HashMap() {
+					{
+						put("kafka", kafkaInput2);
+					}
+				});
 			}
-		});
+		};
 		configs.put("inputs", inputs);
 
 		return configs;
