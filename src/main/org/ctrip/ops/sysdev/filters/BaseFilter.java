@@ -23,7 +23,6 @@ public class BaseFilter implements Runnable {
 		}
 
 		this.outputQueue = new ArrayBlockingQueue(queueSize, false);
-		logger.error(this.outputQueue.hashCode());
 
 		this.prepare();
 	}
