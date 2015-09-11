@@ -34,9 +34,7 @@ public class Main {
 			while (inputIT.hasNext()) {
 				Map.Entry<String, Map> inputEntry = inputIT.next();
 				String inputType = inputEntry.getKey();
-				System.out.println(inputType);
 				Map inputConfig = inputEntry.getValue();
-				System.out.println(inputConfig);
 
 				Class<?> inputClass = Class
 						.forName("org.ctrip.ops.sysdev.inputs." + inputType);
@@ -59,9 +57,7 @@ public class Main {
 				while (filterIT.hasNext()) {
 					Map.Entry<String, Map> filterEntry = filterIT.next();
 					String filterType = filterEntry.getKey();
-					System.out.println(filterType);
 					Map filterConfig = filterEntry.getValue();
-					System.out.println(filterConfig);
 
 					Class<?> filterClass = Class
 							.forName("org.ctrip.ops.sysdev.filters."
@@ -85,9 +81,7 @@ public class Main {
 			while (outputIT.hasNext()) {
 				Map.Entry<String, Map> outputEntry = outputIT.next();
 				String outputType = outputEntry.getKey();
-				System.out.println(outputType);
 				Map outputConfig = outputEntry.getValue();
-				System.out.println(outputConfig);
 
 				Class<?> outputClass = Class
 						.forName("org.ctrip.ops.sysdev.outputs." + outputType);
