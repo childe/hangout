@@ -1,15 +1,17 @@
 package org.ctrip.ops.sysdev;
 
 import org.ctrip.ops.sysdev.inputs.BaseInput;
+import org.ctrip.ops.sysdev.outputs.BaseOutput;
 
 import java.lang.reflect.Constructor;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ArrayBlockingQueue;
-import org.apache.log4j.Logger;
 
+import org.apache.log4j.Logger;
 import org.ctrip.ops.sysdev.configs.HangoutConfig;
 
 public class Main {
@@ -59,15 +61,15 @@ public class Main {
 					String filterType = filterEntry.getKey();
 					System.out.println(filterType);
 					Map filterConfig = filterEntry.getValue();
-					filterConfig.put("preQueues", preQueues);
 					System.out.println(filterConfig);
 
 					Class<?> filterClass = Class
 							.forName("org.ctrip.ops.sysdev.filters."
 									+ filterType);
-					Constructor<?> ctor = filterClass.getConstructor(Map.class);
-					BaseInput filterInstance = (BaseInput) ctor
-							.newInstance(filterConfig);
+					Constructor<?> ctor = filterClass.getConstructor(Map.class,
+							List.class);
+					// BaseFilter filterInstance = (BaseInput) ctor.newInstance(
+					// filterConfig, preQueues);
 					// filterInstance.process();
 				}
 			}
@@ -85,14 +87,14 @@ public class Main {
 				String outputType = outputEntry.getKey();
 				System.out.println(outputType);
 				Map outputConfig = outputEntry.getValue();
-				outputConfig.put("preQueues", preQueues);
 				System.out.println(outputConfig);
 
 				Class<?> outputClass = Class
 						.forName("org.ctrip.ops.sysdev.outputs." + outputType);
-				Constructor<?> ctor = outputClass.getConstructor(Map.class);
-				BaseInput outputInstance = (BaseInput) ctor
-						.newInstance(outputConfig);
+				Constructor<?> ctor = outputClass.getConstructor(Map.class,
+						List.class);
+				BaseOutput outputInstance = (BaseOutput) ctor.newInstance(
+						outputConfig, preQueues);
 				outputInstance.emit();
 			}
 		}

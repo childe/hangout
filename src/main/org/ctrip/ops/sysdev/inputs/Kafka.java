@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 
+import kafka.common.ConsumerRebalanceFailedException;
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.ConsumerIterator;
 import kafka.consumer.KafkaStream;
@@ -34,6 +35,7 @@ public class Kafka extends BaseInput {
 				String m = new String(it.next().message());
 				try {
 					this.messageQueue.put(m);
+					// System.out.println(m);
 				} catch (InterruptedException e) {
 					logger.warn("put message to queue failed");
 					logger.trace(e.getMessage());
@@ -84,8 +86,16 @@ public class Kafka extends BaseInput {
 	public Map<String, Object> emit() {
 		Map<String, Integer> topicCountMap = new HashMap<String, Integer>();
 		topicCountMap.put(this.topic, this.threads);
-		Map<String, List<KafkaStream<byte[], byte[]>>> consumerMap = consumer
-				.createMessageStreams(topicCountMap);
+		Map<String, List<KafkaStream<byte[], byte[]>>> consumerMap = null;
+		try {
+			consumerMap = consumer.createMessageStreams(topicCountMap);
+		} catch (ConsumerRebalanceFailedException e) {
+			logger.error(String.format(
+					"ZookeeperConsumerConnector.consume %s can't rebalance",
+					this.topic));
+			logger.trace(e.getMessage());
+			System.exit(1);
+		}
 
 		List<KafkaStream<byte[], byte[]>> streams = consumerMap.get(topic);
 
@@ -97,10 +107,6 @@ public class Kafka extends BaseInput {
 			executor.submit(new Consumer(stream, messageQueue));
 		}
 		return null;
-	}
-
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 	}
 
 	public ArrayBlockingQueue getMessageQueue() {
