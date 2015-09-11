@@ -8,15 +8,14 @@ import java.util.concurrent.ArrayBlockingQueue;
 import org.apache.log4j.Logger;
 
 public class Stdout extends BaseOutput {
-	private static final Logger logger = Logger.getLogger("Main");
+	private static final Logger logger = Logger.getLogger("BaseOutput");
 
-	public Stdout(Map config, ArrayBlockingQueue preQueue) {
-		super(config, preQueue);
+	public Stdout(Map config, ArrayBlockingQueue inputQueue) {
+		super(config, inputQueue);
 	}
 
 	@Override
 	public void emit() {
-		// TODO Auto-generated method stub
 		while (true) {
 			Object m = this.inputQueue.poll();
 			if (m != null) {
