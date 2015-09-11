@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-
+import java.util.concurrent.ArrayBlockingQueue;
 import org.apache.log4j.Logger;
 
 import org.ctrip.ops.sysdev.configs.HangoutConfig;
@@ -19,7 +19,9 @@ public class Main {
 
 		// parse configure file
 		Map configs = HangoutConfig.parse(args[0]);
-		System.out.println(configs);
+		logger.debug(configs);
+
+		ArrayList<ArrayBlockingQueue> preQueues = new ArrayList<ArrayBlockingQueue>();
 
 		// for input in all_inputs
 		ArrayList<Map> inputs = (ArrayList<Map>) configs.get("inputs");
@@ -39,6 +41,7 @@ public class Main {
 				Constructor<?> ctor = inputClass.getConstructor(Map.class);
 				BaseInput inputInstance = (BaseInput) ctor
 						.newInstance(inputConfig);
+				preQueues.add(inputInstance.getMessageQueue());
 				inputInstance.emit();
 			}
 		}
@@ -56,6 +59,7 @@ public class Main {
 					String filterType = filterEntry.getKey();
 					System.out.println(filterType);
 					Map filterConfig = filterEntry.getValue();
+					filterConfig.put("preQueues", preQueues);
 					System.out.println(filterConfig);
 
 					Class<?> filterClass = Class
@@ -81,6 +85,7 @@ public class Main {
 				String outputType = outputEntry.getKey();
 				System.out.println(outputType);
 				Map outputConfig = outputEntry.getValue();
+				outputConfig.put("preQueues", preQueues);
 				System.out.println(outputConfig);
 
 				Class<?> outputClass = Class

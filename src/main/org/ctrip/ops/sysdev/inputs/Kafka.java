@@ -48,7 +48,7 @@ public class Kafka extends BaseInput {
 	private final int queueSize;
 	private final ConsumerConnector consumer;
 	private ExecutorService executor;
-	public ArrayBlockingQueue messageQueue;
+	private ArrayBlockingQueue messageQueue;
 
 	public Kafka(Map<String, Object> config) {
 		super(config);
@@ -101,7 +101,10 @@ public class Kafka extends BaseInput {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-
 	}
+
+	public ArrayBlockingQueue getMessageQueue() {
+		return this.messageQueue;
+	};
 
 }
