@@ -84,15 +84,8 @@ public class Kafka extends BaseInput {
 		Map<String, Integer> topicCountMap = new HashMap<String, Integer>();
 		topicCountMap.put(this.topic, this.threads);
 		Map<String, List<KafkaStream<byte[], byte[]>>> consumerMap = null;
-		try {
-			consumerMap = consumer.createMessageStreams(topicCountMap);
-		} catch (ConsumerRebalanceFailedException e) {
-			logger.error(String.format(
-					"ZookeeperConsumerConnector.consume %s can't rebalance",
-					this.topic));
-			logger.trace(e.getMessage());
-			System.exit(1);
-		}
+
+		consumerMap = consumer.createMessageStreams(topicCountMap);
 
 		List<KafkaStream<byte[], byte[]>> streams = consumerMap.get(topic);
 
