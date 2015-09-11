@@ -15,12 +15,7 @@ public class Stdout extends BaseOutput {
 	}
 
 	@Override
-	public void emit() {
-		while (true) {
-			Object m = this.inputQueue.poll();
-			if (m != null) {
-				System.out.println(m);
-			}
-		}
+	public void emit(Object event) {
+		System.out.println(event);
 	}
 }

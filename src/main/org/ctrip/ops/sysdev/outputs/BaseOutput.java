@@ -3,7 +3,7 @@ package org.ctrip.ops.sysdev.outputs;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 
-public class BaseOutput {
+public class BaseOutput implements Runnable {
 	protected Map configs;
 	protected ArrayBlockingQueue inputQueue;
 
@@ -11,10 +11,19 @@ public class BaseOutput {
 		this.configs = configs;
 		this.inputQueue = inputQueue;
 	}
-	
+
 	protected void prepare() {
 	};
 
-	public void emit() {
+	public void run() {
+		while (true) {
+			Object event = this.inputQueue.poll();
+			if (event != null) {
+				this.emit(event);
+			}
+		}
+	}
+
+	public void emit(Object event) {
 	};
 }

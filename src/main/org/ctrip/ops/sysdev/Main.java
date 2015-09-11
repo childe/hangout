@@ -5,7 +5,6 @@ import org.ctrip.ops.sysdev.inputs.BaseInput;
 import org.ctrip.ops.sysdev.outputs.BaseOutput;
 
 import java.lang.reflect.Constructor;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
@@ -92,7 +91,7 @@ public class Main {
 
 				BaseOutput outputInstance = (BaseOutput) ctor.newInstance(
 						outputConfig, inputQueue);
-				outputInstance.emit();
+				new Thread(outputInstance).start();
 			}
 		}
 

@@ -34,7 +34,6 @@ public class Kafka extends BaseInput {
 				String m = new String(it.next().message());
 				try {
 					this.messageQueue.put(m);
-					// System.out.println(m);
 				} catch (InterruptedException e) {
 					logger.warn("put message to queue failed");
 					logger.trace(e.getMessage());
