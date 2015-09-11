@@ -1,35 +1,102 @@
-package main.org.ctrip.ops.sysdev.inputs;
+package org.ctrip.ops.sysdev.inputs;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+import org.apache.log4j.Logger;
+
+import kafka.consumer.ConsumerConfig;
 import kafka.consumer.ConsumerIterator;
 import kafka.consumer.KafkaStream;
+import kafka.javaapi.consumer.ConsumerConnector;
 
 public class Kafka extends BaseInput {
+	private static final Logger logger = Logger.getLogger("Main");
 
-	private class ConsumerTest implements Runnable {
-		private KafkaStream m_stream;
-		private int m_threadNumber;
+	private class Consumer implements Runnable {
+		private KafkaStream<byte[], byte[]> m_stream;
+		private ArrayBlockingQueue messageQueue;
 
-		public ConsumerTest(KafkaStream a_stream, int a_threadNumber) {
-			m_threadNumber = a_threadNumber;
+		public Consumer(KafkaStream<byte[], byte[]> a_stream,
+				ArrayBlockingQueue fairQueue) {
 			m_stream = a_stream;
+			this.messageQueue = fairQueue;
 		}
 
 		public void run() {
 			ConsumerIterator<byte[], byte[]> it = m_stream.iterator();
-			while (it.hasNext())
-				System.out.println("Thread " + m_threadNumber + ": "
-						+ new String(it.next().message()));
-			System.out.println("Shutting down Thread: " + m_threadNumber);
+			while (it.hasNext()) {
+				String m = new String(it.next().message());
+				try {
+					this.messageQueue.put(m);
+				} catch (InterruptedException e) {
+					logger.warn("put message to queue failed");
+					logger.trace(e.getMessage());
+				}
+			}
 		}
 	}
 
-	public Kafka(Map config) {
+	private Map<String, Object> config;
+	private final int threads;
+	private final String topic;
+	private final int queueSize;
+	private final ConsumerConnector consumer;
+	private ExecutorService executor;
+	public ArrayBlockingQueue messageQueue;
+
+	public Kafka(Map<String, Object> config) {
 		super(config);
+		this.config = config;
+
+		if (this.config.containsKey("threads")) {
+			this.threads = (int) this.config.get("threads");
+		} else {
+			this.threads = 1;
+		}
+		if (this.config.containsKey("queueSize")) {
+			this.queueSize = (int) this.config.get("queueSize");
+		} else {
+			this.queueSize = 1000;
+		}
+
+		this.messageQueue = new ArrayBlockingQueue(this.queueSize, false);
+
+		this.topic = (String) this.config.get("topic");
+
+		Properties props = new Properties();
+		props.put("zookeeper.connect", this.config.get("zk"));
+		props.put("group.id", "groupID");
+		props.put("zookeeper.session.timeout.ms", "400");
+		props.put("zookeeper.sync.time.ms", "200");
+		props.put("auto.commit.interval.ms", "1000");
+
+		consumer = kafka.consumer.Consumer
+				.createJavaConsumerConnector(new ConsumerConfig(props));
+
 	}
 
-	public Map emit() {
+	public Map<String, Object> emit() {
+		Map<String, Integer> topicCountMap = new HashMap<String, Integer>();
+		topicCountMap.put(this.topic, this.threads);
+		Map<String, List<KafkaStream<byte[], byte[]>>> consumerMap = consumer
+				.createMessageStreams(topicCountMap);
+
+		List<KafkaStream<byte[], byte[]>> streams = consumerMap.get(topic);
+
+		executor = Executors.newFixedThreadPool(this.threads);
+
+		// now create an object to consume the messages
+
+		for (final KafkaStream<byte[], byte[]> stream : streams) {
+			executor.submit(new Consumer(stream, messageQueue));
+		}
+		return null;
 	}
 
 	public static void main(String[] args) {
