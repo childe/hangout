@@ -17,7 +17,7 @@ import kafka.consumer.KafkaStream;
 import kafka.javaapi.consumer.ConsumerConnector;
 
 public class Kafka extends BaseInput {
-	private static final Logger logger = Logger.getLogger("Main");
+	private static final Logger logger = Logger.getLogger("InPutKafka");
 
 	private class Consumer implements Runnable {
 		private KafkaStream<byte[], byte[]> m_stream;
