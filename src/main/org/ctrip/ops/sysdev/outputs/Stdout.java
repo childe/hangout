@@ -10,16 +10,8 @@ import org.apache.log4j.Logger;
 public class Stdout extends BaseOutput {
 	private static final Logger logger = Logger.getLogger("Main");
 
-	private Map configs;
-	private List<ArrayBlockingQueue> preQueues;
-
 	public Stdout(Map config, List<ArrayBlockingQueue> preQueues) {
 		super(config, preQueues);
-
-		this.configs = configs;
-		this.preQueues = preQueues;
-
-		System.out.println(preQueues.size());
 	}
 
 	@Override
@@ -34,5 +26,4 @@ public class Stdout extends BaseOutput {
 			}
 		}
 	}
-
 }
