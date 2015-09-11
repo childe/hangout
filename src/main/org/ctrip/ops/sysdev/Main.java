@@ -24,8 +24,7 @@ public class Main {
 		Map configs = HangoutConfig.parse(args[0]);
 		logger.debug(configs);
 
-		ArrayBlockingQueue inputQueue = new ArrayBlockingQueue(1000,
-				false);
+		ArrayBlockingQueue inputQueue = new ArrayBlockingQueue(1000, false);
 
 		// for input in all_inputs
 		ArrayList<Map> inputs = (ArrayList<Map>) configs.get("inputs");
@@ -48,9 +47,8 @@ public class Main {
 			}
 		}
 
-		
 		// for filter in filters
-		
+
 		if (configs.containsKey("filters")) {
 			ArrayList<Map> filters = (ArrayList<Map>) configs.get("filters");
 
@@ -70,7 +68,8 @@ public class Main {
 							ArrayBlockingQueue.class);
 					BaseFilter filterInstance = (BaseFilter) ctor.newInstance(
 							filterConfig, inputQueue);
-					filterInstance.process();
+					inputQueue = filterInstance.getOutputMQ();
+					new Thread(filterInstance).start();
 				}
 			}
 		}
@@ -86,11 +85,11 @@ public class Main {
 				Map.Entry<String, Map> outputEntry = outputIT.next();
 				String outputType = outputEntry.getKey();
 				Map outputConfig = outputEntry.getValue();
-
 				Class<?> outputClass = Class
 						.forName("org.ctrip.ops.sysdev.outputs." + outputType);
 				Constructor<?> ctor = outputClass.getConstructor(Map.class,
 						ArrayBlockingQueue.class);
+
 				BaseOutput outputInstance = (BaseOutput) ctor.newInstance(
 						outputConfig, inputQueue);
 				outputInstance.emit();
