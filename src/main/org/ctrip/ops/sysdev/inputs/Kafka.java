@@ -44,17 +44,14 @@ public class Kafka extends BaseInput {
 		}
 	}
 
-	private Map<String, Object> config;
 	private final int threads;
 	private final String topic;
 	private final int queueSize;
 	private final ConsumerConnector consumer;
 	private ExecutorService executor;
-	private ArrayBlockingQueue messageQueue;
 
 	public Kafka(Map<String, Object> config) {
 		super(config);
-		this.config = config;
 
 		if (this.config.containsKey("threads")) {
 			this.threads = (int) this.config.get("threads");
@@ -83,7 +80,7 @@ public class Kafka extends BaseInput {
 
 	}
 
-	public Map<String, Object> emit() {
+	public void emit() {
 		Map<String, Integer> topicCountMap = new HashMap<String, Integer>();
 		topicCountMap.put(this.topic, this.threads);
 		Map<String, List<KafkaStream<byte[], byte[]>>> consumerMap = null;
@@ -106,11 +103,5 @@ public class Kafka extends BaseInput {
 		for (final KafkaStream<byte[], byte[]> stream : streams) {
 			executor.submit(new Consumer(stream, messageQueue));
 		}
-		return null;
 	}
-
-	public ArrayBlockingQueue getMessageQueue() {
-		return this.messageQueue;
-	};
-
 }
