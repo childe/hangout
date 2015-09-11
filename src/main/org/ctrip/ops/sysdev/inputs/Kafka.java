@@ -10,7 +10,6 @@ import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 
-import kafka.common.ConsumerRebalanceFailedException;
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.ConsumerIterator;
 import kafka.consumer.KafkaStream;
