@@ -1,4 +1,4 @@
-package main.org.ctrip.ops.sysdev.configs;
+package org.ctrip.ops.sysdev.configs;
 
 import java.io.File;
 import java.io.FileInputStream;
