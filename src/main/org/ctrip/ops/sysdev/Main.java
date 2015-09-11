@@ -1,5 +1,6 @@
 package org.ctrip.ops.sysdev;
 
+import org.ctrip.ops.sysdev.filters.BaseFilter;
 import org.ctrip.ops.sysdev.inputs.BaseInput;
 import org.ctrip.ops.sysdev.outputs.BaseOutput;
 
@@ -23,7 +24,8 @@ public class Main {
 		Map configs = HangoutConfig.parse(args[0]);
 		logger.debug(configs);
 
-		ArrayList<ArrayBlockingQueue> preQueues = new ArrayList<ArrayBlockingQueue>();
+		ArrayBlockingQueue inputQueue = new ArrayBlockingQueue(1000,
+				false);
 
 		// for input in all_inputs
 		ArrayList<Map> inputs = (ArrayList<Map>) configs.get("inputs");
@@ -38,15 +40,17 @@ public class Main {
 
 				Class<?> inputClass = Class
 						.forName("org.ctrip.ops.sysdev.inputs." + inputType);
-				Constructor<?> ctor = inputClass.getConstructor(Map.class);
-				BaseInput inputInstance = (BaseInput) ctor
-						.newInstance(inputConfig);
-				preQueues.add(inputInstance.getMessageQueue());
+				Constructor<?> ctor = inputClass.getConstructor(Map.class,
+						ArrayBlockingQueue.class);
+				BaseInput inputInstance = (BaseInput) ctor.newInstance(
+						inputConfig, inputQueue);
 				inputInstance.emit();
 			}
 		}
 
+		
 		// for filter in filters
+		
 		if (configs.containsKey("filters")) {
 			ArrayList<Map> filters = (ArrayList<Map>) configs.get("filters");
 
@@ -63,10 +67,10 @@ public class Main {
 							.forName("org.ctrip.ops.sysdev.filters."
 									+ filterType);
 					Constructor<?> ctor = filterClass.getConstructor(Map.class,
-							List.class);
-					// BaseFilter filterInstance = (BaseInput) ctor.newInstance(
-					// filterConfig, preQueues);
-					// filterInstance.process();
+							ArrayBlockingQueue.class);
+					BaseFilter filterInstance = (BaseFilter) ctor.newInstance(
+							filterConfig, inputQueue);
+					filterInstance.process();
 				}
 			}
 		}
@@ -86,9 +90,9 @@ public class Main {
 				Class<?> outputClass = Class
 						.forName("org.ctrip.ops.sysdev.outputs." + outputType);
 				Constructor<?> ctor = outputClass.getConstructor(Map.class,
-						List.class);
+						ArrayBlockingQueue.class);
 				BaseOutput outputInstance = (BaseOutput) ctor.newInstance(
-						outputConfig, preQueues);
+						outputConfig, inputQueue);
 				outputInstance.emit();
 			}
 		}

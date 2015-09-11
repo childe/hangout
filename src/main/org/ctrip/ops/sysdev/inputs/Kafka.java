@@ -44,27 +44,23 @@ public class Kafka extends BaseInput {
 		}
 	}
 
-	private final int threads;
-	private final String topic;
-	private final int queueSize;
-	private final ConsumerConnector consumer;
+	private int threads;
+	private String topic;
+	private int queueSize;
+	private ConsumerConnector consumer;
 	private ExecutorService executor;
 
-	public Kafka(Map<String, Object> config) {
-		super(config);
-
+	public Kafka(Map<String, Object> config, ArrayBlockingQueue messageQueue) {
+		super(config, messageQueue);
+	}
+	
+	@Override
+	protected void prepare() {
 		if (this.config.containsKey("threads")) {
 			this.threads = (int) this.config.get("threads");
 		} else {
 			this.threads = 1;
 		}
-		if (this.config.containsKey("queueSize")) {
-			this.queueSize = (int) this.config.get("queueSize");
-		} else {
-			this.queueSize = 1000;
-		}
-
-		this.messageQueue = new ArrayBlockingQueue(this.queueSize, false);
 
 		this.topic = (String) this.config.get("topic");
 
@@ -77,7 +73,6 @@ public class Kafka extends BaseInput {
 
 		consumer = kafka.consumer.Consumer
 				.createJavaConsumerConnector(new ConsumerConfig(props));
-
 	}
 
 	public void emit() {

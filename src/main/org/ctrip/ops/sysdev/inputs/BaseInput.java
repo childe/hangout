@@ -7,13 +7,13 @@ public class BaseInput {
 	protected Map<String, Object> config;
 	protected ArrayBlockingQueue messageQueue;
 
-	public BaseInput(Map config) {
+	public BaseInput(Map config, ArrayBlockingQueue messageQueue) {
 		this.config = config;
+		this.messageQueue = messageQueue;
 		this.prepare();
 	}
 
-	public void prepare() {
-
+	protected void prepare() {
 	};
 
 	public void emit() {
