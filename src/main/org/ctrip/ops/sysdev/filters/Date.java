@@ -10,6 +10,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import org.apache.log4j.Logger;
 import org.ctrip.ops.sysdev.utils.dateparser.DateParser;
 import org.ctrip.ops.sysdev.utils.dateparser.FormatParser;
+import org.ctrip.ops.sysdev.utils.dateparser.ISODateParser;
 import org.ctrip.ops.sysdev.utils.dateparser.UnixMSParser;
 import org.ctrip.ops.sysdev.utils.dateparser.UnixParser;
 
@@ -54,7 +55,9 @@ public class Date extends BaseFilter {
 		}
 		this.parsers = new ArrayList<DateParser>();
 		for (String format : (List<String>) config.get("formats")) {
-			if (format.equalsIgnoreCase("UNIX")) {
+			if (format.equalsIgnoreCase("ISO8601")) {
+				parsers.add(new ISODateParser((String) config.get("timezone")));
+			} else if (format.equalsIgnoreCase("UNIX")) {
 				parsers.add(new UnixParser());
 			} else if (format.equalsIgnoreCase("UNIXMS")) {
 				parsers.add(new UnixMSParser());
