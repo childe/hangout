@@ -19,6 +19,8 @@ public class BaseOutput implements Runnable {
 		this.jinjava = new Jinjava();
 
 		this.inputQueue = inputQueue;
+		
+		this.prepare();
 	}
 
 	protected void prepare() {
