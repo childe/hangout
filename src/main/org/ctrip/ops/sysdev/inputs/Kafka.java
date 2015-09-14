@@ -9,7 +9,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
-import org.ctrip.ops.sysdev.configs.HangoutConfig;
 import org.ctrip.ops.sysdev.decoder.IDecode;
 import org.ctrip.ops.sysdev.decoder.JsonDecoder;
 import org.ctrip.ops.sysdev.decoder.PlainDecoder;
@@ -75,9 +74,9 @@ public class Kafka extends BaseInput {
 		Properties props = new Properties();
 		props.put("zookeeper.connect", this.config.get("zk"));
 		props.put("group.id", this.config.get("groupID"));
-		props.put("zookeeper.session.timeout.ms", "400");
-		props.put("zookeeper.sync.time.ms", "200");
-		props.put("auto.commit.interval.ms", "1000");
+		props.put("zookeeper.session.timeout.ms", "4000");
+		props.put("zookeeper.sync.time.ms", "2000");
+		props.put("auto.commit.interval.ms", "5000");
 
 		consumer = kafka.consumer.Consumer
 				.createJavaConsumerConnector(new ConsumerConfig(props));

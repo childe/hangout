@@ -1,10 +1,11 @@
 package org.ctrip.ops.sysdev.outputs;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-
 import org.apache.log4j.Logger;
+import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
@@ -96,19 +97,13 @@ public class Elasticsearch extends BaseOutput {
 							logger.error("bulk failed");
 							logger.trace(arg2.buildFailureMessage());
 
+							List<ActionRequest> requests = arg1.requests();
 							for (BulkItemResponse item : arg2.getItems()) {
-								logger.trace(item.getFailureMessage());
-								// logger.info(item.getId());
-								// logger.info(item.getIndex());
-								// logger.info(item.getType());
-								// logger.info(item.getItemId());
-								// logger.info(arg1.getContext());
-								// logger.info(arg1.requests().get(0).getContext());
-
 								switch (item.getFailure().getStatus()) {
 								case TOO_MANY_REQUESTS:
 								case SERVICE_UNAVAILABLE:
-									// bulkProcessor.add);
+									bulkProcessor.add(requests.get(item
+											.getItemId()));
 								}
 							}
 						}
@@ -118,11 +113,15 @@ public class Elasticsearch extends BaseOutput {
 					public void afterBulk(long arg0, BulkRequest arg1,
 							Throwable arg2) {
 						logger.error("bulk got exception");
-						logger.trace(arg2.getMessage());
+						arg2.printStackTrace();
+						logger.error(arg2.getLocalizedMessage());
 					}
 
 					@Override
 					public void beforeBulk(long arg0, BulkRequest arg1) {
+						logger.debug("bulk requestID: " + arg0);
+						logger.debug("numberOfActions: "
+								+ arg1.numberOfActions());
 					}
 				}).setBulkActions(bulkActions)
 				.setBulkSize(new ByteSizeValue(bulkSize, ByteSizeUnit.MB))
@@ -137,8 +136,6 @@ public class Elasticsearch extends BaseOutput {
 
 		IndexRequest indexRequest = new IndexRequest(_index, _type)
 				.source(event);
-		System.out.println("id: " + indexRequest.id());
-		logger.info(indexRequest.id());
-		this.bulkProcessor.add(new IndexRequest(_index, _type).source(event));
+		this.bulkProcessor.add(indexRequest);
 	}
 }
