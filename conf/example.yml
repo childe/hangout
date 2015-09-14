@@ -1,0 +1,29 @@
+inputs:
+    - Kafka:
+        topic: app
+        groupID: hangout
+        zk: 192.168.1.200:2181
+        threads: 2
+        codec: plain
+        queueSize: 100
+    - Kafka:
+        topic: web
+        groupID: hangout
+        zk: 192.168.1.201:2181
+        threads: 1
+        codec: json
+        queueSize: 1000
+
+filters:
+    - Grok:
+        src: message
+        match:
+          - '(?<logtime>\S+) (?<local_user>\w+)'
+          - '- (?<user>\w+)'
+    - Date:
+        src: logtime
+        formats:
+            - 'ISO8601'
+
+outputs:
+    - Stdout: {}
