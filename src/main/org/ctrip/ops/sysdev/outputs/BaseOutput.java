@@ -42,6 +42,6 @@ public class BaseOutput implements Runnable {
 		}
 	}
 
-	public void emit(Object event) {
+	public void emit(Map event) {
 	};
 }

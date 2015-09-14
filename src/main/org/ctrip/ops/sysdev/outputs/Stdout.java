@@ -13,7 +13,7 @@ public class Stdout extends BaseOutput {
 	}
 
 	@Override
-	public void emit(Object event) {
+	public void emit(Map event) {
 		System.out.println(event);
 	}
 }
