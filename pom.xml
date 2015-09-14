@@ -77,7 +77,7 @@
         <dependency>
             <groupId>com.hubspot.jinjava</groupId>
             <artifactId>jinjava</artifactId>
-            <version>2.0.0</version>
+            <version>1.0.9</version>
         </dependency>
         <dependency>
             <groupId>org.jruby.joni</groupId>
