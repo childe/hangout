@@ -8,10 +8,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.ctrip.ops.sysdev.Main;
 import org.yaml.snakeyaml.Yaml;
 
 public class HangoutConfig {
-	private static final Logger logger = Logger.getLogger("HangoutConfig");
+	private static final Logger logger = Logger.getLogger(HangoutConfig.class.getName());
 
 	public static Map parse(String filename) {
 		Yaml yaml = new Yaml();

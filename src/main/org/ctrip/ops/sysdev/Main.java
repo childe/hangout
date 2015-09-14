@@ -15,7 +15,7 @@ import org.apache.log4j.Logger;
 import org.ctrip.ops.sysdev.configs.HangoutConfig;
 
 public class Main {
-	private static final Logger logger = Logger.getLogger("Main");
+	private static final Logger logger = Logger.getLogger(Main.class.getName());
 
 	public static void main(String[] args) throws Exception {
 

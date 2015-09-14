@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
+import org.ctrip.ops.sysdev.configs.HangoutConfig;
 import org.ctrip.ops.sysdev.decoder.IDecode;
 import org.ctrip.ops.sysdev.decoder.JsonDecoder;
 import org.ctrip.ops.sysdev.decoder.PlainDecoder;
@@ -19,7 +20,7 @@ import kafka.consumer.KafkaStream;
 import kafka.javaapi.consumer.ConsumerConnector;
 
 public class Kafka extends BaseInput {
-	private static final Logger logger = Logger.getLogger("KafkaInput");
+	private static final Logger logger = Logger.getLogger(Kafka.class.getName());
 
 	private class Consumer implements Runnable {
 		private KafkaStream<byte[], byte[]> m_stream;
