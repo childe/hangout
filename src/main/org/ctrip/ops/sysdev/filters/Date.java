@@ -3,25 +3,15 @@ package org.ctrip.ops.sysdev.filters;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.logging.Level;
-import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.ctrip.ops.sysdev.utils.dateparser.DateParser;
 import org.ctrip.ops.sysdev.utils.dateparser.FormatParser;
 import org.ctrip.ops.sysdev.utils.dateparser.UnixMSParser;
 import org.ctrip.ops.sysdev.utils.dateparser.UnixParser;
-import org.jcodings.specific.UTF8Encoding;
-import org.joni.Matcher;
-import org.joni.Option;
-import org.joni.Regex;
-import org.joni.Region;
-
-import scala.Tuple2;
 
 public class Date extends BaseFilter {
 	private static final Logger logger = Logger.getLogger(Date.class.getName());
