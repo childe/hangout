@@ -2,44 +2,35 @@ package org.ctrip.ops.sysdev.outputs;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
 
 import com.hubspot.jinjava.Jinjava;
 
-public class BaseOutput implements Runnable {
+public class BaseOutput {
 	protected Map config;
 	protected List<String> IF;
 	protected Jinjava jinjava;
-	protected ArrayBlockingQueue inputQueue;
 
-	public BaseOutput(Map config, ArrayBlockingQueue inputQueue) {
+	public BaseOutput(Map config) {
 		this.config = config;
 
 		this.IF = (List<String>) this.config.get("if");
 		this.jinjava = new Jinjava();
 
-		this.inputQueue = inputQueue;
-		
 		this.prepare();
 	}
 
 	protected void prepare() {
 	};
 
-	public void run() {
-		while (true) {
-			Map event = (Map) this.inputQueue.poll();
-			if (event != null) {
-				if (this.IF != null) {
-					for (String c : this.IF) {
-						if (this.jinjava.render(c, event).equals("false")) {
-							continue;
-						}
-					}
+	public void process(Map event) {
+		if (this.IF != null) {
+			for (String c : this.IF) {
+				if (this.jinjava.render(c, event).equals("false")) {
+					continue;
 				}
-				this.emit(event);
 			}
 		}
+		this.emit(event);
 	}
 
 	public void emit(Map event) {

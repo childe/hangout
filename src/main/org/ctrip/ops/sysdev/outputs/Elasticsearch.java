@@ -3,7 +3,6 @@ package org.ctrip.ops.sysdev.outputs;
 import java.util.ArrayList;
 import java.util.Map;
 
-import java.util.concurrent.ArrayBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.bulk.BulkItemResponse;
@@ -28,8 +27,8 @@ public class Elasticsearch extends BaseOutput {
 	private BulkProcessor bulkProcessor;
 	private TransportClient esclient;
 
-	public Elasticsearch(Map config, ArrayBlockingQueue inputQueue) {
-		super(config, inputQueue);
+	public Elasticsearch(Map config) {
+		super(config);
 	}
 
 	protected void prepare() {
@@ -138,7 +137,7 @@ public class Elasticsearch extends BaseOutput {
 
 		IndexRequest indexRequest = new IndexRequest(_index, _type)
 				.source(event);
-		System.out.println("id: "+indexRequest.id());
+		System.out.println("id: " + indexRequest.id());
 		logger.info(indexRequest.id());
 		this.bulkProcessor.add(new IndexRequest(_index, _type).source(event));
 	}

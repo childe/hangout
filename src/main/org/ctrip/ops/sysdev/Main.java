@@ -75,7 +75,7 @@ public class Main {
 
 		// for output in output
 		ArrayList<Map> outputs = (ArrayList<Map>) configs.get("outputs");
-
+		ArrayList<BaseOutput> os = new ArrayList<BaseOutput>();
 		for (Map output : outputs) {
 			Iterator<Entry<String, Map>> outputIT = output.entrySet()
 					.iterator();
@@ -86,12 +86,18 @@ public class Main {
 				Map outputConfig = outputEntry.getValue();
 				Class<?> outputClass = Class
 						.forName("org.ctrip.ops.sysdev.outputs." + outputType);
-				Constructor<?> ctor = outputClass.getConstructor(Map.class,
-						ArrayBlockingQueue.class);
+				Constructor<?> ctor = outputClass.getConstructor(Map.class);
 
-				BaseOutput outputInstance = (BaseOutput) ctor.newInstance(
-						outputConfig, inputQueue);
-				new Thread(outputInstance).start();
+				os.add((BaseOutput) ctor.newInstance(outputConfig));
+			}
+		}
+
+		while (true) {
+			Map event = (Map) inputQueue.poll();
+			if (event != null) {
+				for (BaseOutput o : os) {
+					o.process(event);
+				}
 			}
 		}
 
