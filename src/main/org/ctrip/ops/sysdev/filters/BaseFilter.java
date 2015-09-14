@@ -48,10 +48,17 @@ public class BaseFilter implements Runnable {
 			Map event = (Map) this.inputQueue.poll();
 			if (event != null) {
 
+				boolean succuess = true;
 				if (this.IF != null) {
 					for (String c : this.IF) {
-						System.out.println(this.jinjava.render(c, event));
+						if (this.jinjava.render(c, event).equals("false")) {
+							succuess = false;
+							break;
+						}
 					}
+				}
+				if (succuess == false) {
+					continue;
 				}
 
 				this.filter(event);
