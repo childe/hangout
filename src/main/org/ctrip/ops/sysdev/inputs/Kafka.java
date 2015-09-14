@@ -9,6 +9,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
+import org.ctrip.ops.sysdev.decoder.IDecode;
+import org.ctrip.ops.sysdev.decoder.JsonDecoder;
+import org.ctrip.ops.sysdev.decoder.PlainDecoder;
 
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.ConsumerIterator;
@@ -21,11 +24,13 @@ public class Kafka extends BaseInput {
 	private class Consumer implements Runnable {
 		private KafkaStream<byte[], byte[]> m_stream;
 		private ArrayBlockingQueue messageQueue;
+		private IDecode decoder;
 
 		public Consumer(KafkaStream<byte[], byte[]> a_stream,
-				ArrayBlockingQueue fairQueue) {
+				ArrayBlockingQueue fairQueue, IDecode decoder) {
 			m_stream = a_stream;
 			this.messageQueue = fairQueue;
+			this.decoder = decoder;
 		}
 
 		public void run() {
@@ -33,9 +38,13 @@ public class Kafka extends BaseInput {
 			while (it.hasNext()) {
 				String m = new String(it.next().message());
 				try {
-					this.messageQueue.put(m);
+					Map<String, Object> event = decoder.decode(m);
+					this.messageQueue.put(event);
 				} catch (InterruptedException e) {
 					logger.warn("put message to queue failed");
+					logger.trace(e.getMessage());
+				} catch (Exception e) {
+					logger.error("json decode failed:" + m);
 					logger.trace(e.getMessage());
 				}
 			}
@@ -44,14 +53,14 @@ public class Kafka extends BaseInput {
 
 	private int threads;
 	private String topic;
-	private int queueSize;
 	private ConsumerConnector consumer;
 	private ExecutorService executor;
+	private IDecode decoder;
 
 	public Kafka(Map<String, Object> config, ArrayBlockingQueue messageQueue) {
 		super(config, messageQueue);
 	}
-	
+
 	@Override
 	protected void prepare() {
 		if (this.config.containsKey("threads")) {
@@ -64,13 +73,21 @@ public class Kafka extends BaseInput {
 
 		Properties props = new Properties();
 		props.put("zookeeper.connect", this.config.get("zk"));
-		props.put("group.id", "groupID");
+		props.put("group.id", this.config.get("groupID"));
 		props.put("zookeeper.session.timeout.ms", "400");
 		props.put("zookeeper.sync.time.ms", "200");
 		props.put("auto.commit.interval.ms", "1000");
 
 		consumer = kafka.consumer.Consumer
 				.createJavaConsumerConnector(new ConsumerConfig(props));
+
+		String codec = (String) this.config.get("codec");
+		if (codec.equalsIgnoreCase("plain")) {
+			this.decoder = new PlainDecoder();
+		} else {
+			this.decoder = new JsonDecoder();
+		}
+
 	}
 
 	public void emit() {
@@ -87,7 +104,7 @@ public class Kafka extends BaseInput {
 		// now create an object to consume the messages
 
 		for (final KafkaStream<byte[], byte[]> stream : streams) {
-			executor.submit(new Consumer(stream, messageQueue));
+			executor.submit(new Consumer(stream, messageQueue, this.decoder));
 		}
 	}
 }
