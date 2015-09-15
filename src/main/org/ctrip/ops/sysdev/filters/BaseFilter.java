@@ -1,5 +1,6 @@
 package org.ctrip.ops.sysdev.filters;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,9 +81,15 @@ public class BaseFilter implements Runnable {
 	public static void main(String[] args) {
 		Jinjava jinjava = new Jinjava();
 		long s = System.currentTimeMillis();
+		ArrayList a = new ArrayList();
 		final Map<String, Object> context = new HashMap();
 		context.put("message", "Ja-red");
 		context.put("@timestamp", 1442281327000L);
+		context.put("array", new ArrayList() {
+			{
+				add("123");
+			}
+		});
 
 		Map event = new HashMap() {
 			{
@@ -97,6 +104,9 @@ public class BaseFilter implements Runnable {
 
 		System.out.println(jinjava.render(
 				"{{event[\"@timestamp\"]|datetimeformat(\"%Y.%m\")}}",
+				event = context));
+		System.out.println(jinjava.render(
+				"{{\"-\" in message && \"X\" in message}}",
 				event = context));
 	}
 }
