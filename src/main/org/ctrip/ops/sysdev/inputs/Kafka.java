@@ -19,7 +19,8 @@ import kafka.consumer.KafkaStream;
 import kafka.javaapi.consumer.ConsumerConnector;
 
 public class Kafka extends BaseInput {
-	private static final Logger logger = Logger.getLogger(Kafka.class.getName());
+	private static final Logger logger = Logger
+			.getLogger(Kafka.class.getName());
 
 	private class Consumer implements Runnable {
 		private KafkaStream<byte[], byte[]> m_stream;
@@ -71,12 +72,23 @@ public class Kafka extends BaseInput {
 
 		this.topic = (String) this.config.get("topic");
 
+		String sessionTimeout = "4000", syncTime = "2000", commitInterval = "5000";
+		if (config.containsKey("session_timeout")) {
+			sessionTimeout = (String) config.get("session_timeout");
+		}
+		if (config.containsKey("sync_time")) {
+			syncTime = (String) config.get("sync_time");
+		}
+		if (config.containsKey("commit_interval")) {
+			commitInterval = (String) config.get("commit_interval");
+		}
+
 		Properties props = new Properties();
 		props.put("zookeeper.connect", this.config.get("zk"));
 		props.put("group.id", this.config.get("groupID"));
-		props.put("zookeeper.session.timeout.ms", "4000");
-		props.put("zookeeper.sync.time.ms", "2000");
-		props.put("auto.commit.interval.ms", "5000");
+		props.put("zookeeper.session.timeout.ms", sessionTimeout);
+		props.put("zookeeper.sync.time.ms", syncTime);
+		props.put("auto.commit.interval.ms", commitInterval);
 
 		consumer = kafka.consumer.Consumer
 				.createJavaConsumerConnector(new ConsumerConfig(props));
