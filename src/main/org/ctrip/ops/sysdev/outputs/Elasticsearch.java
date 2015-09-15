@@ -1,6 +1,7 @@
 package org.ctrip.ops.sysdev.outputs;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -130,8 +131,12 @@ public class Elasticsearch extends BaseOutput {
 	}
 
 	@Override
-	public void emit(Map event) {
-		String _index = jinjava.render(index, event = event);
+	public void emit(final Map event) {
+		String _index = jinjava.render(index, new HashMap() {
+			{
+				put("event", event);
+			}
+		});
 
 		IndexRequest indexRequest = new IndexRequest(_index, indexType)
 				.source(event);

@@ -3,18 +3,19 @@ package org.ctrip.ops.sysdev.outputs;
 import java.util.List;
 import java.util.Map;
 
+import org.ctrip.ops.sysdev.utils.jinfilter.JinManager;
+
 import com.hubspot.jinjava.Jinjava;
 
 public class BaseOutput {
 	protected Map config;
 	protected List<String> IF;
-	protected Jinjava jinjava;
+	protected Jinjava jinjava = JinManager.jinjava;
 
 	public BaseOutput(Map config) {
 		this.config = config;
 
 		this.IF = (List<String>) this.config.get("if");
-		this.jinjava = new Jinjava();
 
 		this.prepare();
 	}
