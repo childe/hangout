@@ -13,7 +13,7 @@ public class Rename extends BaseFilter {
 	private Map<String, String> fields;
 
 	protected void prepare() {
-		this.fields = (Map<String, String>) config.get("fields");
+		this.fields = (Map<String, String>) config;
 	};
 
 	@Override

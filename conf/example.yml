@@ -25,25 +25,25 @@ filters:
         formats:
             - 'ISO8601'
 
+    #- Replace:
+        #src: user
+        #value: 'I am {{event.user}} {{event["@timestamp"]|dateformat("YYYY.MM.dd HH:mm:ss.SSS","Asia/Shanghai")}}'
     - Lowercase:
-        src: user
+        fields: ['user']
     - Add:
-        target: me
-        value: 'I am {{event.user}} {{event["@timestamp"]|dateformat("YYYY.MM.dd HH:mm:ss.SSS","Asia/Shanghai")}}'
+        me: 'I am {{event.user}} {{event["@timestamp"]|dateformat("YYYY.MM.dd HH:mm:ss.SSS","Asia/Shanghai")}}'
     - Remove:
-        target:
+        fields:
           - logtime
     - Trim:
-        target:
+        fields:
           - user
     - Rename:
-        fields:
-          me: he
-          user: she
+        me: he
+        user: she
     - Gsub:
-        fields:
-          she: ['c','CCC']
-          he: ['(^\w+)|(\w+$)','XXX']
+        she: ['c','CCC']
+        he: ['(^\w+)|(\w+$)','XXX']
 
 outputs:
     - Elasticsearch:
