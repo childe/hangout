@@ -18,12 +18,45 @@ filters:
     - Grok:
         src: message
         match:
-          - '(?<logtime>\S+) (?<local_user>\w+)'
-          - '- (?<user>\w+)'
+          - '(?<logtime>\S+) (?<user> \w+ )'
+          - '-(?<user2>\w+)'
     - Date:
         src: logtime
         formats:
             - 'ISO8601'
 
+    - Lowercase:
+        src: user
+    - Add:
+        target: me
+        value: 'I am {{event.user}} {{event["@timestamp"]|dateformat("YYYY.MM.dd HH:mm:ss.SSS","Asia/Shanghai")}}'
+    - Remove:
+        target:
+          - logtime
+    - Trim:
+        target:
+          - user
+    - Rename:
+        fields:
+          me: he
+          user: she
+    - Gsub:
+        fields:
+          she: ['c','CCC']
+          he: ['(^\w+)|(\w+$)','XXX']
+
 outputs:
+    - Elasticsearch:
+        cluster: opsdev
+        hosts:
+          - 192.168.1.200
+        index: hangout-{{event["@timestamp"]|dateformat("YYYY.MM.dd")}}
+        index_type: logs # default logs
+        bulk_actions: 20000 #default 20000
+        bulk_size: 15 # default 15 MB
+        flush_interval: 10 # default 10 seconds
+        concurrent_requests: 1 # default 1
+    - Kafka:
+        broker_list: 192.168.81.208:9092
+        topic: test2
     - Stdout: {}
