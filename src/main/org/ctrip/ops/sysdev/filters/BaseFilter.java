@@ -51,7 +51,8 @@ public class BaseFilter implements Runnable {
 				boolean succuess = true;
 				if (this.IF != null) {
 					for (String c : this.IF) {
-						if (this.jinjava.render(c, event).equals("false")) {
+						if (this.jinjava.render(c, event = event).equals(
+								"false")) {
 							succuess = false;
 							break;
 						}
@@ -79,12 +80,23 @@ public class BaseFilter implements Runnable {
 	public static void main(String[] args) {
 		Jinjava jinjava = new Jinjava();
 		long s = System.currentTimeMillis();
-		Map<String, Object> context = new HashMap();
+		final Map<String, Object> context = new HashMap();
 		context.put("message", "Ja-red");
+		context.put("@timestamp", 1442281327000L);
+
+		Map event = new HashMap() {
+			{
+				put("event", context);
+			}
+		};
 
 		for (int i = 0; i < 10000; i++) {
 			jinjava.render("{{\"-\" in message}}", context);
 		}
 		System.out.println(System.currentTimeMillis() - s);
+
+		System.out.println(jinjava.render(
+				"{{event[\"@timestamp\"]|datetimeformat(\"%Y.%m\")}}",
+				event = context));
 	}
 }
