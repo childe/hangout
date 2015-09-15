@@ -23,6 +23,8 @@ public class Grok extends BaseFilter {
 	private String src;
 	private List<Tuple2> matches;
 
+	private ArrayList<String> removeFields;
+
 	public Grok(Map config, ArrayBlockingQueue preQueue) {
 		super(config, preQueue);
 	}
@@ -38,6 +40,9 @@ public class Grok extends BaseFilter {
 			matches.add(new Tuple2(regex, this
 					.getNamedGroupCandidates(matchString)));
 		}
+
+		this.removeFields = (ArrayList<String>) this.config
+				.get("remove_fields");
 
 		if (this.config.containsKey("src")) {
 			this.src = (String) this.config.get("src");
@@ -111,6 +116,10 @@ public class Grok extends BaseFilter {
 						&& ((ArrayList) tags).indexOf(this.tagOnFailure) == -1) {
 					((ArrayList) tags).add(this.tagOnFailure);
 				}
+			}
+		} else if (this.removeFields != null) {
+			for (String f : this.removeFields) {
+				event.remove(f);
 			}
 		}
 	};

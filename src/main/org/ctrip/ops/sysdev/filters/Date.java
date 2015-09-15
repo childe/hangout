@@ -23,12 +23,16 @@ public class Date extends BaseFilter {
 	private boolean addYear;
 	private List<DateParser> parsers;
 
+	private ArrayList<String> removeFields;
+
 	public Date(Map config, ArrayBlockingQueue preQueue) {
 		super(config, preQueue);
 	}
 
 	@SuppressWarnings("unchecked")
 	protected void prepare() {
+		this.removeFields = (ArrayList<String>) this.config
+				.get("remove_fields");
 
 		if (config.containsKey("src")) {
 			this.src = (String) config.get("src");
@@ -102,6 +106,10 @@ public class Date extends BaseFilter {
 						&& ((ArrayList) tags).indexOf(this.tagOnFailure) == -1) {
 					((ArrayList) tags).add(this.tagOnFailure);
 				}
+			}
+		} else if (this.removeFields != null) {
+			for (String f : this.removeFields) {
+				event.remove(f);
 			}
 		}
 	};

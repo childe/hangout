@@ -20,10 +20,12 @@ filters:
         match:
           - '(?<logtime>\S+) (?<user> \w+ )'
           - '-(?<user2>\w+)'
+        remove_fields: ['message']
     - Date:
         src: logtime
         formats:
             - 'ISO8601'
+        remove_fields: ['logtime']
 
     #- Replace:
         #src: user
