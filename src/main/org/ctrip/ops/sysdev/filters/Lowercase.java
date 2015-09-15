@@ -3,23 +3,21 @@ package org.ctrip.ops.sysdev.filters;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import com.hubspot.jinjava.Jinjava;
-
 public class Lowercase extends BaseFilter {
 	public Lowercase(Map config, ArrayBlockingQueue inputQueue) {
 		super(config, inputQueue);
 	}
 
-	private String src;
+	private String fields;
 
 	protected void prepare() {
-		this.src = (String) config.get("src");
+		this.fields = (String) config.get("fields");
 	};
 
 	@Override
 	protected void filter(Map event) {
-		if (event.containsKey(this.src)) {
-			event.put(this.src, ((String)event.get(src)).toLowerCase());
+		if (event.containsKey(this.fields)) {
+			event.put(this.fields, ((String) event.get(fields)).toLowerCase());
 		}
 	}
 }

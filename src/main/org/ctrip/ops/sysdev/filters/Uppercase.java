@@ -3,8 +3,6 @@ package org.ctrip.ops.sysdev.filters;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import com.hubspot.jinjava.Jinjava;
-
 public class Uppercase extends BaseFilter {
 	public Uppercase(Map config, ArrayBlockingQueue inputQueue) {
 		super(config, inputQueue);
@@ -19,7 +17,7 @@ public class Uppercase extends BaseFilter {
 	@Override
 	protected void filter(Map event) {
 		if (event.containsKey(this.src)) {
-			event.put(this.src, ((String)event.get(src)).toUpperCase());
+			event.put(this.src, ((String) event.get(src)).toUpperCase());
 		}
 	}
 }

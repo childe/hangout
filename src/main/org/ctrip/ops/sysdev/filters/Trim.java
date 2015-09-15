@@ -1,28 +1,23 @@
 package org.ctrip.ops.sysdev.filters;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
-
-import org.ctrip.ops.sysdev.utils.jinfilter.JinManager;
-
-import com.hubspot.jinjava.Jinjava;
 
 public class Trim extends BaseFilter {
 	public Trim(Map config, ArrayBlockingQueue inputQueue) {
 		super(config, inputQueue);
 	}
 
-	private ArrayList<String> target;
+	private ArrayList<String> fields;
 
 	protected void prepare() {
-		this.target = (ArrayList<String>) config.get("target");
+		this.fields = (ArrayList<String>) config.get("fields");
 	};
 
 	@Override
 	protected void filter(final Map event) {
-		for (String field : target) {
+		for (String field : fields) {
 			if (event.containsKey(field)) {
 				event.put(field, ((String) event.remove(field)).trim());
 			}

@@ -9,15 +9,15 @@ public class Remove extends BaseFilter {
 		super(config, inputQueue);
 	}
 
-	private ArrayList<String> target;
+	private ArrayList<String> fields;
 
 	protected void prepare() {
-		this.target = (ArrayList<String>) config.get("target");
+		this.fields = (ArrayList<String>) config.get("fields");
 	};
 
 	@Override
 	protected void filter(final Map event) {
-		for (String t : this.target) {
+		for (String t : this.fields) {
 			event.remove(t);
 		}
 	}

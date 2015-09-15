@@ -1,33 +1,36 @@
 package org.ctrip.ops.sysdev.filters;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ArrayBlockingQueue;
-
-import org.ctrip.ops.sysdev.utils.jinfilter.JinManager;
-
-import com.hubspot.jinjava.Jinjava;
 
 public class Add extends BaseFilter {
 	public Add(Map config, ArrayBlockingQueue inputQueue) {
 		super(config, inputQueue);
 	}
 
-	private String target;
-	private String value;
+	private Map<String, String> fields;
 
 	protected void prepare() {
-		this.target = (String) config.get("target");
-		this.value = (String) config.get("value");
+		this.fields = (Map<String, String>) config.get("fields");
 	};
 
 	@Override
 	protected void filter(final Map event) {
-		event.put(this.target, jinjava.render(this.value, new HashMap() {
-			{
-				put("event", event);
-			}
-		}));
+		Iterator<Entry<String, String>> it = fields.entrySet().iterator();
+		while (it.hasNext()) {
+			Map.Entry<String, String> entry = it.next();
+
+			String field = entry.getKey();
+			String value = entry.getValue();
+			event.put(field, jinjava.render(value, new HashMap() {
+				{
+					put("event", event);
+				}
+			}));
+		}
 
 	}
 }

@@ -4,10 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import org.ctrip.ops.sysdev.utils.jinfilter.JinManager;
-
-import com.hubspot.jinjava.Jinjava;
-
 public class Replace extends BaseFilter {
 	public Replace(Map config, ArrayBlockingQueue inputQueue) {
 		super(config, inputQueue);
@@ -24,7 +20,11 @@ public class Replace extends BaseFilter {
 	@Override
 	protected void filter(final Map event) {
 		if (event.containsKey(this.src)) {
-			event.put(this.src, jinjava.render(this.value, new HashMap(){{put("event",event);}}));
+			event.put(this.src, jinjava.render(this.value, new HashMap() {
+				{
+					put("event", event);
+				}
+			}));
 		}
 	}
 }
