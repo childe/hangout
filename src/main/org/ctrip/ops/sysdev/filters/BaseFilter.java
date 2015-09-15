@@ -59,11 +59,10 @@ public class BaseFilter implements Runnable {
 						}
 					}
 				}
-				if (succuess == false) {
-					continue;
+				if (succuess == true) {
+					this.filter(event);
 				}
 
-				this.filter(event);
 				try {
 					this.outputQueue.put(event);
 				} catch (InterruptedException e) {
@@ -120,7 +119,9 @@ public class BaseFilter implements Runnable {
 		System.out.println(jinjava.render("message is: {{\"@timestamp\"}}",
 				context));
 
-		System.out.println(jinjava.render("{% set names = message|split('-', 4) %}{{names[0]}}",
-				context));
+		System.out
+				.println(jinjava.render(
+						"{% set names = message|split('-', 4) %}{{names[0]}}",
+						context));
 	}
 }
