@@ -1,7 +1,10 @@
 package org.ctrip.ops.sysdev.filters;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
+
+import org.ctrip.ops.sysdev.utils.jinfilter.JinManager;
 
 import com.hubspot.jinjava.Jinjava;
 
@@ -12,18 +15,16 @@ public class Replace extends BaseFilter {
 
 	private String src;
 	private String value;
-	private Jinjava jinjava;
 
 	protected void prepare() {
 		this.src = (String) config.get("src");
 		this.value = (String) config.get("value");
-		this.jinjava = new Jinjava();
 	};
 
 	@Override
-	protected void filter(Map event) {
+	protected void filter(final Map event) {
 		if (event.containsKey(this.src)) {
-			event.put(this.src, jinjava.render(this.value, event));
+			event.put(this.src, jinjava.render(this.value, new HashMap(){{put("event",event);}}));
 		}
 	}
 }

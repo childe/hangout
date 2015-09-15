@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import org.apache.log4j.Logger;
+import org.ctrip.ops.sysdev.utils.jinfilter.JinManager;
 
 import com.hubspot.jinjava.Jinjava;
 
@@ -19,12 +20,11 @@ public class BaseFilter implements Runnable {
 	protected List<String> IF;
 	protected ArrayBlockingQueue inputQueue;
 	protected ArrayBlockingQueue outputQueue;
-	protected Jinjava jinjava;
+	protected Jinjava jinjava = JinManager.jinjava;
 
 	public BaseFilter(Map config, ArrayBlockingQueue inputQueue) {
 		this.config = config;
 		this.IF = (List<String>) this.config.get("if");
-		this.jinjava = new Jinjava();
 
 		this.inputQueue = inputQueue;
 
@@ -103,30 +103,21 @@ public class BaseFilter implements Runnable {
 		System.out.println(System.currentTimeMillis() - s);
 
 		System.out.println(jinjava.render(
-				"{{event[\"@timestamp\"]|datetimeformat(\"%Y.%m\")}}",
-				event = context));
-		
+				"{{\"-\" in message && \"X\" in message}}", context));
+
 		System.out.println(jinjava.render(
-				"{{\"-\" in message && \"X\" in message}}",
-				event = context));
-		
-		System.out.println(jinjava.render(
-				"{{\"-\" in message || \"X\" in message}}",
-				event = context));
-		
-		System.out.println(jinjava.render(
-				"{{\"Ja-red\" == message}}",
-				event = context));
-		
-		System.out.println(jinjava.render(
-				"{{\"Ja-red\" != message}}",
-				event = context));
-		
-		System.out.println(jinjava.render(
-				"{{!message}}",
-				event = context));
-		System.out.println(jinjava.render(
-				"{{!name}}",
-				event = context));
+				"{{\"-\" in message || \"X\" in message}}", context));
+
+		System.out.println(jinjava.render("{{\"Ja-red\" == message}}",
+				context));
+
+		System.out.println(jinjava.render("{{\"Ja-red\" != message}}",
+				context));
+
+		System.out.println(jinjava.render("{{!message}}", context));
+		System.out.println(jinjava.render("{{!name}}", context));
+
+		System.out
+				.println(jinjava.render("message is: {{\"@timestamp\"}}", context));
 	}
 }
