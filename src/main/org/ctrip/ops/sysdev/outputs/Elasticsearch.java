@@ -131,10 +131,9 @@ public class Elasticsearch extends BaseOutput {
 
 	@Override
 	public void emit(Map event) {
-		String _index = jinjava.render(index, event);
-		String _type = jinjava.render(indexType, event);
+		String _index = jinjava.render(index, event = event);
 
-		IndexRequest indexRequest = new IndexRequest(_index, _type)
+		IndexRequest indexRequest = new IndexRequest(_index, indexType)
 				.source(event);
 		this.bulkProcessor.add(indexRequest);
 	}
