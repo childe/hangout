@@ -94,7 +94,7 @@ public class Kafka extends BaseInput {
 				.createJavaConsumerConnector(new ConsumerConfig(props));
 
 		String codec = (String) this.config.get("codec");
-		if (codec.equalsIgnoreCase("plain")) {
+		if (codec != null && codec.equalsIgnoreCase("plain")) {
 			this.decoder = new PlainDecoder();
 		} else {
 			this.decoder = new JsonDecoder();
