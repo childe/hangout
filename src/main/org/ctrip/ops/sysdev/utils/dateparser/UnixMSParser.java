@@ -7,7 +7,7 @@ public class UnixMSParser implements DateParser {
 	@Override
 	public DateTime parse(String input) {
 		// TODO Auto-generated method stub
-		return new DateTime(Double.parseDouble(input));
+		return new DateTime(Long.parseLong(input));
 	}
 
 	public static void main(String[] args) {
