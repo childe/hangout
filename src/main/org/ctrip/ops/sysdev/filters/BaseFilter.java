@@ -108,16 +108,19 @@ public class BaseFilter implements Runnable {
 		System.out.println(jinjava.render(
 				"{{\"-\" in message || \"X\" in message}}", context));
 
-		System.out.println(jinjava.render("{{\"Ja-red\" == message}}",
-				context));
+		System.out
+				.println(jinjava.render("{{\"Ja-red\" == message}}", context));
 
-		System.out.println(jinjava.render("{{\"Ja-red\" != message}}",
-				context));
+		System.out
+				.println(jinjava.render("{{\"Ja-red\" != message}}", context));
 
 		System.out.println(jinjava.render("{{!message}}", context));
 		System.out.println(jinjava.render("{{!name}}", context));
 
-		System.out
-				.println(jinjava.render("message is: {{\"@timestamp\"}}", context));
+		System.out.println(jinjava.render("message is: {{\"@timestamp\"}}",
+				context));
+
+		System.out.println(jinjava.render("{% set names = message|split('-', 4) %}{{names[0]}}",
+				context));
 	}
 }
