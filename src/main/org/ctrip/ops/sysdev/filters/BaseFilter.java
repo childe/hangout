@@ -1,5 +1,6 @@
 package org.ctrip.ops.sysdev.filters;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,6 +8,9 @@ import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import org.apache.log4j.Logger;
+import org.ctrip.ops.sysdev.render.FreeMarkerRender;
+import org.ctrip.ops.sysdev.render.JinjavaRender;
+import org.ctrip.ops.sysdev.render.TemplateRender;
 import org.ctrip.ops.sysdev.utils.jinfilter.JinManager;
 
 import com.hubspot.jinjava.Jinjava;
@@ -17,14 +21,27 @@ public class BaseFilter implements Runnable {
 			.getName());
 
 	protected Map config;
-	protected List<String> IF;
+	protected List<TemplateRender> IF;
 	protected ArrayBlockingQueue inputQueue;
 	protected ArrayBlockingQueue outputQueue;
-	protected Jinjava jinjava = JinManager.jinjava;
+	protected TemplateRender render;
 
 	public BaseFilter(Map config, ArrayBlockingQueue inputQueue) {
 		this.config = config;
-		this.IF = (List<String>) this.config.get("if");
+
+		if (this.config.containsKey("if")) {
+			IF = new ArrayList<TemplateRender>();
+			for (String c : (List<String>) this.config.get("if")) {
+				try {
+					IF.add(new FreeMarkerRender(c));
+				} catch (IOException e) {
+					logger.fatal(e.getMessage());
+					System.exit(1);
+				}
+			}
+		} else {
+			IF = null;
+		}
 
 		this.inputQueue = inputQueue;
 
@@ -51,9 +68,8 @@ public class BaseFilter implements Runnable {
 
 				boolean succuess = true;
 				if (this.IF != null) {
-					for (String c : this.IF) {
-						if (this.jinjava.render(c, event = event).equals(
-								"false")) {
+					for (TemplateRender render : this.IF) {
+						if (!render.render(event).equals("true")) {
 							succuess = false;
 							break;
 						}
@@ -78,50 +94,6 @@ public class BaseFilter implements Runnable {
 	}
 
 	public static void main(String[] args) {
-		Jinjava jinjava = new Jinjava();
-		long s = System.currentTimeMillis();
-		ArrayList a = new ArrayList();
-		final Map<String, Object> context = new HashMap();
-		context.put("message", "Ja-red");
-		context.put("@timestamp", 1442281327000L);
-		context.put("array", new ArrayList() {
-			{
-				add("123");
-			}
-		});
 
-		Map event = new HashMap() {
-			{
-				put("event", context);
-			}
-		};
-
-		for (int i = 0; i < 10000; i++) {
-			jinjava.render("{{\"-\" in message}}", context);
-		}
-		System.out.println(System.currentTimeMillis() - s);
-
-		System.out.println(jinjava.render(
-				"{{\"-\" in message && \"X\" in message}}", context));
-
-		System.out.println(jinjava.render(
-				"{{\"-\" in message || \"X\" in message}}", context));
-
-		System.out
-				.println(jinjava.render("{{\"Ja-red\" == message}}", context));
-
-		System.out
-				.println(jinjava.render("{{\"Ja-red\" != message}}", context));
-
-		System.out.println(jinjava.render("{{!message}}", context));
-		System.out.println(jinjava.render("{{!name}}", context));
-
-		System.out.println(jinjava.render("message is: {{\"@timestamp\"}}",
-				context));
-
-		System.out
-				.println(jinjava.render(
-						"{% set names = message|split('-', 4) %}{{names[0]}}",
-						context));
 	}
 }

@@ -1,21 +1,39 @@
 package org.ctrip.ops.sysdev.outputs;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.ctrip.ops.sysdev.utils.jinfilter.JinManager;
-
-import com.hubspot.jinjava.Jinjava;
+import org.apache.log4j.Logger;
+import org.ctrip.ops.sysdev.filters.BaseFilter;
+import org.ctrip.ops.sysdev.render.FreeMarkerRender;
+import org.ctrip.ops.sysdev.render.JinjavaRender;
+import org.ctrip.ops.sysdev.render.TemplateRender;
 
 public class BaseOutput {
+	private static final Logger logger = Logger.getLogger(BaseOutput.class
+			.getName());
+
 	protected Map config;
-	protected List<String> IF;
-	protected Jinjava jinjava = JinManager.jinjava;
+	protected List<TemplateRender> IF;
 
 	public BaseOutput(Map config) {
 		this.config = config;
 
-		this.IF = (List<String>) this.config.get("if");
+		if (this.config.containsKey("if")) {
+			IF = new ArrayList<TemplateRender>();
+			for (String c : (List<String>) this.config.get("if")) {
+				try {
+					IF.add(new FreeMarkerRender(c));
+				} catch (IOException e) {
+					logger.fatal(e.getMessage());
+					System.exit(1);
+				}
+			}
+		} else {
+			IF = null;
+		}
 
 		this.prepare();
 	}
@@ -25,8 +43,8 @@ public class BaseOutput {
 
 	public void process(Map event) {
 		if (this.IF != null) {
-			for (String c : this.IF) {
-				if (this.jinjava.render(c, event).equals("false")) {
+			for (TemplateRender render : this.IF) {
+				if (!render.render(event).equals("true")) {
 					continue;
 				}
 			}

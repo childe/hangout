@@ -1,10 +1,17 @@
 package org.ctrip.ops.sysdev.filters;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import org.apache.log4j.Logger;
+import org.ctrip.ops.sysdev.render.FreeMarkerRender;
+
 public class Replace extends BaseFilter {
+	private static final Logger logger = Logger.getLogger(Replace.class
+			.getName());
+
 	public Replace(Map config, ArrayBlockingQueue inputQueue) {
 		super(config, inputQueue);
 	}
@@ -15,12 +22,19 @@ public class Replace extends BaseFilter {
 	protected void prepare() {
 		this.src = (String) config.get("src");
 		this.value = (String) config.get("value");
+
+		try {
+			this.render = new FreeMarkerRender(this.value);
+		} catch (IOException e) {
+			logger.fatal(e.getMessage());
+			System.exit(1);
+		}
 	};
 
 	@Override
 	protected void filter(final Map event) {
 		if (event.containsKey(this.src)) {
-			event.put(this.src, jinjava.render(this.value, new HashMap() {
+			event.put(this.src, render.render(this.value, new HashMap() {
 				{
 					put("event", event);
 				}

@@ -1,11 +1,14 @@
 package org.ctrip.ops.sysdev.outputs;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.ctrip.ops.sysdev.render.FreeMarkerRender;
+import org.ctrip.ops.sysdev.render.TemplateRender;
 import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkProcessor;
@@ -28,16 +31,31 @@ public class Elasticsearch extends BaseOutput {
 	private String indexType;
 	private BulkProcessor bulkProcessor;
 	private TransportClient esclient;
+	private TemplateRender indexRender;
+	private TemplateRender indexTypeRender;
 
 	public Elasticsearch(Map config) {
 		super(config);
 	}
 
 	protected void prepare() {
-		this.index = (String) config.get("index");
+
+		try {
+			this.indexRender = new FreeMarkerRender(
+					(String) config.get("index"));
+		} catch (IOException e) {
+			logger.fatal(e.getMessage());
+			System.exit(1);
+		}
 
 		if (config.containsKey("index_type")) {
-			this.indexType = (String) config.get("index_type");
+			try {
+				this.indexTypeRender = new FreeMarkerRender(
+						(String) config.get("index_type"));
+			} catch (IOException e) {
+				logger.fatal(e.getMessage());
+				System.exit(1);
+			}
 		} else {
 			this.indexType = "logs";
 		}
@@ -132,11 +150,8 @@ public class Elasticsearch extends BaseOutput {
 
 	@Override
 	public void emit(final Map event) {
-		String _index = jinjava.render(index, new HashMap() {
-			{
-				put("event", event);
-			}
-		});
+		String _index = indexRender.render(event);
+		String _indexType = indexTypeRender.render(event);
 
 		IndexRequest indexRequest = new IndexRequest(_index, indexType)
 				.source(event);

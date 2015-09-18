@@ -68,7 +68,13 @@ public class Main {
 					BaseFilter filterInstance = (BaseFilter) ctor.newInstance(
 							filterConfig, inputQueue);
 					inputQueue = filterInstance.getOutputMQ();
-					new Thread(filterInstance).start();
+					int threads = 1;
+					if (filterConfig.containsKey("threads")) {
+						threads = (int) filterConfig.get("threads");
+					}
+					for (int i = 0; i < threads; i++) {
+						new Thread(filterInstance).start();
+					}
 				}
 			}
 		}
@@ -102,5 +108,4 @@ public class Main {
 		}
 
 	}
-
 }

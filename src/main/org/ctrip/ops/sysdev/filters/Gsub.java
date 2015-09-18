@@ -14,7 +14,7 @@ public class Gsub extends BaseFilter {
 	private Map<String, List<String>> fields;
 
 	protected void prepare() {
-		this.fields = (Map<String, List<String>>) config;
+		this.fields = (Map<String, List<String>>) config.get("fields");
 	};
 
 	@Override

@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.jcodings.specific.UTF8Encoding;
@@ -15,8 +14,6 @@ import org.joni.NameEntry;
 import org.joni.Option;
 import org.joni.Regex;
 import org.joni.Region;
-
-import scala.Tuple2;
 
 public class Grok extends BaseFilter {
 	private static final Logger logger = Logger.getLogger(Grok.class.getName());
@@ -57,7 +54,6 @@ public class Grok extends BaseFilter {
 			this.tagOnFailure = "grokfail";
 		}
 	};
-
 
 	@Override
 	protected void filter(Map event) {
