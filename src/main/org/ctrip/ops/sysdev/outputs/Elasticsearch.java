@@ -42,7 +42,7 @@ public class Elasticsearch extends BaseOutput {
 
 		try {
 			this.indexRender = new FreeMarkerRender(
-					(String) config.get("index"));
+					(String) config.get("index"), (String) config.get("index"));
 		} catch (IOException e) {
 			logger.fatal(e.getMessage());
 			System.exit(1);
@@ -51,6 +51,7 @@ public class Elasticsearch extends BaseOutput {
 		if (config.containsKey("index_type")) {
 			try {
 				this.indexTypeRender = new FreeMarkerRender(
+						(String) config.get("index_type"),
 						(String) config.get("index_type"));
 			} catch (IOException e) {
 				logger.fatal(e.getMessage());

@@ -25,7 +25,7 @@ public class BaseOutput {
 			IF = new ArrayList<TemplateRender>();
 			for (String c : (List<String>) this.config.get("if")) {
 				try {
-					IF.add(new FreeMarkerRender(c));
+					IF.add(new FreeMarkerRender(c,c));
 				} catch (IOException e) {
 					logger.fatal(e.getMessage());
 					System.exit(1);

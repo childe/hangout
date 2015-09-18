@@ -24,7 +24,7 @@ public class Replace extends BaseFilter {
 		this.value = (String) config.get("value");
 
 		try {
-			this.render = new FreeMarkerRender(this.value);
+			this.render = new FreeMarkerRender(value,value);
 		} catch (IOException e) {
 			logger.fatal(e.getMessage());
 			System.exit(1);

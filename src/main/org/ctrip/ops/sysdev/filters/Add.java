@@ -34,7 +34,7 @@ public class Add extends BaseFilter {
 			String value = entry.getValue();
 
 			try {
-				this.f.put(field, new FreeMarkerRender(value));
+				this.f.put(field, new FreeMarkerRender(value,value));
 			} catch (IOException e) {
 				logger.fatal(e.getMessage());
 				System.exit(1);
