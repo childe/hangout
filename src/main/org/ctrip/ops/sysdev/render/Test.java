@@ -63,7 +63,6 @@ public class Test {
 				.println(jinjava.render(
 						"{% set names = message|split('-', 4) %}{{names[0]}}",
 						context));
-	
 
 		// jinjava
 		s = System.currentTimeMillis();
@@ -93,10 +92,7 @@ public class Test {
 		System.out.println("10000 freemarker: ");
 		System.out.println(System.currentTimeMillis() - s);
 
-		
-		t = new Template("",
-				"i am ${name}",
-				cfg);
+		t = new Template("", "i am ${name}", cfg);
 		sw = new StringWriter();
 		t.process(context, sw);
 		try {
@@ -106,12 +102,31 @@ public class Test {
 			e.printStackTrace();
 		}
 		System.out.println(sw.toString());
-		
-		t = new Template("",
-				"i am ${testabcd}",
+
+		t = new Template("", "i am ${testabcd}", cfg);
+		sw = new StringWriter();
+		try {
+			t.process(context, sw);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			sw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println(sw.toString());
+
+		t = new Template(
+				"",
+				"<#if testabcd??>has testabcd field<#else>NOT has testabcdfield</#if>",
 				cfg);
 		sw = new StringWriter();
-		t.process(context, sw);
+		try {
+			t.process(context, sw);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		try {
 			sw.close();
 		} catch (IOException e) {
