@@ -33,7 +33,7 @@ public class BaseFilter implements Runnable {
 			IF = new ArrayList<TemplateRender>();
 			for (String c : (List<String>) this.config.get("if")) {
 				try {
-					IF.add(new FreeMarkerRender(c,c));
+					IF.add(new FreeMarkerRender(c, c));
 				} catch (IOException e) {
 					logger.fatal(e.getMessage());
 					System.exit(1);
@@ -62,38 +62,33 @@ public class BaseFilter implements Runnable {
 	};
 
 	public void run() {
-		while (true) {
-			Map event = (Map) this.inputQueue.poll();
-			if (event != null) {
-
-				boolean succuess = true;
-				if (this.IF != null) {
-					for (TemplateRender render : this.IF) {
-						if (!render.render(event).equals("true")) {
-							succuess = false;
-							break;
+		try {
+			while (true) {
+				Map event = (Map) this.inputQueue.take();
+				if (event != null) {
+					boolean succuess = true;
+					if (this.IF != null) {
+						for (TemplateRender render : this.IF) {
+							if (!render.render(event).equals("true")) {
+								succuess = false;
+								break;
+							}
 						}
 					}
-				}
-				if (succuess == true) {
-					this.filter(event);
-				}
+					if (succuess == true) {
+						this.filter(event);
+					}
 
-				try {
 					this.outputQueue.put(event);
-				} catch (InterruptedException e) {
-					logger.warn("put event to outMQ failed");
-					logger.trace(e.getMessage());
 				}
 			}
+		} catch (InterruptedException e) {
+			logger.warn("put event to outMQ failed");
+			logger.trace(e.getMessage());
 		}
 	}
 
 	public ArrayBlockingQueue getOutputMQ() {
 		return this.outputQueue;
-	}
-
-	public static void main(String[] args) {
-
 	}
 }

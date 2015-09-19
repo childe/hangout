@@ -97,14 +97,17 @@ public class Main {
 				os.add((BaseOutput) ctor.newInstance(outputConfig));
 			}
 		}
-
-		while (true) {
-			Map event = (Map) inputQueue.poll();
-			if (event != null) {
-				for (BaseOutput o : os) {
-					o.process(event);
+		try {
+			while (true) {
+				Map event = (Map) inputQueue.take();
+				if (event != null) {
+					for (BaseOutput o : os) {
+						o.process(event);
+					}
 				}
+
 			}
+		} catch (InterruptedException e) {
 		}
 
 	}
