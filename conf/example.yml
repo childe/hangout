@@ -6,6 +6,9 @@ inputs:
         threads: 2
         codec: plain
         queueSize: 100
+        session_timeout: "4000"
+        sync_time: "2000"
+        commit_interval: "1000"
     - Kafka:
         topic: web
         groupID: hangout
@@ -16,24 +19,29 @@ inputs:
 
 filters:
     - Grok:
+        threads: 4
         src: message
         match:
-          - '(?<logtime>\S+) (?<user> \w+ )'
-          - '-(?<user2>\w+)'
+          - '(?<logtime>\S+) (?<user>.+) (-|(?<level>\w+))'
         remove_fields: ['message']
+    - Add:
+        threads: 4
+        fields:
+            test: 'abcd'
+        if:
+          - '<#if message??>true</#if>'
+          - '<#if message?contains("liu")>true<#elseif message?contains("warn")>true</#if>'
     - Date:
         src: logtime
         formats:
             - 'ISO8601'
         remove_fields: ['logtime']
 
-    #- Replace:
-        #src: user
-        #value: 'I am {{event.user}} {{event["@timestamp"]|dateformat("YYYY.MM.dd HH:mm:ss.SSS","Asia/Shanghai")}}'
     - Lowercase:
         fields: ['user']
     - Add:
-        me: 'I am {{event.user}} {{event["@timestamp"]|dateformat("YYYY.MM.dd HH:mm:ss.SSS","Asia/Shanghai")}}'
+        fields:
+          me: 'I am ${user}'
     - Remove:
         fields:
           - logtime
@@ -41,24 +49,27 @@ filters:
         fields:
           - user
     - Rename:
-        me: he
-        user: she
+        fields:
+          me: he
+          user: she
     - Gsub:
-        she: ['c','CCC']
-        he: ['(^\w+)|(\w+$)','XXX']
+        threads: 4
+        fields:
+          she: ['c','CCC']
+          he: ['(^\w+)|(\w+$)','XXX']
 
 outputs:
     - Elasticsearch:
-        cluster: opsdev
+        cluster: hangoutcluster
         hosts:
           - 192.168.1.200
-        index: hangout-{{event["@timestamp"]|dateformat("YYYY.MM.dd")}}
+        index: 'hangout-${@timestamp.toString("YYYY.MM.dd")}'
         index_type: logs # default logs
         bulk_actions: 20000 #default 20000
         bulk_size: 15 # default 15 MB
         flush_interval: 10 # default 10 seconds
         concurrent_requests: 1 # default 1
     - Kafka:
-        broker_list: 192.168.81.208:9092
+        broker_list: 192.168.1.200:9092
         topic: test2
     - Stdout: {}
