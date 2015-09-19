@@ -134,6 +134,26 @@ public class Test {
 			e.printStackTrace();
 		}
 		System.out.println(sw.toString());
+		
+		
+		
+		t = new Template(
+				"",
+				"1234",
+				cfg);
+		sw = new StringWriter();
+		try {
+			t.process(context, sw);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			sw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println(sw.toString());
 	}
 
 }
