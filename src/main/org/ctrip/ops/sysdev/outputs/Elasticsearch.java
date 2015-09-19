@@ -133,7 +133,6 @@ public class Elasticsearch extends BaseOutput {
 					public void afterBulk(long arg0, BulkRequest arg1,
 							Throwable arg2) {
 						logger.error("bulk got exception");
-						arg2.printStackTrace();
 						logger.error(arg2.getLocalizedMessage());
 					}
 
@@ -154,7 +153,7 @@ public class Elasticsearch extends BaseOutput {
 		String _index = indexRender.render(event);
 		String _indexType = indexTypeRender.render(event);
 
-		IndexRequest indexRequest = new IndexRequest(_index, indexType)
+		IndexRequest indexRequest = new IndexRequest(_index, _indexType)
 				.source(event);
 		this.bulkProcessor.add(indexRequest);
 	}
