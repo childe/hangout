@@ -6,21 +6,103 @@ import org.ctrip.ops.sysdev.outputs.BaseOutput;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.DailyRollingFileAppender;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 import org.ctrip.ops.sysdev.configs.HangoutConfig;
 
 public class Main {
 	private static final Logger logger = Logger.getLogger(Main.class.getName());
 
+	public class Option {
+		String flag, opt;
+
+		public Option(String flag, String opt) {
+			this.flag = flag;
+			this.opt = opt;
+		}
+	}
+
 	public static void main(String[] args) throws Exception {
 
+		ArrayList<String> argsList = new ArrayList<String>();
+		HashMap<String, String> optsList = new HashMap<String, String>();
+		ArrayList<String> doubleOptsList = new ArrayList<String>();
+
+		for (int i = 0; i < args.length; i++) {
+			switch (args[i].charAt(0)) {
+			case '-':
+				if (args[i].length() < 2)
+					throw new IllegalArgumentException("Not a valid argument: "
+							+ args[i]);
+				if (args[i].charAt(1) == '-') {
+					if (args[i].length() < 3)
+						throw new IllegalArgumentException(
+								"Not a valid argument: " + args[i]);
+					// --opt
+					doubleOptsList.add(args[i].substring(2, args[i].length()));
+				} else {
+					if (args.length - 1 == i)
+						throw new IllegalArgumentException(
+								"Expected arg after: " + args[i]);
+					// -opt
+					optsList.put(args[i].substring(1, args[i].length()),
+							args[i + 1]);
+					i++;
+				}
+				break;
+			default:
+				// arg
+				argsList.add(args[i]);
+				break;
+			}
+		}
+
+		if (optsList.containsKey("l")) {
+			DailyRollingFileAppender fa = new DailyRollingFileAppender();
+			fa.setName("FileLogger");
+			fa.setFile(optsList.get("l"));
+			fa.setLayout(new PatternLayout("%d %-5p [%c{1}] %m%n"));
+			if (doubleOptsList.contains("vvvv")) {
+				fa.setThreshold(Level.TRACE);
+			} else if (doubleOptsList.contains("vv")) {
+				fa.setThreshold(Level.DEBUG);
+			} else if (doubleOptsList.contains("v")) {
+				fa.setThreshold(Level.INFO);
+			} else {
+				fa.setThreshold(Level.WARN);
+			}
+			fa.setAppend(true);
+			fa.activateOptions();
+			Logger.getRootLogger().addAppender(fa);
+		} else {
+			ConsoleAppender console = new ConsoleAppender();
+			String PATTERN = "%d [%p|%c|%C{1}] %m%n";
+			console.setLayout(new PatternLayout(PATTERN));
+			if (doubleOptsList.contains("vvvv")) {
+				console.setThreshold(Level.TRACE);
+			} else if (doubleOptsList.contains("vv")) {
+				console.setThreshold(Level.DEBUG);
+			} else if (doubleOptsList.contains("v")) {
+				console.setThreshold(Level.INFO);
+			} else {
+				console.setThreshold(Level.WARN);
+			}
+			console.activateOptions();
+			Logger.getRootLogger().addAppender(console);
+		}
+
 		// parse configure file
-		Map configs = HangoutConfig.parse(args[0]);
+		System.out.println(optsList.get("f"));
+		Map configs = HangoutConfig.parse(optsList.get("f"));
 		logger.debug(configs);
 
 		ArrayBlockingQueue inputQueue = new ArrayBlockingQueue(1000, false);
