@@ -101,7 +101,6 @@ public class Main {
 		}
 
 		// parse configure file
-		System.out.println(optsList.get("f"));
 		Map configs = HangoutConfig.parse(optsList.get("f"));
 		logger.debug(configs);
 
