@@ -6,7 +6,7 @@ public class UnixParser implements DateParser {
 
 	@Override
 	public DateTime parse(String input) {
-		return new DateTime(Double.parseDouble(input) * 1000);
+		return new DateTime((long) (Double.parseDouble(input) * 1000));
 	}
 
 	public static void main(String[] args) {
