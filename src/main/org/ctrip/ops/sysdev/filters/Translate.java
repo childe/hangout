@@ -28,32 +28,40 @@ public class Translate extends BaseFilter {
 	private String target;
 	private String source;
 	private String dictionaryPath;
-	private int refreshInterval = 300;
+	private int refreshInterval;
 	private long nextLoadTime;
-	private HashMap dictionary = null;
+	private HashMap dictionary;
 
 	private void loadDictionary() {
+		if (dictionaryPath == null) {
+			dictionary = null;
+			logger.warn("dictionary_path is null");
+			return;
+		}
 		Yaml yaml = new Yaml();
 		FileInputStream input;
 		try {
 			input = new FileInputStream(new File(dictionaryPath));
 			dictionary = (HashMap) yaml.load(input);
 		} catch (FileNotFoundException e) {
+			logger.error(dictionaryPath + " is not found");
 			logger.error(e.getMessage());
 			dictionary = null;
 		}
 	}
 
 	protected void prepare() {
-		String target = (String) config.get("target");
-		String source = (String) config.get("source");
+		target = (String) config.get("target");
+		source = (String) config.get("source");
 
 		dictionaryPath = (String) config.get("dictionary_path");
 
 		loadDictionary();
 
 		if (config.containsKey("refresh_interval")) {
-			this.refreshInterval = (int) config.get("refresh_interval");
+			this.refreshInterval = (int) config.get("refresh_interval") * 1000;
+		} else {
+			this.refreshInterval = 300 * 1000;
 		}
 		nextLoadTime = System.currentTimeMillis() + refreshInterval * 1000;
 	};
@@ -65,7 +73,7 @@ public class Translate extends BaseFilter {
 		}
 		if (System.currentTimeMillis() >= nextLoadTime) {
 			loadDictionary();
-			nextLoadTime += refreshInterval * 1000;
+			nextLoadTime += refreshInterval;
 		}
 		Object t = dictionary.get(event.get(source));
 		if (t != null) {
