@@ -115,7 +115,7 @@ public class Elasticsearch extends BaseOutput {
 						if (arg2.hasFailures()) {
 
 							logger.error("bulk failed");
-							logger.error(arg2.buildFailureMessage());
+							logger.trace(arg2.buildFailureMessage());
 
 							List<ActionRequest> requests = arg1.requests();
 							for (BulkItemResponse item : arg2.getItems()) {
