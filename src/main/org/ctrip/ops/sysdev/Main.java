@@ -104,7 +104,7 @@ public class Main {
 		Map configs = HangoutConfig.parse(optsList.get("f"));
 		logger.debug(configs);
 
-		ArrayBlockingQueue inputQueue = new ArrayBlockingQueue(1000, false);
+		ArrayBlockingQueue inputQueue = new ArrayBlockingQueue(100, false);
 
 		// for input in all_inputs
 		ArrayList<Map> inputs = (ArrayList<Map>) configs.get("inputs");

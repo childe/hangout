@@ -90,7 +90,7 @@ public class Elasticsearch extends BaseOutput {
 					Integer.parseInt(p)));
 		}
 
-		int bulkActions = 20000, bulkSize = 15, flushInterval = 10, concurrentRequests = 1;
+		int bulkActions = 20000, bulkSize = 15, flushInterval = 10, concurrentRequests = 0;
 		if (config.containsKey("bulk_actions")) {
 			bulkActions = (int) config.get("bulk_actions");
 		}
@@ -115,21 +115,21 @@ public class Elasticsearch extends BaseOutput {
 						// TODO Auto-generated method stub
 						if (arg2.hasFailures()) {
 
-							// logger.error("bulk failed");
-							// logger.error(arg2.buildFailureMessage().substring(
-							// 0, 1000));
-							//
-							// List<ActionRequest> requests = arg1.requests();
-							// for (BulkItemResponse item : arg2.getItems()) {
-							// if (item != null && item.getFailure() != null) {
-							// switch (item.getFailure().getStatus()) {
-							// case TOO_MANY_REQUESTS:
-							// case SERVICE_UNAVAILABLE:
-							// bulkProcessor.add(requests.get(item
-							// .getItemId()));
-							// }
-							// }
-							// }
+							logger.error("bulk failed");
+							logger.error(arg2.buildFailureMessage().substring(
+									0, 1000));
+
+							List<ActionRequest> requests = arg1.requests();
+							for (BulkItemResponse item : arg2.getItems()) {
+								if (item != null && item.getFailure() != null) {
+									switch (item.getFailure().getStatus()) {
+									case TOO_MANY_REQUESTS:
+									case SERVICE_UNAVAILABLE:
+										bulkProcessor.add(requests.get(item
+												.getItemId()));
+									}
+								}
+							}
 						}
 					}
 

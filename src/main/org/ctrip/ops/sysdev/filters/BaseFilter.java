@@ -45,7 +45,7 @@ public class BaseFilter implements Runnable {
 
 		this.inputQueue = inputQueue;
 
-		int queueSize = 1000;
+		int queueSize = 100;
 		if (this.config.containsKey("queueSize")) {
 			queueSize = (int) this.config.get("queueSize");
 		}
