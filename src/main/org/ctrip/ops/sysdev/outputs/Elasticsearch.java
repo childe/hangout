@@ -30,6 +30,7 @@ public class Elasticsearch extends BaseOutput {
 	private String index;
 	private String indexType;
 	private BulkProcessor bulkProcessor;
+	private BulkProcessor retryProcessor;
 	private TransportClient esclient;
 	private TemplateRender indexRender;
 	private TemplateRender indexTypeRender;
@@ -107,6 +108,52 @@ public class Elasticsearch extends BaseOutput {
 			concurrentRequests = (int) config.get("concurrent_requests");
 		}
 
+		retryProcessor = BulkProcessor
+				.builder(this.esclient, new BulkProcessor.Listener() {
+					@Override
+					public void afterBulk(long arg0, BulkRequest arg1,
+							BulkResponse arg2) {
+						// TODO Auto-generated method stub
+						if (arg2.hasFailures()) {
+
+							logger.error("retry bulk failed");
+							logger.error(arg2.buildFailureMessage().substring(
+									0, 1000));
+
+							List<ActionRequest> requests = arg1.requests();
+							for (BulkItemResponse item : arg2.getItems()) {
+								if (item != null && item.getFailure() != null) {
+									switch (item.getFailure().getStatus()) {
+									case TOO_MANY_REQUESTS:
+									case SERVICE_UNAVAILABLE:
+										retryProcessor.add(requests.get(item
+												.getItemId()));
+									}
+								}
+							}
+						}
+					}
+
+					@Override
+					public void afterBulk(long arg0, BulkRequest arg1,
+							Throwable arg2) {
+						logger.error("retry bulk got exception");
+						logger.error(arg2.getLocalizedMessage());
+						logger.error(arg2.getMessage());
+						arg2.printStackTrace();
+					}
+
+					@Override
+					public void beforeBulk(long arg0, BulkRequest arg1) {
+						logger.debug("bulk requestID: " + arg0);
+						logger.debug("numberOfActions: "
+								+ arg1.numberOfActions());
+					}
+				}).setBulkActions(bulkActions)
+				.setBulkSize(new ByteSizeValue(bulkSize, ByteSizeUnit.MB))
+				.setFlushInterval(TimeValue.timeValueSeconds(flushInterval))
+				.setConcurrentRequests(0).build();
+		
 		bulkProcessor = BulkProcessor
 				.builder(this.esclient, new BulkProcessor.Listener() {
 					@Override
@@ -125,7 +172,7 @@ public class Elasticsearch extends BaseOutput {
 									switch (item.getFailure().getStatus()) {
 									case TOO_MANY_REQUESTS:
 									case SERVICE_UNAVAILABLE:
-										bulkProcessor.add(requests.get(item
+										retryProcessor.add(requests.get(item
 												.getItemId()));
 									}
 								}
