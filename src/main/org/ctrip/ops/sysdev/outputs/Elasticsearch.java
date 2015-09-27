@@ -2,11 +2,11 @@ package org.ctrip.ops.sysdev.outputs;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.ctrip.ops.sysdev.render.Formatter;
 import org.ctrip.ops.sysdev.render.FreeMarkerRender;
 import org.ctrip.ops.sysdev.render.TemplateRender;
 import org.elasticsearch.action.ActionRequest;
@@ -47,6 +47,7 @@ public class Elasticsearch extends BaseOutput {
 			logger.fatal(e.getMessage());
 			System.exit(1);
 		}
+		this.index = (String) config.get("index");
 
 		if (config.containsKey("index_type")) {
 			try {
@@ -114,18 +115,21 @@ public class Elasticsearch extends BaseOutput {
 						// TODO Auto-generated method stub
 						if (arg2.hasFailures()) {
 
-							logger.error("bulk failed");
-							logger.trace(arg2.buildFailureMessage());
-
-							List<ActionRequest> requests = arg1.requests();
-							for (BulkItemResponse item : arg2.getItems()) {
-								switch (item.getFailure().getStatus()) {
-								case TOO_MANY_REQUESTS:
-								case SERVICE_UNAVAILABLE:
-									bulkProcessor.add(requests.get(item
-											.getItemId()));
-								}
-							}
+							// logger.error("bulk failed");
+							// logger.error(arg2.buildFailureMessage().substring(
+							// 0, 1000));
+							//
+							// List<ActionRequest> requests = arg1.requests();
+							// for (BulkItemResponse item : arg2.getItems()) {
+							// if (item != null && item.getFailure() != null) {
+							// switch (item.getFailure().getStatus()) {
+							// case TOO_MANY_REQUESTS:
+							// case SERVICE_UNAVAILABLE:
+							// bulkProcessor.add(requests.get(item
+							// .getItemId()));
+							// }
+							// }
+							// }
 						}
 					}
 
@@ -134,6 +138,8 @@ public class Elasticsearch extends BaseOutput {
 							Throwable arg2) {
 						logger.error("bulk got exception");
 						logger.error(arg2.getLocalizedMessage());
+						logger.error(arg2.getMessage());
+						arg2.printStackTrace();
 					}
 
 					@Override
@@ -150,7 +156,8 @@ public class Elasticsearch extends BaseOutput {
 
 	@Override
 	public void emit(final Map event) {
-		String _index = indexRender.render(event);
+		// String _index = indexRender.render(event);
+		String _index = Formatter.format(event, index);
 		String _indexType = indexTypeRender.render(event);
 
 		IndexRequest indexRequest = new IndexRequest(_index, _indexType)
