@@ -4,3 +4,4 @@
 conf/
 target
 Test.java
+build/
