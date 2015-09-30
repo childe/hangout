@@ -153,7 +153,7 @@ public class Elasticsearch extends BaseOutput {
 				.setBulkSize(new ByteSizeValue(bulkSize, ByteSizeUnit.MB))
 				.setFlushInterval(TimeValue.timeValueSeconds(flushInterval))
 				.setConcurrentRequests(0).build();
-		
+
 		bulkProcessor = BulkProcessor
 				.builder(this.esclient, new BulkProcessor.Listener() {
 					@Override
@@ -163,9 +163,12 @@ public class Elasticsearch extends BaseOutput {
 						if (arg2.hasFailures()) {
 
 							logger.error("bulk failed");
-							logger.error(arg2.buildFailureMessage().substring(
-									0, 1000));
-
+							String failureMessage = arg2.buildFailureMessage();
+							if (failureMessage.length() > 1000) {
+								logger.error(failureMessage.substring(0, 1000));
+							} else {
+								logger.error(failureMessage);
+							}
 							List<ActionRequest> requests = arg1.requests();
 							for (BulkItemResponse item : arg2.getItems()) {
 								if (item != null && item.getFailure() != null) {
@@ -184,9 +187,7 @@ public class Elasticsearch extends BaseOutput {
 					public void afterBulk(long arg0, BulkRequest arg1,
 							Throwable arg2) {
 						logger.error("bulk got exception");
-						logger.error(arg2.getLocalizedMessage());
 						logger.error(arg2.getMessage());
-						arg2.printStackTrace();
 					}
 
 					@Override
