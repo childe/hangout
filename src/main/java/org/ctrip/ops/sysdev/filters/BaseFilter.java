@@ -58,7 +58,8 @@ public class BaseFilter implements Runnable {
 	protected void prepare() {
 	};
 
-	protected void filter(Map event) {
+	protected Map filter(Map event) {
+		return null;
 	};
 
 	public void run() {
@@ -76,7 +77,7 @@ public class BaseFilter implements Runnable {
 						}
 					}
 					if (succuess == true) {
-						this.filter(event);
+						event = this.filter(event);
 					}
 
 					this.outputQueue.put(event);

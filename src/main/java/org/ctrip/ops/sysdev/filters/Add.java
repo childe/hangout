@@ -34,7 +34,7 @@ public class Add extends BaseFilter {
 			String value = entry.getValue();
 
 			try {
-				this.f.put(field, new FreeMarkerRender(value,value));
+				this.f.put(field, new FreeMarkerRender(value, value));
 			} catch (IOException e) {
 				logger.fatal(e.getMessage());
 				System.exit(1);
@@ -43,7 +43,7 @@ public class Add extends BaseFilter {
 	};
 
 	@Override
-	protected void filter(final Map event) {
+	protected Map filter(final Map event) {
 		Iterator<Entry<String, TemplateRender>> it = f.entrySet().iterator();
 		while (it.hasNext()) {
 			Map.Entry<String, TemplateRender> entry = it.next();
@@ -52,5 +52,6 @@ public class Add extends BaseFilter {
 			TemplateRender render = entry.getValue();
 			event.put(field, render.render(event));
 		}
+		return event;
 	}
 }

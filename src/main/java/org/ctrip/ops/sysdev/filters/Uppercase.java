@@ -15,9 +15,10 @@ public class Uppercase extends BaseFilter {
 	};
 
 	@Override
-	protected void filter(Map event) {
+	protected Map filter(Map event) {
 		if (event.containsKey(this.src)) {
 			event.put(this.src, ((String) event.get(src)).toUpperCase());
 		}
+		return event;
 	}
 }

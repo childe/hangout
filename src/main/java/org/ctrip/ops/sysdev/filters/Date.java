@@ -73,9 +73,9 @@ public class Date extends BaseFilter {
 	};
 
 	@Override
-	protected void filter(Map event) {
+	protected Map filter(Map event) {
 		if (!event.containsKey(this.src)) {
-			return;
+			return event;
 		}
 
 		boolean success = false;
@@ -112,6 +112,8 @@ public class Date extends BaseFilter {
 				event.remove(f);
 			}
 		}
+
+		return event;
 	};
 
 }

@@ -16,11 +16,12 @@ public class Trim extends BaseFilter {
 	};
 
 	@Override
-	protected void filter(final Map event) {
+	protected Map filter(final Map event) {
 		for (String field : fields) {
 			if (event.containsKey(field)) {
 				event.put(field, ((String) event.remove(field)).trim());
 			}
 		}
+		return event;
 	}
 }

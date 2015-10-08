@@ -16,11 +16,13 @@ public class Lowercase extends BaseFilter {
 	};
 
 	@Override
-	protected void filter(Map event) {
+	protected Map filter(Map event) {
 		for (String field : fields) {
 			if (event.containsKey(field)) {
 				event.put(field, ((String) event.get(field)).toLowerCase());
 			}
 		}
+
+		return event;
 	}
 }

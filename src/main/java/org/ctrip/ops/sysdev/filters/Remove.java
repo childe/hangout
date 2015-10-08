@@ -16,9 +16,11 @@ public class Remove extends BaseFilter {
 	};
 
 	@Override
-	protected void filter(final Map event) {
+	protected Map filter(final Map event) {
 		for (String t : this.fields) {
 			event.remove(t);
 		}
+
+		return event;
 	}
 }

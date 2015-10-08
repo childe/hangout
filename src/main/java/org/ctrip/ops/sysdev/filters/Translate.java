@@ -67,9 +67,9 @@ public class Translate extends BaseFilter {
 	};
 
 	@Override
-	protected void filter(final Map event) {
+	protected Map filter(final Map event) {
 		if (dictionary == null || !event.containsKey(this.source)) {
-			return;
+			return event;
 		}
 		if (System.currentTimeMillis() >= nextLoadTime) {
 			loadDictionary();
@@ -79,5 +79,6 @@ public class Translate extends BaseFilter {
 		if (t != null) {
 			event.put(target, t);
 		}
+		return event;
 	}
 }

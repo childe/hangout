@@ -24,7 +24,7 @@ public class Replace extends BaseFilter {
 		this.value = (String) config.get("value");
 
 		try {
-			this.render = new FreeMarkerRender(value,value);
+			this.render = new FreeMarkerRender(value, value);
 		} catch (IOException e) {
 			logger.fatal(e.getMessage());
 			System.exit(1);
@@ -32,7 +32,7 @@ public class Replace extends BaseFilter {
 	};
 
 	@Override
-	protected void filter(final Map event) {
+	protected Map filter(final Map event) {
 		if (event.containsKey(this.src)) {
 			event.put(this.src, render.render(this.value, new HashMap() {
 				{
@@ -40,5 +40,6 @@ public class Replace extends BaseFilter {
 				}
 			}));
 		}
+		return event;
 	}
 }
