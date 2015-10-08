@@ -79,8 +79,9 @@ public class BaseFilter implements Runnable {
 					if (succuess == true) {
 						event = this.filter(event);
 					}
-
-					this.outputQueue.put(event);
+					if (event != null) {
+						this.outputQueue.put(event);
+					}
 				}
 			}
 		} catch (InterruptedException e) {
