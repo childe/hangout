@@ -112,3 +112,23 @@ Date是用的[jona-time](http://www.joda.org/joda-time/)做解析和格式化.
 If 条件和addfileds等插件使用[freemarker](http://freemarker.org/)模板引擎, 速度快, 功能强大.
 
 [在线测试工具](http://freemarker-online.kenshoo.com/)
+
+
+## Output
+### Elasticsearch
+使用[bulk api](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html) 批量将数据写入ES.
+
+插入失败的时候, 只对 TOO_MANY_REQUESTS, SERVICE_UNAVAILABLE 这两种错误重试.
+
+参数含义参考[java client bulk api](https://www.elastic.co/guide/en/elasticsearch/client/java-api/current/bulk.html)
+
+	cluster: prod # cluster name, required
+	hosts: # required
+		- 192.168.1.100
+		- 192.168.1.200:9301
+	index: 'hangout-${@timestamp.toString("YYYY.MM.dd")}'
+	index_type: logs # default logs
+	bulk_actions: 20000 # default 20000
+	bulk_size: 15	#default 15
+	flush_interval: 10	#default 10
+	concurrent_requests: 0	#default 0
