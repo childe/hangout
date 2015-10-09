@@ -2,7 +2,7 @@
 
 我们一直用logstash从Kafka消费数据进ES, 随着数据量的越来越大, 需要的logstash实例和机器也越来越多. 
 
-于是就拿java实现了一下目前我们用到的Logstash的插件.   
+于是就拿java实现了一下目前我们用到的Logstash的插件.   做为java初学者, 肯定有很多地方写的不好.
 
 - input
 	 * kafka
@@ -19,8 +19,11 @@
 	* Trim
 	* Translate
 	* Rename
-	* 等
-
+	* Lowercase
+	* Uppercase
+	* Remove
+	* Add
+	
 用一个典型配置做测试, 包括Grok Date AddField If条件判断等, 吞吐量是Logstash的5倍左右 .  
 不压测吞吐量, 正常消费的情况下, CPU使用率大概是Logstash的50%到25%.
 
@@ -94,7 +97,7 @@ Date是用的[jona-time](http://www.joda.org/joda-time/)做解析和格式化.
      - '<#if url?contains("http://images4.c-ctrip.com/target/")>true<#elseif url?contains(".c-ctrip.com/images/")>true</#if>'
 ```
 
-### translate
+### Translate
 每隔一段时间, 会重新加载字典. 字典是yaml格式.
 
 	source: user
@@ -102,6 +105,10 @@ Date是用的[jona-time](http://www.joda.org/joda-time/)做解析和格式化.
 	dictionary_path: /user-nick.dict # yaml format
 	refresh_interval: 300 # default 300 seconds
 
+### 其它filter
+配置都比较简单, 可以参考[配置文件示例](https://github.com/childe/hangout/blob/master/example.yml)
+
 ### freemarker
-If 条件和addfileds等插件使用[freemarker](http://freemarker.org/).
-[在线测试](http://freemarker-online.kenshoo.com/)
+If 条件和addfileds等插件使用[freemarker](http://freemarker.org/)模板引擎, 速度快, 功能强大.
+
+[在线测试工具](http://freemarker-online.kenshoo.com/)
