@@ -154,3 +154,7 @@ If 条件和addfileds等插件使用[freemarker](http://freemarker.org/)模板�
 
 ### Stdout
 主要测试用吧.
+
+# 开发:
+如果需要新的插件, 可以从源码编译重新打包.  
+或者编译成jar包, 加入到class path(尚未开发完成).
