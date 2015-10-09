@@ -32,6 +32,15 @@
 ## Input
 ### kafka
 
+	topic: test # string , no default
+	groupID: hangout # string, no default
+	zk: 192.1.1.100:2181 #string, no default
+	threads: 1 # default 1
+	session_timeout: "6000" # string, default 6000
+	commit_interval: "60000" # string, auto.commit.interval.ms, default 1 minute.
+	codec: plain # string, default json
+
+
 ## Filter
 ### Grok
 
