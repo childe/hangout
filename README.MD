@@ -70,6 +70,30 @@ Date是用的[jona-time](http://www.joda.org/joda-time/)做解析和格式化.
 	remove_fields: ['logtime']
 	tag_on_failure: datefail # default datefail
 
+### Drop
+没有额外参数, 配置if使用.
+
+	if:
+		- '<#if user?matches("huhan3")>true</#if>'
+
+### IF
+应用于filter. 是一个列表, 需要满足列表中的每一个条件, 使用[freemarker](http://freemarker.org/) 模板引擎. 
+
+下面这个例子是添加一个target字段, target的值为url字段的第5个部分(下标从0开始).  
+只有在满足以下2个条件的时候才会触发添加字段这个行为.
+
+1. 日志含有url字段
+2.  url中包含 "http://images4.c-ctrip.com/target/" 或者 ".c-ctrip.com/images/" 字符串.
+
+```
+- Add:
+   fields:
+     target: '<#assign a=url?split("/")>${a[4]}'
+   if:
+     - '<#if url??>true</#if>'
+     - '<#if url?contains("http://images4.c-ctrip.com/target/")>true<#elseif url?contains(".c-ctrip.com/images/")>true</#if>'
+```
+
 ### freemarker
 If 条件和addfileds等插件使用[freemarker](http://freemarker.org/).
 [在线测试](http://freemarker-online.kenshoo.com/)
