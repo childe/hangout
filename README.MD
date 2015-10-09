@@ -43,6 +43,18 @@
 
 ## Filter
 ### Grok
+Grok是为了把一个字符串切割成多个field, 用的是[Joni库](https://github.com/jruby/joni), 暂不支持logstash里面的patterns.
+
+会依次匹配match中的正则, 直到有一个成功的.
+
+**注意, 如果正则中的groupname和已有的字段一样, 原来的字段被覆盖**
+
+	src: message #default message
+	match:
+		- '(?<logtime>\S+) (?<user>\S+) (-|(?<level>\w+))'
+		- '(?<logtime>\S+\s+\S+) (?<user>\S+) (-|(?<level>\w+))'
+	remove_fields: ['message']
+	tagOnFailure: grokfail #default grokfail
 
 ### Date
 
