@@ -54,9 +54,21 @@ Grok是为了把一个字符串切割成多个field, 用的是[Joni库](https://
 		- '(?<logtime>\S+) (?<user>\S+) (-|(?<level>\w+))'
 		- '(?<logtime>\S+\s+\S+) (?<user>\S+) (-|(?<level>\w+))'
 	remove_fields: ['message']
-	tagOnFailure: grokfail #default grokfail
+	tag_on_failure: grokfail #default grokfail
 
 ### Date
+Date是用的[jona-time](http://www.joda.org/joda-time/)做解析和格式化.
+
+会依次匹配formats里面的格式, 直到成功.
+
+	src: logtime # default logtime
+	formats:
+		- 'ISO8601'
+		- 'UNIX'
+		- 'UNIX_MS'
+		- 'YYYY-MM-dd HH:mm:ss.SSS'
+	remove_fields: ['logtime']
+	tag_on_failure: datefail # default datefail
 
 ### freemarker
 If 条件和addfileds等插件使用[freemarker](http://freemarker.org/).
