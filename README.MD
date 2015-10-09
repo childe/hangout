@@ -27,6 +27,20 @@
 用一个典型配置做测试, 包括Grok Date AddField If条件判断等, 吞吐量是Logstash的5倍左右 .  
 不压测吞吐量, 正常消费的情况下, CPU使用率大概是Logstash的50%到25%.
 
+# 运行
+	java hangout.jar org.ctrip.ops.sysdev.Main -f app.yml
+
+记录日志到文件:
+
+	java hangout.jar org.ctrip.ops.sysdev.Main -f app.yml -l /var/log/hangout/app.yml.log
+
+默认日志记录是warn级别, 详细日志:
+
+	java hangout.jar org.ctrip.ops.sysdev.Main -f app.yml -l /var/log/hangout/app.yml.log --vvvv
+
+--v 是info , --vv 是debug , --vvvv 是Trace
+		
+
 # 配置
 配置在一定程度上也是模仿logstash, 但用的是通用的yaml格式.
 因为能力有限, 不能实现logstash的那套语法, if是用了另外的格式.
