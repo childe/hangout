@@ -72,7 +72,7 @@ public class Kafka extends BaseInput {
 
 		this.topic = (String) this.config.get("topic");
 
-		String sessionTimeout = "4000", syncTime = "2000", commitInterval = "5000";
+		String sessionTimeout = "6000", syncTime = "2000", commitInterval = "60000";
 		if (config.containsKey("session_timeout")) {
 			sessionTimeout = (String) config.get("session_timeout");
 		}
