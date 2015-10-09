@@ -132,3 +132,8 @@ If 条件和addfileds等插件使用[freemarker](http://freemarker.org/)模板�
 	bulk_size: 15	#default 15
 	flush_interval: 10	#default 10
 	concurrent_requests: 0	#default 0
+
+### Kafka
+
+	broker_list: 192.168.1.100:9092 #The format is host1:port1,host2:port2, and the list can be a subset of brokers or a VIP pointing to a subset of brokers.
+	topic: test2
