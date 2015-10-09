@@ -94,6 +94,14 @@ Date是用的[jona-time](http://www.joda.org/joda-time/)做解析和格式化.
      - '<#if url?contains("http://images4.c-ctrip.com/target/")>true<#elseif url?contains(".c-ctrip.com/images/")>true</#if>'
 ```
 
+### translate
+每隔一段时间, 会重新加载字典. 字典是yaml格式.
+
+	source: user
+	target: nick
+	dictionary_path: /user-nick.dict # yaml format
+	refresh_interval: 300 # default 300 seconds
+
 ### freemarker
 If 条件和addfileds等插件使用[freemarker](http://freemarker.org/).
 [在线测试](http://freemarker-online.kenshoo.com/)
