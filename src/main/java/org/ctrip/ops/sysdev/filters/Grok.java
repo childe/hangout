@@ -48,8 +48,8 @@ public class Grok extends BaseFilter {
 			this.src = "message";
 		}
 
-		if (this.config.containsKey("tagOnFailure")) {
-			this.tagOnFailure = (String) this.config.get("tagOnFailure");
+		if (this.config.containsKey("tag_on_failure")) {
+			this.tagOnFailure = (String) this.config.get("tag_on_failure");
 		} else {
 			this.tagOnFailure = "grokfail";
 		}
