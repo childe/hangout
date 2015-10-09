@@ -80,7 +80,8 @@ public class Date extends BaseFilter {
 
 		boolean success = false;
 
-		String input = ((String) event.get(this.src));
+		
+		String input = event.get(this.src).toString();
 
 		if (addYear) {
 			input = Calendar.getInstance().get(Calendar.YEAR) + input;
