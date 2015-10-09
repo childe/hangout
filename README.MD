@@ -35,9 +35,9 @@
 ## Input
 ### kafka
 
-	topic: test # string , no default
-	groupID: hangout # string, no default
-	zk: 192.1.1.100:2181 #string, no default
+	topic: test # string , required
+	groupID: hangout # string, required
+	zk: 192.1.1.100:2181 #string, required
 	threads: 1 # default 1
 	session_timeout: "6000" # string, default 6000
 	commit_interval: "60000" # string, auto.commit.interval.ms, default 1 minute.
@@ -134,6 +134,9 @@ If 条件和addfileds等插件使用[freemarker](http://freemarker.org/)模板�
 	concurrent_requests: 0	#default 0
 
 ### Kafka
+	#broker_list format is host1:port1,host2:port2, and the list can be a subset of brokers or a VIP pointing to a subset of brokers.
+	broker_list: 192.168.1.100:9092 # required
+	topic: test # required
 
-	broker_list: 192.168.1.100:9092 #The format is host1:port1,host2:port2, and the list can be a subset of brokers or a VIP pointing to a subset of brokers.
-	topic: test2
+### Stdout
+主要测试用吧.
