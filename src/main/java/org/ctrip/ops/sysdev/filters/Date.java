@@ -63,7 +63,7 @@ public class Date extends BaseFilter {
 				parsers.add(new ISODateParser((String) config.get("timezone")));
 			} else if (format.equalsIgnoreCase("UNIX")) {
 				parsers.add(new UnixParser());
-			} else if (format.equalsIgnoreCase("UNIXMS")) {
+			} else if (format.equalsIgnoreCase("UNIX_MS")) {
 				parsers.add(new UnixMSParser());
 			} else {
 				parsers.add(new FormatParser(format, (String) config
