@@ -5,7 +5,6 @@ inputs:
         zk: 192.168.1.200:2181
         threads: 2
         codec: plain
-        queueSize: 100
         session_timeout: "4000"
         sync_time: "2000"
         commit_interval: "1000"
@@ -15,7 +14,6 @@ inputs:
         zk: 192.168.1.201:2181
         threads: 1
         codec: json
-        queueSize: 1000
 
 filters:
     - Grok:
@@ -36,7 +34,6 @@ filters:
         formats:
             - 'ISO8601'
         remove_fields: ['logtime']
-
     - Lowercase:
         fields: ['user']
     - Add:
