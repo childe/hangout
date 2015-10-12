@@ -1,7 +1,11 @@
 package org.ctrip.ops.sysdev.filters;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +25,7 @@ public class Grok extends BaseFilter {
 	private String tagOnFailure;
 	private String src;
 	private List<Regex> matches;
+	private Map<String, String> patterns;
 
 	private ArrayList<String> removeFields;
 
@@ -28,10 +33,72 @@ public class Grok extends BaseFilter {
 		super(config, preQueue);
 	}
 
+	private String convertPatternOneLevel(String p) {
+		String pattern = "\\%\\{[0-9a-zA-Z]+(:[-_.0-9a-zA-Z]+){0,2}\\}";
+		java.util.regex.Matcher m = java.util.regex.Pattern.compile(pattern)
+				.matcher(p);
+		String newPattern = "";
+		int last_end = 0;
+		while (m.find()) {
+			newPattern += p.substring(last_end, m.start());
+			String syntaxANDsemantic = m.group(0).substring(2,
+					m.group(0).length() - 1);
+			String syntax = "", semantic = "";
+			String[] syntaxANDsemanticArray = syntaxANDsemantic.split(":", 3);
+
+			syntax = syntaxANDsemanticArray[0];
+
+			if (syntaxANDsemanticArray.length > 1) {
+				semantic = syntaxANDsemanticArray[1];
+				newPattern += "(?<" + semantic + ">" + patterns.get(syntax)
+						+ ")";
+			} else {
+				newPattern += patterns.get(syntax);
+			}
+			last_end = m.end();
+		}
+		newPattern += p.substring(last_end);
+		return newPattern;
+	}
+
+	private String convertPattern(String p) {
+		do {
+			String rst = this.convertPatternOneLevel(p);
+			if (rst.equals(p)) {
+				return p;
+			}
+			p = rst;
+		} while (true);
+	}
+
 	@SuppressWarnings("unchecked")
 	protected void prepare() {
+		this.patterns = new HashMap<String, String>();
+
+		ClassLoader classLoader = getClass().getClassLoader();
+		try (BufferedReader br = new BufferedReader(new FileReader(classLoader
+				.getResource("grok-patterns").getFile()))) {
+
+			String sCurrentLine;
+
+			while ((sCurrentLine = br.readLine()) != null) {
+				sCurrentLine = sCurrentLine.trim();
+				if (sCurrentLine.length() == 0
+						|| sCurrentLine.indexOf("#") == 0) {
+					continue;
+				}
+				this.patterns.put(sCurrentLine.split("\\s", 2)[0],
+						sCurrentLine.split("\\s", 2)[1]);
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 		this.matches = new ArrayList<Regex>();
+
 		for (String matchString : (ArrayList<String>) this.config.get("match")) {
+			matchString = convertPattern(matchString);
 			Regex regex = new Regex(matchString.getBytes(), 0,
 					matchString.getBytes().length, Option.NONE,
 					UTF8Encoding.INSTANCE);
@@ -120,35 +187,58 @@ public class Grok extends BaseFilter {
 	};
 
 	public static void main(String[] argv) {
-		byte[] pattern = "(?<name>a*) (-|(?<age>\\d+)) (?<level>\\w+)"
-				.getBytes();
-		String input = "aaa - debug";
-		byte[] str = input.getBytes();
 
-		Regex regex = new Regex(pattern, 0, pattern.length, Option.NONE,
-				UTF8Encoding.INSTANCE);
-		Matcher matcher = regex.matcher(str);
-		int result = matcher.search(0, str.length, Option.DEFAULT);
-		if (result != -1) {
-			Region region = matcher.getEagerRegion();
-			for (Iterator<NameEntry> entry = regex.namedBackrefIterator(); entry
-					.hasNext();) {
-				NameEntry e = entry.next();
-				int number = e.getBackRefs()[0]; // can have many refs per name
-				int begin = region.beg[number];
-				int end = region.end[number];
-				// System.out.println(e.toString());
-				// System.out.println(number);
-				// System.out.println(begin);
-				// System.out.println(end);
-				if (begin != -1) {
-					System.out.println(new String(e.name, e.nameP, e.nameEnd
-							- e.nameP)
-							+ ": " + input.substring(begin, end));
+		HashMap<String, String> patterns = new HashMap<String, String>();
+
+		try (BufferedReader br = new BufferedReader(new FileReader(
+				"/Users/liujia/Projects/hangout/p"))) {
+
+			String sCurrentLine;
+
+			while ((sCurrentLine = br.readLine()) != null) {
+				sCurrentLine = sCurrentLine.trim();
+				if (sCurrentLine.length() == 0
+						|| sCurrentLine.indexOf("#") == 0) {
+					continue;
 				}
-
+				patterns.put(sCurrentLine.split("\\s", 2)[0],
+						sCurrentLine.split("\\s", 2)[1]);
 			}
-		}
-	}
 
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		String p = "%{HTTPDATE:logtime}%{WORD:divice_id}\\s+id=%{WORD:id}\\s+time=\"%{DATA:logtime}\"\\s+fw=%{WORD:fw}\\s+pri=%{INT:pri:int}\\s+vpn=%{NOTSPACE:vpn}\\s+user=%{NOTSPACE:user}\\s+src=%{NOTSPACE:sip}\\s+sport=%{NOTSPACE:sport}\\s+type=%{NOTSPACE}\\s+msg=\"%{DATA:msg}\"";
+
+		String pattern = "\\%\\{[0-9a-zA-Z]+(:[-_.0-9a-zA-Z]+){0,2}\\}";
+		java.util.regex.Matcher m = java.util.regex.Pattern.compile(pattern)
+				.matcher(p);
+		String newPattern = "";
+		int last_end = 0;
+		while (m.find()) {
+			newPattern += p.substring(last_end, m.start());
+			String syntaxANDsemantic = m.group(0).substring(2,
+					m.group(0).length() - 1);
+			System.out.println(syntaxANDsemantic);
+			String syntax = "", semantic = "";
+			String[] syntaxANDsemanticArray = syntaxANDsemantic.split(":", 3);
+
+			syntax = syntaxANDsemanticArray[0];
+
+			if (syntaxANDsemanticArray.length > 1) {
+				semantic = syntaxANDsemanticArray[1];
+				newPattern += "(?<" + semantic + ">" + patterns.get(syntax)
+						+ ")";
+			} else {
+				newPattern += patterns.get(syntax);
+			}
+			System.out.println(syntax);
+			System.out.println(semantic);
+			last_end = m.end();
+		}
+		newPattern += p.substring(last_end);
+		System.out.println(newPattern);
+
+	}
 }
