@@ -43,6 +43,11 @@ public class FormatParser implements DateParser {
 		long a = DateTimeFormat.forPattern("dd MMM YYYY:HH:mm:ss")
 				.withLocale(Locale.ENGLISH).parseMillis("13 May 2015:22:46:59");
 		System.out.println(a);
+		
+		DateTime b = DateTimeFormat.forPattern("dd MMM YYYY:HH:mm:ss")
+				.withLocale(Locale.forLanguageTag("en")).parseDateTime("13 May 2015:22:46:59");
+		System.out.println(b);
+		
 
 		String input = "2015/05/06 10:31:20.427";
 		FormatParser p = new FormatParser("YYYY/MM/dd HH:mm:ss.SSS", null, null);
