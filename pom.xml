@@ -20,10 +20,6 @@
             </resource>
             <resource>
                 <directory>src/main/java/resources/</directory>
-                <includes>
-                    <include>*</include>
-                </includes>
-                <filtering>true</filtering>
             </resource>
         </resources>
         <plugins>
