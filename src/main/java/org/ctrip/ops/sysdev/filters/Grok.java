@@ -42,7 +42,7 @@ public class Grok extends BaseFilter {
 	}
 
 	private String convertPatternOneLevel(String p) {
-		String pattern = "\\%\\{[0-9a-zA-Z]+(:[-_.0-9a-zA-Z]+){0,2}\\}";
+		String pattern = "\\%\\{[_0-9a-zA-Z]+(:[-_.0-9a-zA-Z]+){0,2}\\}";
 		java.util.regex.Matcher m = java.util.regex.Pattern.compile(pattern)
 				.matcher(p);
 		String newPattern = "";
