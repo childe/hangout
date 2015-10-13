@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.ctrip.ops.sysdev.render.Formatter;
@@ -35,8 +36,8 @@ public class Elasticsearch extends BaseOutput {
 	private TemplateRender indexRender;
 	private TemplateRender indexTypeRender;
 
-	public Elasticsearch(Map config) {
-		super(config);
+	public Elasticsearch(Map config, ArrayBlockingQueue inputQueue) {
+		super(config, inputQueue);
 	}
 
 	protected void prepare() {

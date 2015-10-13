@@ -31,6 +31,7 @@ public class Main {
 		}
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void main(String[] args) throws Exception {
 
 		ArrayList<String> argsList = new ArrayList<String>();
@@ -162,8 +163,14 @@ public class Main {
 
 		// for output in output
 		ArrayList<Map> outputs = (ArrayList<Map>) configs.get("outputs");
-		ArrayList<BaseOutput> os = new ArrayList<BaseOutput>();
+
+		ArrayList<ArrayBlockingQueue> inputQueuesForOutput = new ArrayList<ArrayBlockingQueue>();
+
 		for (Map output : outputs) {
+			ArrayBlockingQueue inputQueueForOutput = new ArrayBlockingQueue(20,
+					false);
+			inputQueuesForOutput.add(inputQueueForOutput);
+
 			Iterator<Entry<String, Map>> outputIT = output.entrySet()
 					.iterator();
 
@@ -173,20 +180,28 @@ public class Main {
 				Map outputConfig = outputEntry.getValue();
 				Class<?> outputClass = Class
 						.forName("org.ctrip.ops.sysdev.outputs." + outputType);
-				Constructor<?> ctor = outputClass.getConstructor(Map.class);
+				Constructor<?> ctor = outputClass.getConstructor(Map.class,
+						ArrayBlockingQueue.class);
 
-				os.add((BaseOutput) ctor.newInstance(outputConfig));
+				BaseOutput outputInstance = (BaseOutput) ctor.newInstance(
+						outputConfig, inputQueueForOutput);
+				int threads = 1;
+				if (outputConfig.containsKey("threads")) {
+					threads = (int) outputConfig.get("threads");
+				}
+				for (int i = 0; i < threads; i++) {
+					new Thread(outputInstance).start();
+				}
 			}
 		}
 		try {
 			while (true) {
 				Map event = (Map) inputQueue.take();
 				if (event != null) {
-					for (BaseOutput o : os) {
-						o.process(event);
+					for (ArrayBlockingQueue o : inputQueuesForOutput) {
+						o.put(event);
 					}
 				}
-
 			}
 		} catch (InterruptedException e) {
 		}
