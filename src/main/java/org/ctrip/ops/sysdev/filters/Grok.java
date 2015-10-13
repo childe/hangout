@@ -111,7 +111,7 @@ public class Grok extends BaseFilter {
 	protected void prepare() {
 		this.patterns = new HashMap<String, String>();
 
-		final String path = "grok-patterns";
+		final String path = "patterns";
 		final File jarFile = new File(getClass().getProtectionDomain()
 				.getCodeSource().getLocation().getPath());
 
@@ -153,7 +153,7 @@ public class Grok extends BaseFilter {
 		} else { // Run with IDE
 			try {
 				load_patterns(new File(ClassLoader.getSystemResource(
-						"grok-patterns").getFile()));
+						"patterns").getFile()));
 			} catch (Exception e) {
 				logger.warn(e);
 			}
