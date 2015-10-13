@@ -1,15 +1,23 @@
 package org.ctrip.ops.sysdev.filters;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+
 
 import org.apache.log4j.Logger;
 import org.jcodings.specific.UTF8Encoding;
@@ -71,28 +79,98 @@ public class Grok extends BaseFilter {
 		} while (true);
 	}
 
+	private void load_patterns(File path) {
+		if (path.isDirectory()) {
+			for (File subpath : path.listFiles())
+				load_patterns(subpath);
+		} else {
+			try {
+				BufferedReader br = new BufferedReader(new FileReader(path));
+				String sCurrentLine;
+
+				while ((sCurrentLine = br.readLine()) != null) {
+					sCurrentLine = sCurrentLine.trim();
+					if (sCurrentLine.length() == 0
+							|| sCurrentLine.indexOf("#") == 0) {
+						continue;
+					}
+					this.patterns.put(sCurrentLine.split("\\s", 2)[0],
+							sCurrentLine.split("\\s", 2)[1]);
+				}
+
+				br.close();
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+	}
+
 	@SuppressWarnings("unchecked")
 	protected void prepare() {
 		this.patterns = new HashMap<String, String>();
 
-		ClassLoader classLoader = getClass().getClassLoader();
-		try (BufferedReader br = new BufferedReader(new FileReader(classLoader
-				.getResource("grok-patterns").getFile()))) {
+		final String path = "grok-patterns";
+		final File jarFile = new File(getClass().getProtectionDomain()
+				.getCodeSource().getLocation().getPath());
 
-			String sCurrentLine;
-
-			while ((sCurrentLine = br.readLine()) != null) {
-				sCurrentLine = sCurrentLine.trim();
-				if (sCurrentLine.length() == 0
-						|| sCurrentLine.indexOf("#") == 0) {
-					continue;
+		if (jarFile.isFile()) { // Run with JAR file
+			try {
+				JarFile jar = new JarFile(jarFile);
+				final Enumeration<JarEntry> entries = jar.entries();
+				while (entries.hasMoreElements()) {
+					final String name = entries.nextElement().getName();
+					if (name.startsWith(path)) {
+						InputStream in = ClassLoader
+								.getSystemResourceAsStream(name);
+						File file = File.createTempFile(name, "");
+						try {
+							OutputStream os = new FileOutputStream(file);
+							int bytesRead = 0;
+							byte[] buffer = new byte[8192];
+							while ((bytesRead = in.read(buffer, 0, 8192)) != -1) {
+								os.write(buffer, 0, bytesRead);
+							}
+							os.close();
+							in.close();
+						} catch (Exception e) {
+							logger.warn(e);
+						}
+						try {
+							load_patterns(file);
+						} catch (Exception e) {
+							logger.warn(e);
+						}
+					}
 				}
-				this.patterns.put(sCurrentLine.split("\\s", 2)[0],
-						sCurrentLine.split("\\s", 2)[1]);
+				jar.close();
+			} catch (IOException e) {
+				logger.error("prepare patterns failed");
+				logger.trace(e);
 			}
 
-		} catch (IOException e) {
-			e.printStackTrace();
+		} else { // Run with IDE
+			try {
+				load_patterns(new File(ClassLoader.getSystemResource(
+						"grok-patterns").getFile()));
+			} catch (Exception e) {
+				logger.warn(e);
+			}
+		}
+
+		if (this.config.containsKey("pattern_paths")) {
+			try {
+				ArrayList<String> pattern_paths = (ArrayList<String>) this.config
+						.get("pattern_paths");
+
+				for (String pattern_path : pattern_paths) {
+					load_patterns(new File(pattern_path));
+				}
+			} catch (Exception e) {
+				logger.error("read pattern_path failed");
+				logger.warn(e);
+			}
 		}
 
 		this.matches = new ArrayList<Regex>();
@@ -158,8 +236,6 @@ public class Grok extends BaseFilter {
 				}
 
 			} catch (Exception e) {
-				System.out.println("grok failed:" + event);
-				System.out.println(e.getLocalizedMessage());
 				logger.warn("grok failed:" + event);
 				logger.trace(e.getLocalizedMessage());
 				success = false;
