@@ -97,7 +97,7 @@ public class KV extends BaseFilter {
 					k = k.replaceAll(this.trimkey, "");
 				}
 
-				if (this.target == null) {
+				if (this.target != null) {
 					targetObj.put(k, v);
 				} else {
 					event.put(k, v);
