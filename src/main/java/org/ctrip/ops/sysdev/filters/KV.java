@@ -55,13 +55,11 @@ public class KV extends BaseFilter {
 		if (this.config.containsKey("trim")) {
 			this.trim = (String) this.config.get("trim");
 			this.trim = "^[" + this.trim + "]+|[" + this.trim + "]+$";
-			System.out.println(trim);
 		}
 
 		if (this.config.containsKey("trimkey")) {
 			this.trimkey = (String) this.config.get("trimkey");
 			this.trimkey = "^[" + this.trimkey + "]+|[" + this.trimkey + "]+$";
-			System.out.println(trimkey);
 		}
 
 		if (this.config.containsKey("tag_on_failure")) {
