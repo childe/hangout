@@ -114,9 +114,8 @@ public class Elasticsearch extends BaseOutput {
 					@Override
 					public void afterBulk(long arg0, BulkRequest arg1,
 							BulkResponse arg2) {
-						// TODO Auto-generated method stub
+						logger.debug("bulk done with requestID: " + arg0);
 						if (arg2.hasFailures()) {
-
 							logger.error("retry bulk failed");
 							logger.error(arg2.buildFailureMessage().substring(
 									0, 1000));
@@ -160,9 +159,8 @@ public class Elasticsearch extends BaseOutput {
 					@Override
 					public void afterBulk(long arg0, BulkRequest arg1,
 							BulkResponse arg2) {
-						// TODO Auto-generated method stub
+						logger.debug("bulk done with requestID: " + arg0);
 						if (arg2.hasFailures()) {
-
 							logger.error("bulk failed");
 							String failureMessage = arg2.buildFailureMessage();
 							if (failureMessage.length() > 1000) {
