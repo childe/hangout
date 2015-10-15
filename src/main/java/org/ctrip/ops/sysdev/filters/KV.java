@@ -104,7 +104,7 @@ public class KV extends BaseFilter {
 				}
 			}
 
-			if (this.target == null) {
+			if (this.target != null) {
 				event.put(this.target, targetObj);
 			}
 		} catch (Exception e) {
