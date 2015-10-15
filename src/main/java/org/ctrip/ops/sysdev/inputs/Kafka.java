@@ -1,9 +1,12 @@
 package org.ctrip.ops.sysdev.inputs;
 
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Map.Entry;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -52,17 +55,17 @@ public class Kafka extends BaseInput {
 		}
 	}
 
-	private int threads;
-	private String fetchers;
-	private String topic;
 	private ConsumerConnector consumer;
 	private ExecutorService executor;
 	private IDecode decoder;
+	private Map<String, Integer> topic;
+	private int threads;
 
 	public Kafka(Map<String, Object> config, ArrayBlockingQueue messageQueue) {
 		super(config, messageQueue);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void prepare() {
 		if (this.config.containsKey("threads")) {
@@ -70,34 +73,22 @@ public class Kafka extends BaseInput {
 		} else {
 			this.threads = 1;
 		}
-		
-		if (this.config.containsKey("fetchers")) {
-			this.fetchers = (String) this.config.get("fetchers");
-		} else {
-			this.fetchers = "1";
-		}
 
-		this.topic = (String) this.config.get("topic");
-
-		String sessionTimeout = "6000", syncTime = "2000", commitInterval = "60000";
-		if (config.containsKey("session_timeout")) {
-			sessionTimeout = (String) config.get("session_timeout");
-		}
-		if (config.containsKey("sync_time")) {
-			syncTime = (String) config.get("sync_time");
-		}
-		if (config.containsKey("commit_interval")) {
-			commitInterval = (String) config.get("commit_interval");
-		}
+		this.topic = (Map<String, Integer>) this.config.get("topic");
 
 		Properties props = new Properties();
-		props.put("zookeeper.connect", this.config.get("zk"));
-		props.put("group.id", this.config.get("groupID"));
-		props.put("zookeeper.session.timeout.ms", sessionTimeout);
-		props.put("zookeeper.sync.time.ms", syncTime);
-		props.put("auto.commit.interval.ms", commitInterval);
-		props.put("num.consumer.fetchers", fetchers);
 
+		HashMap<String, String> consumerSettings = (HashMap<String, String>) this.config
+				.get("consumer_settings");
+		Iterator<Entry<String, String>> consumerSetting = consumerSettings
+				.entrySet().iterator();
+
+		while (consumerSetting.hasNext()) {
+			Map.Entry<String, String> entry = consumerSetting.next();
+			String k = entry.getKey();
+			String v = entry.getValue();
+			props.put(k, v);
+		}
 		consumer = kafka.consumer.Consumer
 				.createJavaConsumerConnector(new ConsumerConfig(props));
 
@@ -111,11 +102,9 @@ public class Kafka extends BaseInput {
 	}
 
 	public void emit() {
-		Map<String, Integer> topicCountMap = new HashMap<String, Integer>();
-		topicCountMap.put(this.topic, this.threads);
 		Map<String, List<KafkaStream<byte[], byte[]>>> consumerMap = null;
 
-		consumerMap = consumer.createMessageStreams(topicCountMap);
+		consumerMap = consumer.createMessageStreams(this.topic);
 
 		List<KafkaStream<byte[], byte[]>> streams = consumerMap.get(topic);
 
