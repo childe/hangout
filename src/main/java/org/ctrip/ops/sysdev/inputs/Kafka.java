@@ -106,14 +106,20 @@ public class Kafka extends BaseInput {
 
 		consumerMap = consumer.createMessageStreams(this.topic);
 
-		List<KafkaStream<byte[], byte[]>> streams = consumerMap.get(topic);
+		Iterator<Entry<String, Integer>> topicIT = this.topic.entrySet()
+				.iterator();
 
-		executor = Executors.newFixedThreadPool(this.threads);
+		while (topicIT.hasNext()) {
+			Map.Entry<String, Integer> entry = topicIT.next();
+			String topic = entry.getKey();
+			List<KafkaStream<byte[], byte[]>> streams = consumerMap.get(topic);
 
-		// now create an object to consume the messages
+			executor = Executors.newFixedThreadPool(this.threads);
 
-		for (final KafkaStream<byte[], byte[]> stream : streams) {
-			executor.submit(new Consumer(stream, messageQueue, this.decoder));
+			for (final KafkaStream<byte[], byte[]> stream : streams) {
+				executor.submit(new Consumer(stream, messageQueue, this.decoder));
+			}
 		}
+
 	}
 }
