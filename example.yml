@@ -1,18 +1,27 @@
 inputs:
     - Kafka:
-        topic: app
-        groupID: hangout
-        zk: 192.168.1.200:2181
+        topic: 
+          app: 2
+        consumer_settings:
+          group.id: hangout
+          zookeeper.connect: 192.168.1.200:2181
+          session_timeout: "4000"
+          sync_time: "2000"
+          commit_interval: "5000"
         threads: 2
         codec: plain
-        session_timeout: "4000"
-        sync_time: "2000"
-        commit_interval: "1000"
     - Kafka:
-        topic: web
+        topic: 
+          web: 2
+        consumer_settings:
+          group.id: hangout
+          zookeeper.connect: 192.168.1.201:2181
+          auto.commit.interval.ms: "5000"
+          fetch.message.max.bytes: "10485760"
+          num.consumer.fetchers: "1"
         groupID: hangout
         zk: 192.168.1.201:2181
-        threads: 1
+        threads: 2
         codec: json
 
 filters:
@@ -20,7 +29,7 @@ filters:
         threads: 4
         src: message
         match:
-          - '(?<logtime>\S+) (?<user>.+) (-|(?<level>\w+))'
+          - '^(?<logtime>\S+) (?<user>.+) (-|(?<level>\w+)) %{DATA:msg}$'
         remove_fields: ['message']
     - Add:
         threads: 4
@@ -54,6 +63,15 @@ filters:
         fields:
           she: ['c','CCC']
           he: ['(^\w+)|(\w+$)','XXX']
+    - KV:
+        source: msg
+        target: kv
+        field_split: ' '
+        value_split: '='
+        trim: '\t\"'
+        trimkey: '\"'
+        tag_on_failure: "KVfail"
+        remove_fields: ['msg']
 
 outputs:
     - Elasticsearch:
