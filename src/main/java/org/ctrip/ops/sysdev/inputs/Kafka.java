@@ -53,6 +53,7 @@ public class Kafka extends BaseInput {
 	}
 
 	private int threads;
+	private String fetchers;
 	private String topic;
 	private ConsumerConnector consumer;
 	private ExecutorService executor;
@@ -68,6 +69,12 @@ public class Kafka extends BaseInput {
 			this.threads = (int) this.config.get("threads");
 		} else {
 			this.threads = 1;
+		}
+		
+		if (this.config.containsKey("fetchers")) {
+			this.fetchers = (String) this.config.get("fetchers");
+		} else {
+			this.fetchers = "1";
 		}
 
 		this.topic = (String) this.config.get("topic");
@@ -89,6 +96,7 @@ public class Kafka extends BaseInput {
 		props.put("zookeeper.session.timeout.ms", sessionTimeout);
 		props.put("zookeeper.sync.time.ms", syncTime);
 		props.put("auto.commit.interval.ms", commitInterval);
+		props.put("num.consumer.fetchers", fetchers);
 
 		consumer = kafka.consumer.Consumer
 				.createJavaConsumerConnector(new ConsumerConfig(props));
