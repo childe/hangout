@@ -1,6 +1,5 @@
 package org.ctrip.ops.sysdev.inputs;
 
-import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -59,7 +58,6 @@ public class Kafka extends BaseInput {
 	private ExecutorService executor;
 	private IDecode decoder;
 	private Map<String, Integer> topic;
-	private int threads;
 
 	public Kafka(Map<String, Object> config, ArrayBlockingQueue messageQueue) {
 		super(config, messageQueue);
@@ -68,12 +66,6 @@ public class Kafka extends BaseInput {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void prepare() {
-		if (this.config.containsKey("threads")) {
-			this.threads = (int) this.config.get("threads");
-		} else {
-			this.threads = 1;
-		}
-
 		this.topic = (Map<String, Integer>) this.config.get("topic");
 
 		Properties props = new Properties();
@@ -98,7 +90,6 @@ public class Kafka extends BaseInput {
 		} else {
 			this.decoder = new JsonDecoder();
 		}
-
 	}
 
 	public void emit() {
@@ -112,9 +103,10 @@ public class Kafka extends BaseInput {
 		while (topicIT.hasNext()) {
 			Map.Entry<String, Integer> entry = topicIT.next();
 			String topic = entry.getKey();
+			Integer threads = entry.getValue();
 			List<KafkaStream<byte[], byte[]>> streams = consumerMap.get(topic);
 
-			executor = Executors.newFixedThreadPool(this.threads);
+			executor = Executors.newFixedThreadPool(threads);
 
 			for (final KafkaStream<byte[], byte[]> stream : streams) {
 				executor.submit(new Consumer(stream, messageQueue, this.decoder));
