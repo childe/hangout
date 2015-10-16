@@ -35,12 +35,14 @@ public class Elasticsearch extends BaseOutput {
 	private TransportClient esclient;
 	private TemplateRender indexRender;
 	private TemplateRender indexTypeRender;
+	private boolean retrying;
 
 	public Elasticsearch(Map config, ArrayBlockingQueue inputQueue) {
 		super(config, inputQueue);
 	}
 
 	protected void prepare() {
+		retrying = false;
 
 		try {
 			this.indexRender = new FreeMarkerRender(
@@ -97,15 +99,12 @@ public class Elasticsearch extends BaseOutput {
 			bulkActions = (int) config.get("bulk_actions");
 		}
 		if (config.containsKey("bulk_size")) {
-
 			bulkSize = (int) config.get("bulk_size");
 		}
 		if (config.containsKey("flush_interval")) {
-
 			flushInterval = (int) config.get("flush_interval");
 		}
 		if (config.containsKey("concurrent_requests")) {
-
 			concurrentRequests = (int) config.get("concurrent_requests");
 		}
 
@@ -126,11 +125,14 @@ public class Elasticsearch extends BaseOutput {
 									switch (item.getFailure().getStatus()) {
 									case TOO_MANY_REQUESTS:
 									case SERVICE_UNAVAILABLE:
+										retrying = true;
 										retryProcessor.add(requests.get(item
 												.getItemId()));
 									}
 								}
 							}
+						} else {
+							retrying = false;
 						}
 					}
 
@@ -151,7 +153,7 @@ public class Elasticsearch extends BaseOutput {
 					}
 				}).setBulkActions(bulkActions)
 				.setBulkSize(new ByteSizeValue(bulkSize, ByteSizeUnit.MB))
-				.setFlushInterval(TimeValue.timeValueSeconds(flushInterval))
+				.setFlushInterval(TimeValue.timeValueSeconds(10))
 				.setConcurrentRequests(0).build();
 
 		bulkProcessor = BulkProcessor
@@ -174,11 +176,14 @@ public class Elasticsearch extends BaseOutput {
 									switch (item.getFailure().getStatus()) {
 									case TOO_MANY_REQUESTS:
 									case SERVICE_UNAVAILABLE:
+										retrying = false;
 										retryProcessor.add(requests.get(item
 												.getItemId()));
 									}
 								}
 							}
+						} else {
+							retrying = false;
 						}
 					}
 
@@ -191,6 +196,15 @@ public class Elasticsearch extends BaseOutput {
 
 					@Override
 					public void beforeBulk(long arg0, BulkRequest arg1) {
+						while (retrying) {
+							try {
+								logger.warn("retrying... waiting...");
+								Thread.sleep(100);
+							} catch (InterruptedException e) {
+								logger.error("got error while waiting retrying");
+								logger.error(e.getMessage());
+							}
+						}
 						logger.debug("bulk requestID: " + arg0);
 						logger.debug("numberOfActions: "
 								+ arg1.numberOfActions());
