@@ -23,6 +23,7 @@
 	* Uppercase
 	* Remove
 	* Add
+	* KV
 	
 用一个典型配置做测试, 包括Grok Date AddField If条件判断等, 吞吐量是Logstash的5倍左右 .  
 不压测吞吐量, 正常消费的情况下, CPU使用率大概是Logstash的50%到25%.
@@ -48,14 +49,18 @@
 
 ## Input
 ### kafka
+从Kafka读数据. 下面示例是说, 开2个线程取app这个topic的数据, 编码格式为plain纯文本.  consumer_settings中的参数, 参考[kafka]官方文档](http://kafka.apache.org/documentation.html#consumerconfigs), 所有参数都可以在这里配置. 比较重要的是group.id, zookeeper.connect这两个, 一定要有.   zookeeper.connect的格式为 hostname1:port1,hostname2:port2,hostname3:port3.
 
-	topic: test # string , required
-	groupID: hangout # string, required
-	zk: 192.1.1.100:2181 #string, required
-	threads: 1 # default 1
-	session_timeout: "6000" # string, default 6000
-	commit_interval: "60000" # string, auto.commit.interval.ms, default 1 minute.
-	codec: plain # string, default json
+    - Kafka:
+        topic: 
+          app: 2
+        consumer_settings:
+          group.id: hangout
+          zookeeper.connect: 192.168.1.200:2181
+          session_timeout: "4000"
+          sync_time: "2000"
+          commit_interval: "5000"
+        codec: plain
 
 
 ## Filter
@@ -118,6 +123,24 @@ Date是用的[jona-time](http://www.joda.org/joda-time/)做解析和格式化.
 	target: nick
 	dictionary_path: /user-nick.dict # yaml format
 	refresh_interval: 300 # default 300 seconds
+
+### KV
+将 a=1&b=2, 或者name=app id=123 type=nginx 这样的字符串拆分成{a:1,b:2}  {name:app, id:123, type:nginx} 等多个字段, 放到日志里面去.
+
+配置如下.  
+如果targete有定义, 会把拆分出来字段放在这个字段中, 如果没有定义,放到在顶层.  
+trim 是把拆分出来的字段内容做前后修整. 将不需要的字符去掉. 下面的示例就是说把双引号和tag都去掉.   
+trimkey和trim类似, 处理的是字段名称.
+
+    - KV:
+        source: msg # default message
+        target: kv   # default null
+        field_split: ' '  # default " "
+        value_split: '='  # default "="
+        trim: '\t\"'  #default null
+        trimkey: '\"'  # default null
+        tag_on_failure: "KVfail" # default "KVfail"
+        remove_fields: ['msg']
 
 ### 其它filter
 配置都比较简单, 可以参考[配置文件示例](https://github.com/childe/hangout/blob/master/example.yml)
