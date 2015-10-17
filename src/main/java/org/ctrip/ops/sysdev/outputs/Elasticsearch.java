@@ -147,8 +147,8 @@ public class Elasticsearch extends BaseOutput {
 
 					@Override
 					public void beforeBulk(long arg0, BulkRequest arg1) {
-						logger.debug("bulk requestID: " + arg0);
-						logger.debug("numberOfActions: "
+						logger.info("retry bulk requestID: " + arg0);
+						logger.info("retry numberOfActions: "
 								+ arg1.numberOfActions());
 					}
 				}).setBulkActions(bulkActions)
@@ -205,8 +205,8 @@ public class Elasticsearch extends BaseOutput {
 								logger.error(e.getMessage());
 							}
 						}
-						logger.debug("bulk requestID: " + arg0);
-						logger.debug("numberOfActions: "
+						logger.info("bulk requestID: " + arg0);
+						logger.info("numberOfActions: "
 								+ arg1.numberOfActions());
 					}
 				}).setBulkActions(bulkActions)
