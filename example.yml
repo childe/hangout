@@ -8,7 +8,6 @@ inputs:
           session_timeout: "4000"
           sync_time: "2000"
           commit_interval: "5000"
-        threads: 2
         codec: plain
     - Kafka:
         topic: 
@@ -21,7 +20,6 @@ inputs:
           num.consumer.fetchers: "1"
         groupID: hangout
         zk: 192.168.1.201:2181
-        threads: 2
         codec: json
 
 filters:
@@ -63,6 +61,10 @@ filters:
         fields:
           she: ['c','CCC']
           he: ['(^\w+)|(\w+$)','XXX']
+    - Translate:
+        source: ServiceCode
+        target: soaurl
+        dictionary_path: /tmp/app.dic
     - KV:
         source: msg
         target: kv
@@ -75,6 +77,7 @@ filters:
 
 outputs:
     - Elasticsearch:
+        threads: 1
         cluster: hangoutcluster
         hosts:
           - 192.168.1.200
@@ -85,6 +88,8 @@ outputs:
         flush_interval: 10 # default 10 seconds
         concurrent_requests: 1 # default 1
     - Kafka:
+        threads: 1
         broker_list: 192.168.1.200:9092
         topic: test2
     - Stdout: {}
+        threads: 1
