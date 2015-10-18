@@ -110,25 +110,23 @@ public class Elasticsearch extends BaseOutput {
 					public void afterBulk(long arg0, BulkRequest arg1,
 							BulkResponse arg2) {
 						logger.debug("bulk done with requestID: " + arg0);
-						if (arg2.hasFailures()) {
-							logger.error("bulk failed");
-							String failureMessage = arg2.buildFailureMessage();
-							if (failureMessage.length() > 1000) {
-								logger.error(failureMessage.substring(0, 1000));
-							} else {
-								logger.error(failureMessage);
-							}
-							List<ActionRequest> requests = arg1.requests();
-							for (BulkItemResponse item : arg2.getItems()) {
-								if (item != null && item.getFailure() != null) {
-									switch (item.getFailure().getStatus()) {
-									case TOO_MANY_REQUESTS:
-									case SERVICE_UNAVAILABLE:
-										bulkProcessor.add(requests.get(item
-												.getItemId()));
-									}
+						List<ActionRequest> requests = arg1.requests();
+						int idx = 0;
+						for (BulkItemResponse item : arg2.getItems()) {
+							if (item.isFailed()) {
+								if (idx == 0) {
+									logger.error("bulk failed");
+									logger.error(item.getFailureMessage());
+								}
+								switch (item.getFailure().getStatus()) {
+								case TOO_MANY_REQUESTS:
+								case SERVICE_UNAVAILABLE:
+									bulkProcessor.add(requests.get(item
+											.getItemId()));
 								}
 							}
+
+							idx += 1;
 						}
 					}
 
