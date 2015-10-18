@@ -31,19 +31,15 @@ public class Elasticsearch extends BaseOutput {
 	private String index;
 	private String indexType;
 	private BulkProcessor bulkProcessor;
-	private BulkProcessor retryProcessor;
 	private TransportClient esclient;
 	private TemplateRender indexRender;
 	private TemplateRender indexTypeRender;
-	private boolean retrying;
 
 	public Elasticsearch(Map config, ArrayBlockingQueue inputQueue) {
 		super(config, inputQueue);
 	}
 
 	protected void prepare() {
-		retrying = false;
-
 		try {
 			this.indexRender = new FreeMarkerRender(
 					(String) config.get("index"), (String) config.get("index"));
@@ -108,54 +104,6 @@ public class Elasticsearch extends BaseOutput {
 			concurrentRequests = (int) config.get("concurrent_requests");
 		}
 
-		retryProcessor = BulkProcessor
-				.builder(this.esclient, new BulkProcessor.Listener() {
-					@Override
-					public void afterBulk(long arg0, BulkRequest arg1,
-							BulkResponse arg2) {
-						logger.debug("bulk done with requestID: " + arg0);
-						if (arg2.hasFailures()) {
-							logger.error("retry bulk failed");
-							logger.error(arg2.buildFailureMessage().substring(
-									0, 1000));
-
-							List<ActionRequest> requests = arg1.requests();
-							for (BulkItemResponse item : arg2.getItems()) {
-								if (item != null && item.getFailure() != null) {
-									switch (item.getFailure().getStatus()) {
-									case TOO_MANY_REQUESTS:
-									case SERVICE_UNAVAILABLE:
-										retrying = true;
-										retryProcessor.add(requests.get(item
-												.getItemId()));
-									}
-								}
-							}
-						} else {
-							retrying = false;
-						}
-					}
-
-					@Override
-					public void afterBulk(long arg0, BulkRequest arg1,
-							Throwable arg2) {
-						logger.error("retry bulk got exception");
-						logger.error(arg2.getLocalizedMessage());
-						logger.error(arg2.getMessage());
-						arg2.printStackTrace();
-					}
-
-					@Override
-					public void beforeBulk(long arg0, BulkRequest arg1) {
-						logger.info("retry bulk requestID: " + arg0);
-						logger.info("retry numberOfActions: "
-								+ arg1.numberOfActions());
-					}
-				}).setBulkActions(bulkActions)
-				.setBulkSize(new ByteSizeValue(bulkSize, ByteSizeUnit.MB))
-				.setFlushInterval(TimeValue.timeValueSeconds(10))
-				.setConcurrentRequests(0).build();
-
 		bulkProcessor = BulkProcessor
 				.builder(this.esclient, new BulkProcessor.Listener() {
 					@Override
@@ -176,14 +124,11 @@ public class Elasticsearch extends BaseOutput {
 									switch (item.getFailure().getStatus()) {
 									case TOO_MANY_REQUESTS:
 									case SERVICE_UNAVAILABLE:
-										retrying = false;
-										retryProcessor.add(requests.get(item
+										bulkProcessor.add(requests.get(item
 												.getItemId()));
 									}
 								}
 							}
-						} else {
-							retrying = false;
 						}
 					}
 
@@ -196,15 +141,6 @@ public class Elasticsearch extends BaseOutput {
 
 					@Override
 					public void beforeBulk(long arg0, BulkRequest arg1) {
-						while (retrying) {
-							try {
-								logger.warn("retrying... waiting...");
-								Thread.sleep(100);
-							} catch (InterruptedException e) {
-								logger.error("got error while waiting retrying");
-								logger.error(e.getMessage());
-							}
-						}
 						logger.info("bulk requestID: " + arg0);
 						logger.info("numberOfActions: "
 								+ arg1.numberOfActions());
