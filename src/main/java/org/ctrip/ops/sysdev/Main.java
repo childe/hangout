@@ -36,7 +36,7 @@ public class Main {
 
 		ArrayList<String> argsList = new ArrayList<String>();
 		HashMap<String, String> optsList = new HashMap<String, String>();
-		ArrayList<String> doubleOptsList = new ArrayList<String>();
+		ArrayList<String> singleOptsList = new ArrayList<String>();
 
 		for (int i = 0; i < args.length; i++) {
 			switch (args[i].charAt(0)) {
@@ -49,15 +49,16 @@ public class Main {
 						throw new IllegalArgumentException(
 								"Not a valid argument: " + args[i]);
 					// --opt
-					doubleOptsList.add(args[i].substring(2, args[i].length()));
+					singleOptsList.add(args[i].substring(2, args[i].length()));
 				} else {
-					if (args.length - 1 == i)
-						throw new IllegalArgumentException(
-								"Expected arg after: " + args[i]);
-					// -opt
-					optsList.put(args[i].substring(1, args[i].length()),
-							args[i + 1]);
-					i++;
+					if (args.length - 1 == i || args[i + 1].charAt(1) == '-') {
+						singleOptsList.add(args[i].substring(1,
+								args[i].length()));
+					} else {// -opt
+						optsList.put(args[i].substring(1, args[i].length()),
+								args[i + 1]);
+						i++;
+					}
 				}
 				break;
 			default:
@@ -72,11 +73,11 @@ public class Main {
 			fa.setName("FileLogger");
 			fa.setFile(optsList.get("l"));
 			fa.setLayout(new PatternLayout("%d %-5p [%c{1}] %m%n"));
-			if (doubleOptsList.contains("vvvv")) {
+			if (singleOptsList.contains("vvvv")) {
 				fa.setThreshold(Level.TRACE);
-			} else if (doubleOptsList.contains("vv")) {
+			} else if (singleOptsList.contains("vv")) {
 				fa.setThreshold(Level.DEBUG);
-			} else if (doubleOptsList.contains("v")) {
+			} else if (singleOptsList.contains("v")) {
 				fa.setThreshold(Level.INFO);
 			} else {
 				fa.setThreshold(Level.WARN);
@@ -88,11 +89,11 @@ public class Main {
 			ConsoleAppender console = new ConsoleAppender();
 			String PATTERN = "%d [%p|%c|%C{1}] %m%n";
 			console.setLayout(new PatternLayout(PATTERN));
-			if (doubleOptsList.contains("vvvv")) {
+			if (singleOptsList.contains("vvvv")) {
 				console.setThreshold(Level.TRACE);
-			} else if (doubleOptsList.contains("vv")) {
+			} else if (singleOptsList.contains("vv")) {
 				console.setThreshold(Level.DEBUG);
-			} else if (doubleOptsList.contains("v")) {
+			} else if (singleOptsList.contains("v")) {
 				console.setThreshold(Level.INFO);
 			} else {
 				console.setThreshold(Level.WARN);
