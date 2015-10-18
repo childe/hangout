@@ -37,9 +37,9 @@
 
 默认日志记录是warn级别, 详细日志:
 
-	java hangout.jar org.ctrip.ops.sysdev.Main -f app.yml -l /var/log/hangout/app.yml.log --vvvv
+	java hangout.jar org.ctrip.ops.sysdev.Main -f app.yml -l /var/log/hangout/app.yml.log -vvvv
 
---v 是info , --vv 是debug , --vvvv 是Trace
+-v 是info , -vv 是debug , -vvvv 是Trace
 		
 
 # 配置
