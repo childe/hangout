@@ -109,7 +109,7 @@ public class Elasticsearch extends BaseOutput {
 					@Override
 					public void afterBulk(long arg0, BulkRequest arg1,
 							BulkResponse arg2) {
-						logger.debug("bulk done with executionId: " + arg0);
+						logger.info("bulk done with executionId: " + arg0);
 						List<ActionRequest> requests = arg1.requests();
 						int idx = 0;
 						for (BulkItemResponse item : arg2.getItems()) {
