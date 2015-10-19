@@ -7,8 +7,8 @@ import java.util.Map.Entry;
 import java.util.concurrent.ArrayBlockingQueue;
 
 public class Gsub extends BaseFilter {
-	public Gsub(Map config, ArrayBlockingQueue inputQueue) {
-		super(config, inputQueue);
+	public Gsub(Map config) {
+		super(config);
 	}
 
 	private Map<String, List<String>> fields;

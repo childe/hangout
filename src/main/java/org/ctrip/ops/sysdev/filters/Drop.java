@@ -4,8 +4,8 @@ import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 
 public class Drop extends BaseFilter {
-	public Drop(Map config, ArrayBlockingQueue inputQueue) {
-		super(config, inputQueue);
+	public Drop(Map config) {
+		super(config);
 	}
 
 	protected void prepare() {

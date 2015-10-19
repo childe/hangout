@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.ctrip.ops.sysdev.utils.dateparser.DateParser;
@@ -25,8 +24,8 @@ public class Date extends BaseFilter {
 
 	private ArrayList<String> removeFields;
 
-	public Date(Map config, ArrayBlockingQueue preQueue) {
-		super(config, preQueue);
+	public Date(Map config) {
+		super(config);
 	}
 
 	@SuppressWarnings("unchecked")

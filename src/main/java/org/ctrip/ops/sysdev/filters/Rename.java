@@ -6,8 +6,8 @@ import java.util.Map.Entry;
 import java.util.concurrent.ArrayBlockingQueue;
 
 public class Rename extends BaseFilter {
-	public Rename(Map config, ArrayBlockingQueue inputQueue) {
-		super(config, inputQueue);
+	public Rename(Map config) {
+		super(config);
 	}
 
 	private Map<String, String> fields;

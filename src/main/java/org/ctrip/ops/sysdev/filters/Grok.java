@@ -37,8 +37,8 @@ public class Grok extends BaseFilter {
 
 	private ArrayList<String> removeFields;
 
-	public Grok(Map config, ArrayBlockingQueue preQueue) {
-		super(config, preQueue);
+	public Grok(Map config) {
+		super(config);
 	}
 
 	private String convertPatternOneLevel(String p) {

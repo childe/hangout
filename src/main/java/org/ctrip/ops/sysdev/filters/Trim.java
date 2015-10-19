@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 
 public class Trim extends BaseFilter {
-	public Trim(Map config, ArrayBlockingQueue inputQueue) {
-		super(config, inputQueue);
+	public Trim(Map config) {
+		super(config);
 	}
 
 	private ArrayList<String> fields;

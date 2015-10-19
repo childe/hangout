@@ -12,8 +12,8 @@ public class Replace extends BaseFilter {
 	private static final Logger logger = Logger.getLogger(Replace.class
 			.getName());
 
-	public Replace(Map config, ArrayBlockingQueue inputQueue) {
-		super(config, inputQueue);
+	public Replace(Map config) {
+		super(config);
 	}
 
 	private String src;

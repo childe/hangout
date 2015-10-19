@@ -10,9 +10,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.DailyRollingFileAppender;
@@ -127,24 +124,12 @@ public class Main {
 					Class<?> filterClass = Class
 							.forName("org.ctrip.ops.sysdev.filters."
 									+ filterType);
-					Constructor<?> ctor = filterClass.getConstructor(Map.class,
-							ArrayBlockingQueue.class);
-					// BaseFilter filterInstance = (BaseFilter)
-					// ctor.newInstance(
-					// filterConfig, inputQueue);
-					BaseFilter filterInstance = (BaseFilter) ctor.newInstance(
-							filterConfig, null);
+					Constructor<?> ctor = filterClass.getConstructor(Map.class);
+
+					BaseFilter filterInstance = (BaseFilter) ctor
+							.newInstance(filterConfig);
 					filterProcessors[idx] = filterInstance;
 					idx++;
-
-					// inputQueue = filterInstance.getOutputMQ();
-					// int threads = 1;
-					// if (filterConfig.containsKey("threads")) {
-					// threads = (int) filterConfig.get("threads");
-					// }
-					// for (int i = 0; i < threads; i++) {
-					// new Thread(filterInstance).start();
-					// }
 				}
 			}
 		}
@@ -165,11 +150,10 @@ public class Main {
 				Map outputConfig = outputEntry.getValue();
 				Class<?> outputClass = Class
 						.forName("org.ctrip.ops.sysdev.outputs." + outputType);
-				Constructor<?> ctor = outputClass.getConstructor(Map.class,
-						ArrayBlockingQueue.class);
+				Constructor<?> ctor = outputClass.getConstructor(Map.class);
 
-				outputProcessors[idx] = (BaseOutput) ctor.newInstance(
-						outputConfig, null);
+				outputProcessors[idx] = (BaseOutput) ctor
+						.newInstance(outputConfig);
 				idx++;
 			}
 		}

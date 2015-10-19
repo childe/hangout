@@ -21,8 +21,8 @@ public class Translate extends BaseFilter {
 	private static final Logger logger = Logger.getLogger(Translate.class
 			.getName());
 
-	public Translate(Map config, ArrayBlockingQueue inputQueue) {
-		super(config, inputQueue);
+	public Translate(Map config) {
+		super(config);
 	}
 
 	private String target;

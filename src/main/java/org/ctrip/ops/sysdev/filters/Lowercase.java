@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 
 public class Lowercase extends BaseFilter {
-	public Lowercase(Map config, ArrayBlockingQueue inputQueue) {
-		super(config, inputQueue);
+	public Lowercase(Map config) {
+		super(config);
 	}
 
 	private ArrayList<String> fields;

@@ -12,8 +12,8 @@ import org.json.simple.JSONValue;
 public class Json extends BaseFilter {
 	private static final Logger logger = Logger.getLogger(Json.class.getName());
 
-	public Json(Map config, ArrayBlockingQueue inputQueue) {
-		super(config, inputQueue);
+	public Json(Map config) {
+		super(config);
 	}
 
 	private String tagOnFailure;

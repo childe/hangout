@@ -16,8 +16,8 @@ import org.ctrip.ops.sysdev.render.TemplateRender;
 public class Add extends BaseFilter {
 	private static final Logger logger = Logger.getLogger(Add.class.getName());
 
-	public Add(Map config, ArrayBlockingQueue inputQueue) {
-		super(config, inputQueue);
+	public Add(Map config) {
+		super(config);
 	}
 
 	private Map<String, TemplateRender> f;

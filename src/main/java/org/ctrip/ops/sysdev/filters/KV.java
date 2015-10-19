@@ -21,8 +21,8 @@ public class KV extends BaseFilter {
 
 	private ArrayList<String> removeFields;
 
-	public KV(Map config, ArrayBlockingQueue preQueue) {
-		super(config, preQueue);
+	public KV(Map config) {
+		super(config);
 	}
 
 	@SuppressWarnings("unchecked")
