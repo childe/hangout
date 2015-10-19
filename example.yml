@@ -1,26 +1,23 @@
 inputs:
     - Kafka:
+        codec: plain
         topic: 
           app: 2
         consumer_settings:
           group.id: hangout
           zookeeper.connect: 192.168.1.200:2181
-          session_timeout: "4000"
-          sync_time: "2000"
-          commit_interval: "5000"
-        codec: plain
+          auto.commit.interval.ms: "1000"
+          socket.receive.buffer.bytes: "1048576"
+          fetch.message.max.bytes: "1048576"
+          num.consumer.fetchers: "4"
     - Kafka:
+        codec: json
         topic: 
-          web: 2
+          web: 1
         consumer_settings:
           group.id: hangout
           zookeeper.connect: 192.168.1.201:2181
           auto.commit.interval.ms: "5000"
-          fetch.message.max.bytes: "10485760"
-          num.consumer.fetchers: "1"
-        groupID: hangout
-        zk: 192.168.1.201:2181
-        codec: json
 
 filters:
     - Grok:
