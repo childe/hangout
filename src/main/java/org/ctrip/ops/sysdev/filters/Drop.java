@@ -11,7 +11,7 @@ public class Drop extends BaseFilter {
 	protected void prepare() {
 	};
 
-	public Map filter(Map event) {
+	protected Map filter(Map event) {
 		return null;
 	}
 }

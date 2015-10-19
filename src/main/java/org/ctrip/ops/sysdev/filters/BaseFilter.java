@@ -70,7 +70,7 @@ public class BaseFilter implements Runnable {
 		return event;
 	};
 
-	public Map filter(Map event) {
+	protected Map filter(Map event) {
 		return null;
 	}
 

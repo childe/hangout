@@ -32,7 +32,7 @@ public class Replace extends BaseFilter {
 	};
 
 	@Override
-	public Map filter(final Map event) {
+	protected Map filter(final Map event) {
 		if (event.containsKey(this.src)) {
 			event.put(this.src, render.render(this.value, new HashMap() {
 				{

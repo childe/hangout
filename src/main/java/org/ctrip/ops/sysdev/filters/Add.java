@@ -43,7 +43,7 @@ public class Add extends BaseFilter {
 	};
 
 	@Override
-	public Map filter(final Map event) {
+	protected Map filter(final Map event) {
 		Iterator<Entry<String, TemplateRender>> it = f.entrySet().iterator();
 		while (it.hasNext()) {
 			Map.Entry<String, TemplateRender> entry = it.next();

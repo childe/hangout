@@ -16,7 +16,7 @@ public class Lowercase extends BaseFilter {
 	};
 
 	@Override
-	public Map filter(Map event) {
+	protected Map filter(Map event) {
 		for (String field : fields) {
 			if (event.containsKey(field)) {
 				event.put(field, ((String) event.get(field)).toLowerCase());
