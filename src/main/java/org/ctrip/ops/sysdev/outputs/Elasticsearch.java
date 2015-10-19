@@ -27,37 +27,20 @@ import org.elasticsearch.common.unit.TimeValue;
 public class Elasticsearch extends BaseOutput {
 	private static final Logger logger = Logger.getLogger(Elasticsearch.class
 			.getName());
-
-	private String index;
 	private String indexType;
+	private String index;
 	private BulkProcessor bulkProcessor;
 	private TransportClient esclient;
-	private TemplateRender indexRender;
-	private TemplateRender indexTypeRender;
 
 	public Elasticsearch(Map config, ArrayBlockingQueue inputQueue) {
 		super(config, inputQueue);
 	}
 
 	protected void prepare() {
-		try {
-			this.indexRender = new FreeMarkerRender(
-					(String) config.get("index"), (String) config.get("index"));
-		} catch (IOException e) {
-			logger.fatal(e.getMessage());
-			System.exit(1);
-		}
 		this.index = (String) config.get("index");
 
 		if (config.containsKey("index_type")) {
-			try {
-				this.indexTypeRender = new FreeMarkerRender(
-						(String) config.get("index_type"),
-						(String) config.get("index_type"));
-			} catch (IOException e) {
-				logger.fatal(e.getMessage());
-				System.exit(1);
-			}
+			this.indexType = (String) config.get("index_type");
 		} else {
 			this.indexType = "logs";
 		}
@@ -151,9 +134,8 @@ public class Elasticsearch extends BaseOutput {
 
 	@Override
 	public void emit(final Map event) {
-		// String _index = indexRender.render(event);
 		String _index = Formatter.format(event, index);
-		String _indexType = indexTypeRender.render(event);
+		String _indexType = Formatter.format(event, indexType);
 
 		IndexRequest indexRequest = new IndexRequest(_index, _indexType)
 				.source(event);
