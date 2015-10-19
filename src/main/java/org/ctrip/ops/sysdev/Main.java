@@ -53,7 +53,7 @@ public class Main {
 					// --opt
 					singleOptsList.add(args[i].substring(2, args[i].length()));
 				} else {
-					if (args.length - 1 == i || args[i + 1].charAt(1) == '-') {
+					if (args.length - 1 == i || args[i + 1].charAt(0) == '-') {
 						singleOptsList.add(args[i].substring(1,
 								args[i].length()));
 					} else {// -opt
