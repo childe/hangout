@@ -1,5 +1,7 @@
 package org.ctrip.ops.sysdev.inputs;
 
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -15,6 +17,7 @@ import org.ctrip.ops.sysdev.decoder.IDecode;
 import org.ctrip.ops.sysdev.decoder.JsonDecoder;
 import org.ctrip.ops.sysdev.decoder.PlainDecoder;
 import org.ctrip.ops.sysdev.filters.BaseFilter;
+import org.ctrip.ops.sysdev.outputs.BaseOutput;
 
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.ConsumerIterator;
@@ -30,14 +33,43 @@ public class Kafka extends BaseInput {
 		private ArrayBlockingQueue messageQueue;
 		private IDecode decoder;
 		private BaseFilter[] filterProcessors;
+		private BaseOutput[] outputProcessors;
 
 		public Consumer(KafkaStream<byte[], byte[]> a_stream,
 				ArrayBlockingQueue fairQueue, IDecode decoder,
-				BaseFilter[] filterProcessors) {
+				BaseFilter[] filterProcessors, ArrayList<Map> outputs) {
 			m_stream = a_stream;
 			this.messageQueue = fairQueue;
 			this.decoder = decoder;
 			this.filterProcessors = filterProcessors.clone();
+
+			outputProcessors = new BaseOutput[outputs.size()];
+
+			int idx = 0;
+			for (Map output : outputs) {
+				Iterator<Entry<String, Map>> outputIT = output.entrySet()
+						.iterator();
+
+				while (outputIT.hasNext()) {
+					Map.Entry<String, Map> outputEntry = outputIT.next();
+					String outputType = outputEntry.getKey();
+					Map outputConfig = outputEntry.getValue();
+					Class<?> outputClass;
+					try {
+						outputClass = Class
+								.forName("org.ctrip.ops.sysdev.outputs."
+										+ outputType);
+						Constructor<?> ctor = outputClass.getConstructor(
+								Map.class, ArrayBlockingQueue.class);
+
+						outputProcessors[idx] = (BaseOutput) ctor.newInstance(
+								outputConfig, null);
+						idx++;
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
 		}
 
 		public void run() {
@@ -57,10 +89,11 @@ public class Kafka extends BaseInput {
 						event = bf.process(event);
 					}
 					if (event != null) {
-						this.messageQueue.put(event);
+						for (BaseOutput bo : outputProcessors) {
+							bo.emit(event);
+						}
 					}
 				} catch (Exception e) {
-					System.out.println(idx);
 					logger.error("process event failed:" + m);
 					e.printStackTrace();
 					logger.error(e);
@@ -75,8 +108,8 @@ public class Kafka extends BaseInput {
 	private Map<String, Integer> topic;
 
 	public Kafka(Map<String, Object> config, ArrayBlockingQueue messageQueue,
-			BaseFilter[] filterProcessors) {
-		super(config, messageQueue, filterProcessors);
+			BaseFilter[] filterProcessors, ArrayList<Map> outputs) {
+		super(config, messageQueue, filterProcessors, outputs);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -126,7 +159,7 @@ public class Kafka extends BaseInput {
 
 			for (final KafkaStream<byte[], byte[]> stream : streams) {
 				executor.submit(new Consumer(stream, messageQueue,
-						this.decoder, this.filterProcessors));
+						this.decoder, this.filterProcessors, this.outputs));
 			}
 		}
 

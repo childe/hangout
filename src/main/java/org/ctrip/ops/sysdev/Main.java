@@ -137,7 +137,7 @@ public class Main {
 					BaseFilter filterInstance = (BaseFilter) ctor.newInstance(
 							filterConfig, null);
 					filterProcessors[idx] = filterInstance;
-					idx += 1;
+					idx++;
 
 					// inputQueue = filterInstance.getOutputMQ();
 					// int threads = 1;
@@ -148,6 +148,32 @@ public class Main {
 					// new Thread(filterInstance).start();
 					// }
 				}
+			}
+		}
+
+		// for output in output
+		ArrayList<Map> outputs = (ArrayList<Map>) configs.get("outputs");
+
+		BaseOutput[] outputProcessors = new BaseOutput[outputs
+				.size()];
+
+		int idx = 0;
+		for (Map output : outputs) {
+			Iterator<Entry<String, Map>> outputIT = output.entrySet()
+					.iterator();
+
+			while (outputIT.hasNext()) {
+				Map.Entry<String, Map> outputEntry = outputIT.next();
+				String outputType = outputEntry.getKey();
+				Map outputConfig = outputEntry.getValue();
+				Class<?> outputClass = Class
+						.forName("org.ctrip.ops.sysdev.outputs." + outputType);
+				Constructor<?> ctor = outputClass.getConstructor(Map.class,
+						ArrayBlockingQueue.class);
+
+				outputProcessors[idx] = (BaseOutput) ctor.newInstance(
+						outputConfig, null);
+				idx++;
 			}
 		}
 
@@ -165,59 +191,12 @@ public class Main {
 				Class<?> inputClass = Class
 						.forName("org.ctrip.ops.sysdev.inputs." + inputType);
 				Constructor<?> ctor = inputClass.getConstructor(Map.class,
-						ArrayBlockingQueue.class, BaseFilter[].class);
+						ArrayBlockingQueue.class, BaseFilter[].class, ArrayList.class);
 				BaseInput inputInstance = (BaseInput) ctor.newInstance(
-						inputConfig, inputQueue, filterProcessors);
+						inputConfig, inputQueue, filterProcessors,
+						outputs);
 				inputInstance.emit();
 			}
 		}
-
-		// for output in output
-		ArrayList<Map> outputs = (ArrayList<Map>) configs.get("outputs");
-
-		ArrayList<ArrayBlockingQueue> inputQueuesForOutput = new ArrayList<ArrayBlockingQueue>();
-
-		for (Map output : outputs) {
-			ArrayBlockingQueue inputQueueForOutput = new ArrayBlockingQueue(20,
-					false);
-			inputQueuesForOutput.add(inputQueueForOutput);
-
-			Iterator<Entry<String, Map>> outputIT = output.entrySet()
-					.iterator();
-
-			while (outputIT.hasNext()) {
-				Map.Entry<String, Map> outputEntry = outputIT.next();
-				String outputType = outputEntry.getKey();
-				Map outputConfig = outputEntry.getValue();
-				Class<?> outputClass = Class
-						.forName("org.ctrip.ops.sysdev.outputs." + outputType);
-				Constructor<?> ctor = outputClass.getConstructor(Map.class,
-						ArrayBlockingQueue.class);
-
-				int threads = 1;
-				if (outputConfig.containsKey("threads")) {
-					threads = (int) outputConfig.get("threads");
-				}
-
-				ExecutorService executor = Executors
-						.newFixedThreadPool(threads);
-				for (int i = 0; i < threads; i++) {
-					executor.submit((BaseOutput) ctor.newInstance(outputConfig,
-							inputQueueForOutput));
-				}
-			}
-		}
-		try {
-			while (true) {
-				Map event = (Map) inputQueue.take();
-				if (event != null) {
-					for (ArrayBlockingQueue o : inputQueuesForOutput) {
-						o.put(event);
-					}
-				}
-			}
-		} catch (InterruptedException e) {
-		}
-
 	}
 }
