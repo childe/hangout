@@ -53,9 +53,26 @@ public class BaseFilter implements Runnable {
 	protected void prepare() {
 	};
 
+	public Map process(Map event) {
+		boolean succuess = true;
+		if (this.IF != null) {
+			for (TemplateRender render : this.IF) {
+				if (!render.render(event).equals("true")) {
+					succuess = false;
+					break;
+				}
+			}
+		}
+		if (succuess == true) {
+			event = this.filter(event);
+		}
+
+		return event;
+	};
+
 	public Map filter(Map event) {
 		return null;
-	};
+	}
 
 	public void run() {
 		try {

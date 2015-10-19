@@ -35,7 +35,6 @@ public class Main {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void main(String[] args) throws Exception {
-
 		ArrayList<String> argsList = new ArrayList<String>();
 		HashMap<String, String> optsList = new HashMap<String, String>();
 		ArrayList<String> singleOptsList = new ArrayList<String>();
@@ -111,7 +110,7 @@ public class Main {
 		ArrayBlockingQueue inputQueue = new ArrayBlockingQueue(20, false);
 
 		// for filter in filters
-		BaseFilter[] filterProcessors = null;
+		BaseFilter[] filterProcessors = new BaseFilter[0];
 
 		if (configs.containsKey("filters")) {
 			ArrayList<Map> filters = (ArrayList<Map>) configs.get("filters");
@@ -138,6 +137,7 @@ public class Main {
 					BaseFilter filterInstance = (BaseFilter) ctor.newInstance(
 							filterConfig, null);
 					filterProcessors[idx] = filterInstance;
+					idx += 1;
 
 					// inputQueue = filterInstance.getOutputMQ();
 					// int threads = 1;

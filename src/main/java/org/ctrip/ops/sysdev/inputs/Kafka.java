@@ -37,24 +37,32 @@ public class Kafka extends BaseInput {
 			m_stream = a_stream;
 			this.messageQueue = fairQueue;
 			this.decoder = decoder;
-			this.filterProcessors = filterProcessors;
+			this.filterProcessors = filterProcessors.clone();
 		}
 
 		public void run() {
 			ConsumerIterator<byte[], byte[]> it = m_stream.iterator();
 			while (it.hasNext()) {
 				String m = new String(it.next().message());
+				Map<String, Object> event;
+				int idx = 0;
 				try {
-					Map<String, Object> event = decoder.decode(m);
+					event = decoder.decode(m);
+
 					for (BaseFilter bf : filterProcessors) {
+						idx += 1;
 						if (event == null) {
 							break;
 						}
-						event = bf.filter(event);
-						this.messageQueue.put(event);
+						event = bf.process(event);
 					}
+					// if (event != null) {
+					// this.messageQueue.put(event);
+					// }
 				} catch (Exception e) {
+					System.out.println(idx);
 					logger.error("process event failed:" + m);
+					e.printStackTrace();
 					logger.error(e);
 				}
 			}
