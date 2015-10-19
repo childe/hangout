@@ -57,9 +57,10 @@
         consumer_settings:
           group.id: hangout
           zookeeper.connect: 192.168.1.200:2181
-          session_timeout: "4000"
-          sync_time: "2000"
-          commit_interval: "5000"
+          auto.commit.interval.ms: "1000"
+          socket.receive.buffer.bytes: "1048576"
+          fetch.message.max.bytes: "1048576"
+          num.consumer.fetchers: "4"
         codec: plain
 
 
