@@ -56,9 +56,9 @@ public class Kafka extends BaseInput {
 						}
 						event = bf.process(event);
 					}
-					// if (event != null) {
-					// this.messageQueue.put(event);
-					// }
+					if (event != null) {
+						this.messageQueue.put(event);
+					}
 				} catch (Exception e) {
 					System.out.println(idx);
 					logger.error("process event failed:" + m);
