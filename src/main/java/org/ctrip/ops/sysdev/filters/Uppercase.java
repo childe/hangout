@@ -1,5 +1,6 @@
 package org.ctrip.ops.sysdev.filters;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 
@@ -8,17 +9,20 @@ public class Uppercase extends BaseFilter {
 		super(config, inputQueue);
 	}
 
-	private String src;
+	private ArrayList<String> fields;
 
 	protected void prepare() {
-		this.src = (String) config.get("src");
+		this.fields = (ArrayList<String>) config.get("fields");
 	};
 
 	@Override
 	protected Map filter(Map event) {
-		if (event.containsKey(this.src)) {
-			event.put(this.src, ((String) event.get(src)).toUpperCase());
+		for (String field : fields) {
+			if (event.containsKey(field)) {
+				event.put(field, ((String) event.get(field)).toUpperCase());
+			}
 		}
+
 		return event;
 	}
 }
