@@ -3,11 +3,6 @@ package org.ctrip.ops.sysdev.outputs;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.ctrip.ops.sysdev.render.Formatter;
@@ -33,8 +28,8 @@ public class Elasticsearch extends BaseOutput {
 	private ScheduledFuture scheduledFuture;
 	private long executionID;
 
-	public Elasticsearch(Map config, ArrayBlockingQueue inputQueue) {
-		super(config, inputQueue);
+	public Elasticsearch(Map config) {
+		super(config);
 	}
 
 	protected void prepare() {
@@ -43,7 +38,12 @@ public class Elasticsearch extends BaseOutput {
 		if (config.containsKey("index_type")) {
 			this.indexType = (String) config.get("index_type");
 		} else {
-			this.indexType = "logs";
+			try {
+				this.indexTypeRender = new FreeMarkerRender("logs", "logs");
+			} catch (IOException e) {
+				logger.fatal(e.getMessage());
+				System.exit(1);
+			}
 		}
 
 		this.initESClient();

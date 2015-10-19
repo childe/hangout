@@ -107,8 +107,6 @@ public class Main {
 		Map configs = HangoutConfig.parse(optsList.get("f"));
 		logger.debug(configs);
 
-		ArrayBlockingQueue inputQueue = new ArrayBlockingQueue(20, false);
-
 		// for filter in filters
 		BaseFilter[] filterProcessors = new BaseFilter[0];
 
@@ -154,8 +152,7 @@ public class Main {
 		// for output in output
 		ArrayList<Map> outputs = (ArrayList<Map>) configs.get("outputs");
 
-		BaseOutput[] outputProcessors = new BaseOutput[outputs
-				.size()];
+		BaseOutput[] outputProcessors = new BaseOutput[outputs.size()];
 
 		int idx = 0;
 		for (Map output : outputs) {
@@ -191,10 +188,9 @@ public class Main {
 				Class<?> inputClass = Class
 						.forName("org.ctrip.ops.sysdev.inputs." + inputType);
 				Constructor<?> ctor = inputClass.getConstructor(Map.class,
-						ArrayBlockingQueue.class, BaseFilter[].class, ArrayList.class);
+						BaseFilter[].class, ArrayList.class);
 				BaseInput inputInstance = (BaseInput) ctor.newInstance(
-						inputConfig, inputQueue, filterProcessors,
-						outputs);
+						inputConfig, filterProcessors, outputs);
 				inputInstance.emit();
 			}
 		}

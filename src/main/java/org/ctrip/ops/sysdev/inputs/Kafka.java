@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Map.Entry;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -30,16 +29,13 @@ public class Kafka extends BaseInput {
 
 	private class Consumer implements Runnable {
 		private KafkaStream<byte[], byte[]> m_stream;
-		private ArrayBlockingQueue messageQueue;
 		private IDecode decoder;
 		private BaseFilter[] filterProcessors;
 		private BaseOutput[] outputProcessors;
 
-		public Consumer(KafkaStream<byte[], byte[]> a_stream,
-				ArrayBlockingQueue fairQueue, IDecode decoder,
+		public Consumer(KafkaStream<byte[], byte[]> a_stream, IDecode decoder,
 				BaseFilter[] filterProcessors, ArrayList<Map> outputs) {
 			m_stream = a_stream;
-			this.messageQueue = fairQueue;
 			this.decoder = decoder;
 			this.filterProcessors = filterProcessors.clone();
 
@@ -59,11 +55,11 @@ public class Kafka extends BaseInput {
 						outputClass = Class
 								.forName("org.ctrip.ops.sysdev.outputs."
 										+ outputType);
-						Constructor<?> ctor = outputClass.getConstructor(
-								Map.class, ArrayBlockingQueue.class);
+						Constructor<?> ctor = outputClass
+								.getConstructor(Map.class);
 
-						outputProcessors[idx] = (BaseOutput) ctor.newInstance(
-								outputConfig, null);
+						outputProcessors[idx] = (BaseOutput) ctor
+								.newInstance(outputConfig);
 						idx++;
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -107,9 +103,9 @@ public class Kafka extends BaseInput {
 	private IDecode decoder;
 	private Map<String, Integer> topic;
 
-	public Kafka(Map<String, Object> config, ArrayBlockingQueue messageQueue,
-			BaseFilter[] filterProcessors, ArrayList<Map> outputs) {
-		super(config, messageQueue, filterProcessors, outputs);
+	public Kafka(Map<String, Object> config, BaseFilter[] filterProcessors,
+			ArrayList<Map> outputs) {
+		super(config, filterProcessors, outputs);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -158,8 +154,8 @@ public class Kafka extends BaseInput {
 			executor = Executors.newFixedThreadPool(threads);
 
 			for (final KafkaStream<byte[], byte[]> stream : streams) {
-				executor.submit(new Consumer(stream, messageQueue,
-						this.decoder, this.filterProcessors, this.outputs));
+				executor.submit(new Consumer(stream, this.decoder,
+						this.filterProcessors, this.outputs));
 			}
 		}
 

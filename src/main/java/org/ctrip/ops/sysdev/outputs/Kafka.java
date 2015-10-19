@@ -2,7 +2,6 @@ package org.ctrip.ops.sysdev.outputs;
 
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.ArrayBlockingQueue;
 
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
@@ -18,8 +17,8 @@ public class Kafka extends BaseOutput {
 	private Producer producer;
 	private String topic;
 
-	public Kafka(Map config, ArrayBlockingQueue inputQueue) {
-		super(config, inputQueue);
+	public Kafka(Map config) {
+		super(config);
 	}
 
 	protected void prepare() {
