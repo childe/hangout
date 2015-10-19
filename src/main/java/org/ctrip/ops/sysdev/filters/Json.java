@@ -38,7 +38,7 @@ public class Json extends BaseFilter {
 	};
 
 	@Override
-	protected Map filter(final Map event) {
+	public Map filter(final Map event) {
 		Map<String, Object> obj = null;
 		if (event.containsKey(this.field)) {
 			obj = (HashMap<String, Object>) JSONValue.parse((String) event

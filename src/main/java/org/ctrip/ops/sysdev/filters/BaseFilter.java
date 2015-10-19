@@ -53,7 +53,7 @@ public class BaseFilter implements Runnable {
 	protected void prepare() {
 	};
 
-	protected Map filter(Map event) {
+	public Map filter(Map event) {
 		return null;
 	};
 

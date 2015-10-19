@@ -201,7 +201,7 @@ public class Grok extends BaseFilter {
 	};
 
 	@Override
-	protected Map filter(Map event) {
+	public Map filter(Map event) {
 		if (!event.containsKey(this.src)) {
 			return event;
 		}

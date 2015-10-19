@@ -18,7 +18,7 @@ public class Gsub extends BaseFilter {
 	};
 
 	@Override
-	protected Map filter(final Map event) {
+	public Map filter(final Map event) {
 		Iterator<Entry<String, List<String>>> it = fields.entrySet().iterator();
 		while (it.hasNext()) {
 			Map.Entry<String, List<String>> entry = it.next();

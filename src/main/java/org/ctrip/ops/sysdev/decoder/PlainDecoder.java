@@ -11,12 +11,14 @@ public class PlainDecoder implements IDecode {
 
 	@Override
 	public Map<String, Object> decode(final String message) {
+		System.out.println(message);
 		HashMap<String, Object> event = new HashMap<String, Object>() {
 			{
 				put("message", message);
 				put("@timestamp", DateTime.now());
 			}
 		};
+		System.out.println(event);
 		return event;
 	}
 }

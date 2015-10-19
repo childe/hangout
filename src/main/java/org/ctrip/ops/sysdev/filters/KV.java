@@ -70,7 +70,7 @@ public class KV extends BaseFilter {
 	};
 
 	@Override
-	protected Map filter(Map event) {
+	public Map filter(Map event) {
 		if (!event.containsKey(this.source)) {
 			return event;
 		}

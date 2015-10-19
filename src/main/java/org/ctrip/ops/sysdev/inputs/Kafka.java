@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import org.ctrip.ops.sysdev.decoder.IDecode;
 import org.ctrip.ops.sysdev.decoder.JsonDecoder;
 import org.ctrip.ops.sysdev.decoder.PlainDecoder;
+import org.ctrip.ops.sysdev.filters.BaseFilter;
 
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.ConsumerIterator;
@@ -28,12 +29,15 @@ public class Kafka extends BaseInput {
 		private KafkaStream<byte[], byte[]> m_stream;
 		private ArrayBlockingQueue messageQueue;
 		private IDecode decoder;
+		private BaseFilter[] filterProcessors;
 
 		public Consumer(KafkaStream<byte[], byte[]> a_stream,
-				ArrayBlockingQueue fairQueue, IDecode decoder) {
+				ArrayBlockingQueue fairQueue, IDecode decoder,
+				BaseFilter[] filterProcessors) {
 			m_stream = a_stream;
 			this.messageQueue = fairQueue;
 			this.decoder = decoder;
+			this.filterProcessors = filterProcessors;
 		}
 
 		public void run() {
@@ -42,13 +46,16 @@ public class Kafka extends BaseInput {
 				String m = new String(it.next().message());
 				try {
 					Map<String, Object> event = decoder.decode(m);
-					this.messageQueue.put(event);
-				} catch (InterruptedException e) {
-					logger.warn("put message to queue failed");
-					logger.trace(e.getMessage());
+					for (BaseFilter bf : filterProcessors) {
+						if (event == null) {
+							break;
+						}
+						event = bf.filter(event);
+						this.messageQueue.put(event);
+					}
 				} catch (Exception e) {
-					logger.error("json decode failed:" + m);
-					logger.trace(e.getMessage());
+					logger.error("process event failed:" + m);
+					logger.error(e);
 				}
 			}
 		}
@@ -59,8 +66,9 @@ public class Kafka extends BaseInput {
 	private IDecode decoder;
 	private Map<String, Integer> topic;
 
-	public Kafka(Map<String, Object> config, ArrayBlockingQueue messageQueue) {
-		super(config, messageQueue);
+	public Kafka(Map<String, Object> config, ArrayBlockingQueue messageQueue,
+			BaseFilter[] filterProcessors) {
+		super(config, messageQueue, filterProcessors);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -109,7 +117,8 @@ public class Kafka extends BaseInput {
 			executor = Executors.newFixedThreadPool(threads);
 
 			for (final KafkaStream<byte[], byte[]> stream : streams) {
-				executor.submit(new Consumer(stream, messageQueue, this.decoder));
+				executor.submit(new Consumer(stream, messageQueue,
+						this.decoder, this.filterProcessors));
 			}
 		}
 

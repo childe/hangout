@@ -22,7 +22,6 @@ public class Uppercase extends BaseFilter {
 				event.put(field, ((String) event.get(field)).toUpperCase());
 			}
 		}
-
 		return event;
 	}
 }

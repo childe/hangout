@@ -67,7 +67,7 @@ public class Translate extends BaseFilter {
 	};
 
 	@Override
-	protected Map filter(final Map event) {
+	public Map filter(final Map event) {
 		if (dictionary == null || !event.containsKey(this.source)) {
 			return event;
 		}
