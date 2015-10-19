@@ -11,6 +11,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.DailyRollingFileAppender;
@@ -184,14 +186,16 @@ public class Main {
 				Constructor<?> ctor = outputClass.getConstructor(Map.class,
 						ArrayBlockingQueue.class);
 
-				BaseOutput outputInstance = (BaseOutput) ctor.newInstance(
-						outputConfig, inputQueueForOutput);
 				int threads = 1;
 				if (outputConfig.containsKey("threads")) {
 					threads = (int) outputConfig.get("threads");
 				}
+
+				ExecutorService executor = Executors
+						.newFixedThreadPool(threads);
 				for (int i = 0; i < threads; i++) {
-					new Thread(outputInstance).start();
+					executor.submit((BaseOutput) ctor.newInstance(outputConfig,
+							inputQueueForOutput));
 				}
 			}
 		}
