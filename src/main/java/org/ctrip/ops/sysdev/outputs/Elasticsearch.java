@@ -1,18 +1,18 @@
 package org.ctrip.ops.sysdev.outputs;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.ctrip.ops.sysdev.render.Formatter;
-import org.ctrip.ops.sysdev.render.FreeMarkerRender;
-import org.ctrip.ops.sysdev.render.TemplateRender;
 import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.bulk.BulkItemResponse;
-import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
@@ -20,17 +20,18 @@ import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.common.unit.ByteSizeUnit;
-import org.elasticsearch.common.unit.ByteSizeValue;
-import org.elasticsearch.common.unit.TimeValue;
 
 public class Elasticsearch extends BaseOutput {
 	private static final Logger logger = Logger.getLogger(Elasticsearch.class
 			.getName());
 	private String indexType;
 	private String index;
-	private BulkProcessor bulkProcessor;
 	private TransportClient esclient;
+	private BulkRequest bulkRequest;
+	private int bulkActions, flushInterval;
+	private ScheduledThreadPoolExecutor scheduler;
+	private ScheduledFuture scheduledFuture;
+	private long executionID;
 
 	public Elasticsearch(Map config, ArrayBlockingQueue inputQueue) {
 		super(config, inputQueue);
@@ -73,72 +74,95 @@ public class Elasticsearch extends BaseOutput {
 					Integer.parseInt(p)));
 		}
 
-		int bulkActions = 20000, bulkSize = 15, flushInterval = 10, concurrentRequests = 0;
+		// bulkRequest = this.esclient.prepareBulk();
+
 		if (config.containsKey("bulk_actions")) {
 			bulkActions = (int) config.get("bulk_actions");
+		} else {
+			bulkActions = 20000;
 		}
-		if (config.containsKey("bulk_size")) {
-			bulkSize = (int) config.get("bulk_size");
-		}
+
 		if (config.containsKey("flush_interval")) {
-			flushInterval = (int) config.get("flush_interval");
+			flushInterval = (int) config.get("flush_interval") * 1000;
+		} else {
+			flushInterval = 30000;
 		}
-		if (config.containsKey("concurrent_requests")) {
-			concurrentRequests = (int) config.get("concurrent_requests");
+
+		bulkRequest = new BulkRequest();
+
+		scheduler = (ScheduledThreadPoolExecutor) Executors
+				.newScheduledThreadPool(1);
+		this.scheduler.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
+		this.scheduler
+				.setContinueExistingPeriodicTasksAfterShutdownPolicy(false);
+		this.scheduledFuture = this.scheduler.scheduleWithFixedDelay(
+				new Flush(), flushInterval, flushInterval,
+				TimeUnit.MILLISECONDS);
+
+		executionID = 0;
+	}
+
+	private synchronized int executeBulk() {
+		executionID++;
+		logger.info(executionID + ": number of bulk actions "
+				+ bulkRequest.numberOfActions());
+
+		final BulkRequest bulkRequest = this.bulkRequest;
+		this.bulkRequest = new BulkRequest();
+
+		BulkResponse bulkItemResponses = esclient.bulk(bulkRequest).actionGet();
+		logger.info("got bulk response: " + executionID);
+		List<ActionRequest> requests = bulkRequest.requests();
+		int idx = 0;
+		int toberetry = 0;
+		for (BulkItemResponse item : bulkItemResponses.getItems()) {
+			if (item.isFailed()) {
+				if (idx == 0) {
+					logger.error("bulk failed: " + executionID);
+					logger.error(item.getFailureMessage());
+				}
+				switch (item.getFailure().getStatus()) {
+				case TOO_MANY_REQUESTS:
+				case SERVICE_UNAVAILABLE:
+					toberetry++;
+					this.bulkRequest.add(requests.get(item.getItemId()));
+				}
+			}
+			idx++;
 		}
-
-		bulkProcessor = BulkProcessor
-				.builder(this.esclient, new BulkProcessor.Listener() {
-					@Override
-					public void afterBulk(long arg0, BulkRequest arg1,
-							BulkResponse arg2) {
-						logger.info("bulk done with executionId: " + arg0);
-						List<ActionRequest> requests = arg1.requests();
-						int idx = 0;
-						for (BulkItemResponse item : arg2.getItems()) {
-							if (item.isFailed()) {
-								if (idx == 0) {
-									logger.error("bulk failed");
-									logger.error(item.getFailureMessage());
-								}
-								switch (item.getFailure().getStatus()) {
-								case TOO_MANY_REQUESTS:
-								case SERVICE_UNAVAILABLE:
-									bulkProcessor.add(requests.get(item
-											.getItemId()));
-								}
-							}
-
-							idx += 1;
-						}
-					}
-
-					@Override
-					public void afterBulk(long arg0, BulkRequest arg1,
-							Throwable arg2) {
-						logger.error("bulk got exception");
-						logger.error(arg2.getMessage());
-					}
-
-					@Override
-					public void beforeBulk(long arg0, BulkRequest arg1) {
-						logger.info("executionId: " + arg0);
-						logger.info("numberOfActions: "
-								+ arg1.numberOfActions());
-					}
-				}).setBulkActions(bulkActions)
-				.setBulkSize(new ByteSizeValue(bulkSize, ByteSizeUnit.MB))
-				.setFlushInterval(TimeValue.timeValueSeconds(flushInterval))
-				.setConcurrentRequests(concurrentRequests).build();
+		if (toberetry > 0) {
+			try {
+				logger.info("sleep " + toberetry / 10
+						+ "millseconds after bulk failure");
+				Thread.sleep(toberetry / 10);
+			} catch (InterruptedException e) {
+				logger.error(e);
+			}
+		}
+		logger.info("bulk finished: " + executionID);
+		return toberetry;
 	}
 
 	@Override
 	public void emit(final Map event) {
 		String _index = Formatter.format(event, index);
 		String _indexType = Formatter.format(event, indexType);
-
-		IndexRequest indexRequest = new IndexRequest(_index, _indexType)
-				.source(event);
-		this.bulkProcessor.add(indexRequest);
+		bulkRequest.add(new IndexRequest(_index, _indexType).source(event));
+		if (bulkRequest.numberOfActions() >= this.bulkActions) {
+			executeBulk();
+		}
 	}
+
+	class Flush implements Runnable {
+		@Override
+		public void run() {
+			synchronized (Elasticsearch.this) {
+				if (bulkRequest.numberOfActions() == 0) {
+					return;
+				}
+				executeBulk();
+			}
+		}
+	}
+
 }
