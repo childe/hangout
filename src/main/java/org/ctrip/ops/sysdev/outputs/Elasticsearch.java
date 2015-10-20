@@ -152,8 +152,7 @@ public class Elasticsearch extends BaseOutput {
 				.setConcurrentRequests(concurrentRequests).build();
 	}
 
-	@Override
-	public void emit(final Map event) {
+	private void emit(final Map event) {
 		// String _index = indexRender.render(event);
 		String _index = Formatter.format(event, index);
 		String _indexType = indexTypeRender.render(event);

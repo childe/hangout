@@ -12,8 +12,6 @@ public class Null extends BaseOutput {
 		super(config);
 	}
 
-	@Override
-	public void emit(Map event) {
-
+	private void emit(Map event) {
 	}
 }

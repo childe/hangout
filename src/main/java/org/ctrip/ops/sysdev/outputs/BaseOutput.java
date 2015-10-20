@@ -42,6 +42,21 @@ public class BaseOutput {
 	protected void prepare() {
 	};
 
-	public void emit(Map event) {
+	private void emit(Map event) {
 	};
+
+	public void process(Map event) {
+		boolean succuess = true;
+		if (this.IF != null) {
+			for (TemplateRender render : this.IF) {
+				if (!render.render(event).equals("true")) {
+					succuess = false;
+					break;
+				}
+			}
+		}
+		if (succuess == true) {
+			this.emit(event);
+		}
+	}
 }

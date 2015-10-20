@@ -73,12 +73,10 @@ public class Kafka extends BaseInput {
 			while (it.hasNext()) {
 				String m = new String(it.next().message());
 				Map<String, Object> event;
-				int idx = 0;
 				try {
 					event = decoder.decode(m);
 
 					for (BaseFilter bf : filterProcessors) {
-						idx += 1;
 						if (event == null) {
 							break;
 						}
@@ -86,7 +84,7 @@ public class Kafka extends BaseInput {
 					}
 					if (event != null) {
 						for (BaseOutput bo : outputProcessors) {
-							bo.emit(event);
+							bo.process(event);
 						}
 					}
 				} catch (Exception e) {
