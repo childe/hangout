@@ -32,7 +32,7 @@ public class Kafka extends BaseOutput {
 		producer = new Producer<>(pconfig);
 	};
 
-	private void emit(Map event) {
+	protected void emit(Map event) {
 		producer.send(new KeyedMessage<>(topic, JSONValue.toJSONString(event)
 				.getBytes()));
 	}

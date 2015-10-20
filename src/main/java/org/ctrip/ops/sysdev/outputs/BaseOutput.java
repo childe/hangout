@@ -42,7 +42,7 @@ public class BaseOutput {
 	protected void prepare() {
 	};
 
-	private void emit(Map event) {
+	protected void emit(Map event) {
 	};
 
 	public void process(Map event) {

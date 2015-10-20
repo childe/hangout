@@ -13,7 +13,7 @@ public class Stdout extends BaseOutput {
 		super(config);
 	}
 
-	private void emit(Map event) {
+	protected void emit(Map event) {
 		System.out.println(event);
 	}
 }
