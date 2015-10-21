@@ -21,13 +21,10 @@ inputs:
 
 filters:
     - Grok:
-        threads: 4
-        src: message
         match:
           - '^(?<logtime>\S+) (?<user>.+) (-|(?<level>\w+)) %{DATA:msg}$'
         remove_fields: ['message']
     - Add:
-        threads: 4
         fields:
             test: 'abcd'
         if:
@@ -54,13 +51,12 @@ filters:
           me: he
           user: she
     - Gsub:
-        threads: 4
         fields:
           she: ['c','CCC']
           he: ['(^\w+)|(\w+$)','XXX']
     - Translate:
-        source: ServiceCode
-        target: soaurl
+        source: user
+        target: nick
         dictionary_path: /tmp/app.dic
     - KV:
         source: msg
@@ -74,19 +70,16 @@ filters:
 
 outputs:
     - Elasticsearch:
-        threads: 1
         cluster: hangoutcluster
         hosts:
           - 192.168.1.200
-        index: 'hangout-${@timestamp.toString("YYYY.MM.dd")}'
+        index: 'hangout-%{user}-%{+YYYY.MM.dd}'
         index_type: logs # default logs
         bulk_actions: 20000 #default 20000
         bulk_size: 15 # default 15 MB
         flush_interval: 10 # default 10 seconds
         concurrent_requests: 1 # default 1
     - Kafka:
-        threads: 1
         broker_list: 192.168.1.200:9092
         topic: test2
     - Stdout: {}
-        threads: 1
