@@ -114,22 +114,32 @@ public class Elasticsearch extends BaseOutput {
 							BulkResponse arg2) {
 						logger.info("bulk done with executionId: " + arg0);
 						List<ActionRequest> requests = arg1.requests();
-						int idx = 0;
+						int toberetry = 0;
 						for (BulkItemResponse item : arg2.getItems()) {
 							if (item.isFailed()) {
-								if (idx == 0) {
-									logger.error("bulk failed");
-									logger.error(item.getFailureMessage());
-								}
 								switch (item.getFailure().getStatus()) {
 								case TOO_MANY_REQUESTS:
 								case SERVICE_UNAVAILABLE:
+									if (toberetry == 0) {
+										logger.error("bulk failed");
+										logger.error(item.getFailureMessage());
+									}
+									toberetry++;
 									bulkProcessor.add(requests.get(item
 											.getItemId()));
 								}
 							}
+						}
 
-							idx += 1;
+						if (toberetry > 0) {
+							try {
+								logger.info("sleep " + toberetry / 2
+										+ "millseconds after bulk failure");
+								Thread.sleep(toberetry / 2);
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 						}
 					}
 
