@@ -66,7 +66,7 @@
 
 ## Filter
 ### Grok
-Grok是为了把一个字符串切割成多个field, 用的是[Joni库](https://github.com/jruby/joni), 暂不支持logstash里面的patterns.
+Grok是为了把一个字符串切割成多个field, 用的是[Joni库](https://github.com/jruby/joni), 不完全支持logstash里面的patterns语法,%{INT:bytes:int}这种语法不支持, 只支持%{INT:bytes},字段类型需要在ES中定义.
 
 会依次匹配match中的正则, 直到有一个成功的.
 
