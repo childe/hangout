@@ -10,11 +10,21 @@ public class JsonDecoder implements IDecode {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, Object> decode(String message) {
+	public Map<String, Object> decode(final String message) {
 		Map<String, Object> event = (HashMap<String, Object>) JSONValue
 				.parse(message);
-		if (!event.containsKey("@timestamp")) {
-			event.put("@timestamp", DateTime.now());
+
+		if (event == null) {
+			event = new HashMap<String, Object>() {
+				{
+					put("message", message);
+					put("@timestamp", DateTime.now());
+				}
+			};
+		} else {
+			if (!event.containsKey("@timestamp")) {
+				event.put("@timestamp", DateTime.now());
+			}
 		}
 		return event;
 	}
