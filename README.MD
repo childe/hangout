@@ -29,15 +29,15 @@
 不压测吞吐量, 正常消费的情况下, CPU使用率大概是Logstash的50%到25%.
 
 # 运行
-	java hangout.jar org.ctrip.ops.sysdev.Main -f app.yml
+	bin/hangout -f app.yml
 
 记录日志到文件:
 
-	java hangout.jar org.ctrip.ops.sysdev.Main -f app.yml -l /var/log/hangout/app.yml.log
+	bin/hangout -f app.yml -l /var/log/hangout/app.yml.log
 
 默认日志记录是warn级别, 详细日志:
 
-	java hangout.jar org.ctrip.ops.sysdev.Main -f app.yml -l /var/log/hangout/app.yml.log -vvvv
+	bin/hangout -f app.yml -l /var/log/hangout/app.yml.log -vvvv
 
 -v 是info , -vv 是debug , -vvvv 是Trace
 		
