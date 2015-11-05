@@ -5,3 +5,4 @@ conf/
 target
 Test.java
 build/
+release/
