@@ -119,10 +119,19 @@ Date是用的[jona-time](http://www.joda.org/joda-time/)做解析和格式化.
 
 ### Translate
 每隔一段时间, 会重新加载字典. 字典是yaml格式.
+用的[snakeyaml](https://bitbucket.org/asomov/snakeyaml)加载yaml文件的, 如果key是整数类型,会首先尝试转换成Integer, 超出Integer范围才会尝试Long.  
+但是Json格式的日志会被直接转成Long类型的, 导致不能匹配.
+
+所以yaml里面需要这么写:
+
+	!!java.lang.Long 123: 信用卡
+	!!java.lang.Long 345: 借记卡
+
+Tranlate 配置：
 
 	source: user
 	target: nick
-	dictionary_path: /user-nick.dict # yaml format
+	dictionary_path: /user-nick.yml
 	refresh_interval: 300 # default 300 seconds
 
 ### KV
