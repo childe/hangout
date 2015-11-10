@@ -3,18 +3,10 @@ package org.ctrip.ops.sysdev.filters;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.ArrayBlockingQueue;
-
-import scala.Tuple2;
 
 import org.apache.log4j.Logger;
-import org.ctrip.ops.sysdev.render.FreeMarkerRender;
-import org.ctrip.ops.sysdev.render.TemplateRender;
 import org.yaml.snakeyaml.Yaml;
 
 public class Translate extends BaseFilter {
