@@ -70,7 +70,7 @@ public class Main {
 			DailyRollingFileAppender fa = new DailyRollingFileAppender();
 			fa.setName("FileLogger");
 			fa.setFile(optsList.get("l"));
-			fa.setLayout(new PatternLayout("%d %-5p [%c{1}] %m%n"));
+			fa.setLayout(new PatternLayout("%d %p %C %t %m%n"));
 			if (singleOptsList.contains("vvvv")) {
 				fa.setThreshold(Level.TRACE);
 			} else if (singleOptsList.contains("vv")) {
@@ -85,7 +85,7 @@ public class Main {
 			Logger.getRootLogger().addAppender(fa);
 		} else {
 			ConsoleAppender console = new ConsoleAppender();
-			String PATTERN = "%d [%p|%c|%C{1}] %m%n";
+			String PATTERN = "%d %p %C %t %m%n";
 			console.setLayout(new PatternLayout(PATTERN));
 			if (singleOptsList.contains("vvvv")) {
 				console.setThreshold(Level.TRACE);
