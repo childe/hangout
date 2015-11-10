@@ -115,20 +115,35 @@ public class Elasticsearch extends BaseOutput {
 						logger.info("bulk done with executionId: " + arg0);
 						List<ActionRequest> requests = arg1.requests();
 						int toberetry = 0;
+						int totalFailed = 0;
 						for (BulkItemResponse item : arg2.getItems()) {
 							if (item.isFailed()) {
 								switch (item.getFailure().getStatus()) {
 								case TOO_MANY_REQUESTS:
 								case SERVICE_UNAVAILABLE:
 									if (toberetry == 0) {
-										logger.error("bulk failed");
+										logger.error("bulk has failed item which NEED to retry");
 										logger.error(item.getFailureMessage());
 									}
 									toberetry++;
 									bulkProcessor.add(requests.get(item
 											.getItemId()));
+									break;
+								default:
+									if (totalFailed == 0) {
+										logger.error("bulk has failed item which do NOT need to retry");
+										logger.error(item.getFailureMessage());
+									}
+									break;
 								}
+
+								totalFailed++;
 							}
+						}
+
+						if (totalFailed > 0) {
+							logger.info(totalFailed + " doc failed, "
+									+ toberetry + " need to retry");
 						}
 
 						if (toberetry > 0) {
