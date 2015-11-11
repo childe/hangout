@@ -1,5 +1,6 @@
 package org.ctrip.ops.sysdev.inputs;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,13 +31,16 @@ public class Kafka extends BaseInput {
 	private class Consumer implements Runnable {
 		private KafkaStream<byte[], byte[]> m_stream;
 		private IDecode decoder;
+		private String encoding;
 		private BaseFilter[] filterProcessors;
 		private BaseOutput[] outputProcessors;
 
-		public Consumer(KafkaStream<byte[], byte[]> a_stream, IDecode decoder,
-				BaseFilter[] filterProcessors, ArrayList<Map> outputs) {
+		public Consumer(KafkaStream<byte[], byte[]> a_stream, String encoding,
+				IDecode decoder, BaseFilter[] filterProcessors,
+				ArrayList<Map> outputs) {
 			m_stream = a_stream;
 			this.decoder = decoder;
+			this.encoding = encoding;
 			this.filterProcessors = filterProcessors.clone();
 
 			outputProcessors = new BaseOutput[outputs.size()];
@@ -71,7 +75,14 @@ public class Kafka extends BaseInput {
 		public void run() {
 			ConsumerIterator<byte[], byte[]> it = m_stream.iterator();
 			while (it.hasNext()) {
-				String m = new String(it.next().message());
+				String m = null;
+				try {
+					m = new String(it.next().message(), this.encoding);
+				} catch (UnsupportedEncodingException e1) {
+					e1.printStackTrace();
+					logger.error(e1);
+				}
+
 				Map<String, Object> event;
 				try {
 					event = decoder.decode(m);
@@ -99,6 +110,7 @@ public class Kafka extends BaseInput {
 	private ConsumerConnector consumer;
 	private ExecutorService executor;
 	private IDecode decoder;
+	private String encoding;
 	private Map<String, Integer> topic;
 
 	public Kafka(Map<String, Object> config, BaseFilter[] filterProcessors,
@@ -127,6 +139,12 @@ public class Kafka extends BaseInput {
 		consumer = kafka.consumer.Consumer
 				.createJavaConsumerConnector(new ConsumerConfig(props));
 
+		if (this.config.containsKey("encoding")) {
+			this.encoding = (String) this.config.get("encoding");
+		} else {
+			this.encoding = "UTF8";
+		}
+
 		String codec = (String) this.config.get("codec");
 		if (codec != null && codec.equalsIgnoreCase("plain")) {
 			this.decoder = new PlainDecoder();
@@ -152,8 +170,8 @@ public class Kafka extends BaseInput {
 			executor = Executors.newFixedThreadPool(threads);
 
 			for (final KafkaStream<byte[], byte[]> stream : streams) {
-				executor.submit(new Consumer(stream, this.decoder,
-						this.filterProcessors, this.outputs));
+				executor.submit(new Consumer(stream, this.encoding,
+						this.decoder, this.filterProcessors, this.outputs));
 			}
 		}
 
