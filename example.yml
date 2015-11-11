@@ -67,8 +67,15 @@ filters:
         trimkey: '\"'
         tag_on_failure: "KVfail"
         remove_fields: ['msg']
+    - Convert:
+        fields:
+            cs_bytes: integer
+            time_taken: float
 
 outputs:
+    - Stdout:
+        if:
+            - '<#if user=="childe">true</#if>'
     - Elasticsearch:
         cluster: hangoutcluster
         hosts:
@@ -82,4 +89,3 @@ outputs:
     - Kafka:
         broker_list: 192.168.1.200:9092
         topic: test2
-    - Stdout: {}
