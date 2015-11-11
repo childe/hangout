@@ -5,8 +5,6 @@ import java.util.Map;
 
 import org.joda.time.DateTime;
 
-;
-
 public class PlainDecoder implements IDecode {
 
 	@Override
