@@ -19,7 +19,7 @@ public class KV extends BaseFilter {
 	private String trim;
 	private String trimkey;
 
-	private ArrayList<String> removeFields;
+	private ArrayList<String> removeFields, excludeKeys, includeKeys;
 
 	public KV(Map config) {
 		super(config);
@@ -67,6 +67,10 @@ public class KV extends BaseFilter {
 		} else {
 			this.tagOnFailure = "KVfail";
 		}
+
+		this.excludeKeys = (ArrayList<String>) this.config.get("exclude_keys");
+		this.includeKeys = (ArrayList<String>) this.config.get("include_keys");
+
 	};
 
 	@Override
@@ -88,6 +92,12 @@ public class KV extends BaseFilter {
 				}
 
 				String k = kandv[0];
+				if (this.includeKeys != null && !this.includeKeys.contains(k)
+						|| this.excludeKeys != null
+						&& this.excludeKeys.contains(k)) {
+					continue;
+				}
+
 				String v = kandv[1];
 
 				if (this.trim != null) {

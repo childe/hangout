@@ -66,6 +66,8 @@ filters:
         value_split: '='
         trim: '\t\"'
         trimkey: '\"'
+        include_keys: ["a","b","xyz","12"]
+        exclude_keys: ["b","c"] # b in excluded
         tag_on_failure: "KVfail"
         remove_fields: ['msg']
     - Convert:
