@@ -74,6 +74,8 @@ filters:
         fields:
             cs_bytes: integer
             time_taken: float
+    - URLDecode:
+        fields: ["query1","query2"]
 
 outputs:
     - Stdout:
