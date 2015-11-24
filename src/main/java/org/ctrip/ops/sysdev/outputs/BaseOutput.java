@@ -9,7 +9,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 import org.apache.log4j.Logger;
 import org.ctrip.ops.sysdev.filters.BaseFilter;
 import org.ctrip.ops.sysdev.render.FreeMarkerRender;
-import org.ctrip.ops.sysdev.render.JinjavaRender;
 import org.ctrip.ops.sysdev.render.TemplateRender;
 
 public class BaseOutput {
