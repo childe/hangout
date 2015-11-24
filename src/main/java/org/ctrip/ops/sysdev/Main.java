@@ -73,6 +73,7 @@ public class Main {
 			fa.setLayout(new PatternLayout("%d %p %C %t %m%n"));
 			if (singleOptsList.contains("vvvv")) {
 				fa.setThreshold(Level.TRACE);
+				Logger.getRootLogger().setLevel(Level.TRACE);
 			} else if (singleOptsList.contains("vv")) {
 				fa.setThreshold(Level.DEBUG);
 			} else if (singleOptsList.contains("v")) {
@@ -89,6 +90,7 @@ public class Main {
 			console.setLayout(new PatternLayout(PATTERN));
 			if (singleOptsList.contains("vvvv")) {
 				console.setThreshold(Level.TRACE);
+				Logger.getRootLogger().setLevel(Level.TRACE);
 			} else if (singleOptsList.contains("vv")) {
 				console.setThreshold(Level.DEBUG);
 			} else if (singleOptsList.contains("v")) {
