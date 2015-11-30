@@ -2,12 +2,10 @@ package org.ctrip.ops.sysdev.inputs;
 
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
 
 import org.ctrip.ops.sysdev.filters.BaseFilter;
-import org.ctrip.ops.sysdev.outputs.BaseOutput;
 
-public class BaseInput {
+public abstract class BaseInput {
 	protected Map<String, Object> config;
 	protected BaseFilter[] filterProcessors;
 	ArrayList<Map> outputs;
@@ -20,10 +18,7 @@ public class BaseInput {
 		this.prepare();
 	}
 
-	protected void prepare() {
-	};
+	protected abstract void prepare();
 
-	public void emit() {
-
-	};
+	public abstract void emit();
 }

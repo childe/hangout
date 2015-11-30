@@ -6,3 +6,5 @@ target
 Test.java
 build/
 release/
+.idea/
+*.iml
