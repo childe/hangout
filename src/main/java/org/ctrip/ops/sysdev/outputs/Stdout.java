@@ -13,6 +13,12 @@ public class Stdout extends BaseOutput {
 		super(config);
 	}
 
+	@Override
+	protected void prepare() {
+
+	}
+
+	@Override
 	protected void emit(Map event) {
 		System.out.println(event);
 	}
