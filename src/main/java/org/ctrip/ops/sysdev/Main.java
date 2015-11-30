@@ -106,59 +106,6 @@ public class Main {
 		Map configs = HangoutConfig.parse(optsList.get("f"));
 		logger.debug(configs);
 
-		// for filter in filters
-		BaseFilter[] filterProcessors = new BaseFilter[0];
-
-		if (configs.containsKey("filters")) {
-			ArrayList<Map> filters = (ArrayList<Map>) configs.get("filters");
-			filterProcessors = new BaseFilter[filters.size()];
-
-			int idx = 0;
-			for (Map filter : filters) {
-				Iterator<Entry<String, Map>> filterIT = filter.entrySet()
-						.iterator();
-
-				while (filterIT.hasNext()) {
-					Map.Entry<String, Map> filterEntry = filterIT.next();
-					String filterType = filterEntry.getKey();
-					Map filterConfig = filterEntry.getValue();
-
-					Class<?> filterClass = Class
-							.forName("org.ctrip.ops.sysdev.filters."
-									+ filterType);
-					Constructor<?> ctor = filterClass.getConstructor(Map.class);
-
-					BaseFilter filterInstance = (BaseFilter) ctor
-							.newInstance(filterConfig);
-					filterProcessors[idx] = filterInstance;
-					idx++;
-				}
-			}
-		}
-
-		// for output in output
-		ArrayList<Map> outputs = (ArrayList<Map>) configs.get("outputs");
-
-		BaseOutput[] outputProcessors = new BaseOutput[outputs.size()];
-
-		int idx = 0;
-		for (Map output : outputs) {
-			Iterator<Entry<String, Map>> outputIT = output.entrySet()
-					.iterator();
-
-			while (outputIT.hasNext()) {
-				Map.Entry<String, Map> outputEntry = outputIT.next();
-				String outputType = outputEntry.getKey();
-				Map outputConfig = outputEntry.getValue();
-				Class<?> outputClass = Class
-						.forName("org.ctrip.ops.sysdev.outputs." + outputType);
-				Constructor<?> ctor = outputClass.getConstructor(Map.class);
-
-				outputProcessors[idx] = (BaseOutput) ctor
-						.newInstance(outputConfig);
-				idx++;
-			}
-		}
 
 		// for input in all_inputs
 		ArrayList<Map> inputs = (ArrayList<Map>) configs.get("inputs");
@@ -174,9 +121,9 @@ public class Main {
 				Class<?> inputClass = Class
 						.forName("org.ctrip.ops.sysdev.inputs." + inputType);
 				Constructor<?> ctor = inputClass.getConstructor(Map.class,
-						BaseFilter[].class, ArrayList.class);
+						ArrayList.class, ArrayList.class);
 				BaseInput inputInstance = (BaseInput) ctor.newInstance(
-						inputConfig, filterProcessors, outputs);
+						inputConfig, configs.get("filters"), configs.get("outputs"));
 				inputInstance.emit();
 			}
 		}
