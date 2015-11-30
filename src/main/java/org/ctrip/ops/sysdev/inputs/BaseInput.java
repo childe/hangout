@@ -1,12 +1,10 @@
 package org.ctrip.ops.sysdev.inputs;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ArrayBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.ctrip.ops.sysdev.decoder.IDecode;
@@ -26,18 +24,44 @@ public class BaseInput {
 	protected ArrayList<Map> filters;
 	protected ArrayList<Map> outputs;
 
-	public BaseInput(Map config, ArrayList<Map> filters, ArrayList<Map> outputs)
-			throws Exception {
-		this.config = config;
-		this.filters = filters;
-		this.outputs = outputs;
-		String codec = (String) this.config.get("codec");
-		if (codec != null && codec.equalsIgnoreCase("plain")) {
-			this.decoder = new PlainDecoder();
-		} else {
-			this.decoder = new JsonDecoder();
-		}
+	public BaseFilter[] createFilterProcessors() {
+		if (filters != null) {
+			filterProcessors = new BaseFilter[filters.size()];
 
+			int idx = 0;
+			for (Map filter : filters) {
+				Iterator<Entry<String, Map>> filterIT = filter.entrySet()
+						.iterator();
+
+				while (filterIT.hasNext()) {
+					Map.Entry<String, Map> filterEntry = filterIT.next();
+					String filterType = filterEntry.getKey();
+					Map filterConfig = filterEntry.getValue();
+
+					try {
+						Class<?> filterClass = Class
+								.forName("org.ctrip.ops.sysdev.filters."
+										+ filterType);
+						Constructor<?> ctor = filterClass
+								.getConstructor(Map.class);
+
+						BaseFilter filterInstance = (BaseFilter) ctor
+								.newInstance(filterConfig);
+						filterProcessors[idx] = filterInstance;
+					} catch (Exception e) {
+						logger.error(e);
+						System.exit(1);
+					}
+					idx++;
+				}
+			}
+		} else {
+			filterProcessors = null;
+		}
+		return filterProcessors;
+	}
+
+	public BaseOutput[] createOutputProcessors() {
 		outputProcessors = new BaseOutput[outputs.size()];
 		int idx = 0;
 		for (Map output : outputs) {
@@ -62,34 +86,24 @@ public class BaseInput {
 				}
 			}
 		}
+		return outputProcessors;
+	}
 
-		if (filters != null) {
-			filterProcessors = new BaseFilter[filters.size()];
-
-			idx = 0;
-			for (Map filter : filters) {
-				Iterator<Entry<String, Map>> filterIT = filter.entrySet()
-						.iterator();
-
-				while (filterIT.hasNext()) {
-					Map.Entry<String, Map> filterEntry = filterIT.next();
-					String filterType = filterEntry.getKey();
-					Map filterConfig = filterEntry.getValue();
-
-					Class<?> filterClass = Class
-							.forName("org.ctrip.ops.sysdev.filters."
-									+ filterType);
-					Constructor<?> ctor = filterClass.getConstructor(Map.class);
-
-					BaseFilter filterInstance = (BaseFilter) ctor
-							.newInstance(filterConfig);
-					filterProcessors[idx] = filterInstance;
-					idx++;
-				}
-			}
+	public IDecode createDecoder() {
+		String codec = (String) this.config.get("codec");
+		if (codec != null && codec.equalsIgnoreCase("plain")) {
+			return new PlainDecoder();
 		} else {
-			filterProcessors = null;
+			return new JsonDecoder();
 		}
+	}
+
+	public BaseInput(Map config, ArrayList<Map> filters, ArrayList<Map> outputs)
+			throws Exception {
+		this.config = config;
+		this.filters = filters;
+		this.outputs = outputs;
+
 	}
 
 	public void process(String message) {

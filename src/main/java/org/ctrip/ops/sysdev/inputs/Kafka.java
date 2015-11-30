@@ -12,6 +12,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
+import org.ctrip.ops.sysdev.decoder.IDecode;
+import org.ctrip.ops.sysdev.filters.BaseFilter;
+import org.ctrip.ops.sysdev.outputs.BaseOutput;
 
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.ConsumerIterator;
@@ -29,32 +32,59 @@ public class Kafka extends BaseInput {
 	private class Consumer implements Runnable {
 		private KafkaStream<byte[], byte[]> m_stream;
 		private Kafka kafkaInput;
+		private IDecode decoder;
+		private String encoding;
+		private BaseFilter[] filterProcessors;
+		private BaseOutput[] outputProcessors;
 
 		public Consumer(KafkaStream<byte[], byte[]> a_stream, Kafka kafkaInput) {
 			this.m_stream = a_stream;
 			this.kafkaInput = kafkaInput;
+			this.encoding = kafkaInput.encoding;
+			this.decoder = kafkaInput.createDecoder();
+			this.filterProcessors = kafkaInput.createFilterProcessors();
+			this.outputProcessors = kafkaInput.createOutputProcessors();
 		}
 
 		public void run() {
-			ConsumerIterator<byte[], byte[]> it = m_stream.iterator();
-			while (it.hasNext()) {
-				String m = null;
-				try {
-					m = new String(it.next().message(),
-							this.kafkaInput.encoding);
-				} catch (UnsupportedEncodingException e1) {
-					e1.printStackTrace();
-					logger.error(e1);
-				}
+			try {
+				ConsumerIterator<byte[], byte[]> it = m_stream.iterator();
+				while (it.hasNext()) {
+					String m = null;
+					try {
+						m = new String(it.next().message(),
+								this.kafkaInput.encoding);
+					} catch (UnsupportedEncodingException e1) {
+						e1.printStackTrace();
+						logger.error(e1);
+					}
 
-				Map<String, Object> event;
-				try {
-					this.kafkaInput.process(m);
-				} catch (Exception e) {
-					logger.error("process event failed:" + m);
-					e.printStackTrace();
-					logger.error(e);
+					try {
+						Map<String, Object> event = this.decoder
+								.decode(m);
+
+						if (this.filterProcessors != null) {
+							for (BaseFilter bf : filterProcessors) {
+								if (event == null) {
+									break;
+								}
+								event = bf.process(event);
+							}
+						}
+						if (event != null) {
+							for (BaseOutput bo : outputProcessors) {
+								bo.process(event);
+							}
+						}
+					} catch (Exception e) {
+						logger.error("process event failed:" + m);
+						e.printStackTrace();
+						logger.error(e);
+					}
 				}
+			} catch (Throwable t) {
+				logger.error(t);
+				System.exit(1);
 			}
 		}
 	}
