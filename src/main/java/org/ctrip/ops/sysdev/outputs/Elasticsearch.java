@@ -28,6 +28,7 @@ public class Elasticsearch extends BaseOutput {
 			.getName());
 
 	private String index;
+    private String indexTimezone;
 	private BulkProcessor bulkProcessor;
 	private TransportClient esclient;
 	private TemplateRender indexRender;
@@ -46,6 +47,12 @@ public class Elasticsearch extends BaseOutput {
 			System.exit(1);
 		}
 		this.index = (String) config.get("index");
+
+        if (config.containsKey("timezone")) {
+            this.indexTimezone = (String) config.get("timezone");
+        } else {
+            this.indexTimezone = "UTC";
+        }
 
 		if (config.containsKey("index_type")) {
 			try {
@@ -179,7 +186,7 @@ public class Elasticsearch extends BaseOutput {
 
 	protected void emit(final Map event) {
 		// String _index = indexRender.render(event);
-		String _index = Formatter.format(event, index);
+		String _index = Formatter.format(event, index, indexTimezone);
 		String _indexType = indexTypeRender.render(event);
 
 		IndexRequest indexRequest = new IndexRequest(_index, _indexType)
