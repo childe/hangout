@@ -10,7 +10,7 @@ public class TestArgParse {
 
     @Test
     public void testParseArg() throws Exception {
-        String[] args = new String[]{"-f", "data/sql.txt"};
+        String[] args = new String[]{"-f", "test config file"};
         Options options = new Options();
         options.addOption("h", false, "usage help");
         options.addOption("help", false, "usage help");

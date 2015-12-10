@@ -1,7 +1,6 @@
 package org.ctrip.ops.sysdev.inputs;
 
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -14,8 +13,6 @@ import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.ctrip.ops.sysdev.decoder.IDecode;
-import org.ctrip.ops.sysdev.decoder.JsonDecoder;
-import org.ctrip.ops.sysdev.decoder.PlainDecoder;
 import org.ctrip.ops.sysdev.filters.BaseFilter;
 import org.ctrip.ops.sysdev.outputs.BaseOutput;
 
@@ -28,101 +25,78 @@ public class Kafka extends BaseInput {
 	private static final Logger logger = Logger
 			.getLogger(Kafka.class.getName());
 
+	private ConsumerConnector consumer;
+	private ExecutorService executor;
+	private String encoding;
+
 	private class Consumer implements Runnable {
 		private KafkaStream<byte[], byte[]> m_stream;
+		private Kafka kafkaInput;
 		private IDecode decoder;
 		private String encoding;
 		private BaseFilter[] filterProcessors;
 		private BaseOutput[] outputProcessors;
 
-		public Consumer(KafkaStream<byte[], byte[]> a_stream, String encoding,
-				IDecode decoder, BaseFilter[] filterProcessors,
-				ArrayList<Map> outputs) {
-			m_stream = a_stream;
-			this.decoder = decoder;
-			this.encoding = encoding;
-			this.filterProcessors = filterProcessors.clone();
-
-			outputProcessors = new BaseOutput[outputs.size()];
-
-			int idx = 0;
-			for (Map output : outputs) {
-				Iterator<Entry<String, Map>> outputIT = output.entrySet()
-						.iterator();
-
-				while (outputIT.hasNext()) {
-					Map.Entry<String, Map> outputEntry = outputIT.next();
-					String outputType = outputEntry.getKey();
-					Map outputConfig = outputEntry.getValue();
-					Class<?> outputClass;
-					try {
-						outputClass = Class
-								.forName("org.ctrip.ops.sysdev.outputs."
-										+ outputType);
-						Constructor<?> ctor = outputClass
-								.getConstructor(Map.class);
-
-						outputProcessors[idx] = (BaseOutput) ctor
-								.newInstance(outputConfig);
-						idx++;
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			}
+		public Consumer(KafkaStream<byte[], byte[]> a_stream, Kafka kafkaInput) {
+			this.m_stream = a_stream;
+			this.kafkaInput = kafkaInput;
+			this.encoding = kafkaInput.encoding;
+			this.decoder = kafkaInput.createDecoder();
+			this.filterProcessors = kafkaInput.createFilterProcessors();
+			this.outputProcessors = kafkaInput.createOutputProcessors();
 		}
 
 		public void run() {
-			ConsumerIterator<byte[], byte[]> it = m_stream.iterator();
-			while (it.hasNext()) {
-				String m = null;
-				try {
-					m = new String(it.next().message(), this.encoding);
-				} catch (UnsupportedEncodingException e1) {
-					e1.printStackTrace();
-					logger.error(e1);
-				}
-
-				Map<String, Object> event;
-				try {
-					event = decoder.decode(m);
-
-					for (BaseFilter bf : filterProcessors) {
-						if (event == null) {
-							break;
-						}
-						event = bf.process(event);
+			try {
+				ConsumerIterator<byte[], byte[]> it = m_stream.iterator();
+				while (it.hasNext()) {
+					String m = null;
+					try {
+						m = new String(it.next().message(),
+								this.kafkaInput.encoding);
+					} catch (UnsupportedEncodingException e1) {
+						e1.printStackTrace();
+						logger.error(e1);
 					}
-					if (event != null) {
-						for (BaseOutput bo : outputProcessors) {
-							bo.process(event);
+
+					try {
+						Map<String, Object> event = this.decoder
+								.decode(m);
+
+						if (this.filterProcessors != null) {
+							for (BaseFilter bf : filterProcessors) {
+								if (event == null) {
+									break;
+								}
+								event = bf.process(event);
+							}
 						}
+						if (event != null) {
+							for (BaseOutput bo : outputProcessors) {
+								bo.process(event);
+							}
+						}
+					} catch (Exception e) {
+						logger.error("process event failed:" + m);
+						e.printStackTrace();
+						logger.error(e);
 					}
-				} catch (Exception e) {
-					logger.error("process event failed:" + m);
-					e.printStackTrace();
-					logger.error(e);
 				}
+			} catch (Throwable t) {
+				logger.error(t);
+				System.exit(1);
 			}
 		}
 	}
 
-	private ConsumerConnector consumer;
-	private ExecutorService executor;
-	private IDecode decoder;
-	private String encoding;
-	private Map<String, Integer> topic;
-
-	public Kafka(Map<String, Object> config, BaseFilter[] filterProcessors,
-			ArrayList<Map> outputs) {
-		super(config, filterProcessors, outputs);
+	public Kafka(Map<String, Object> config, ArrayList<Map> filter,
+			ArrayList<Map> outputs) throws Exception {
+		super(config, filter, outputs);
+		this.prepare();
 	}
 
 	@SuppressWarnings("unchecked")
-	@Override
 	protected void prepare() {
-		this.topic = (Map<String, Integer>) this.config.get("topic");
-
 		Properties props = new Properties();
 
 		HashMap<String, String> consumerSettings = (HashMap<String, String>) this.config
@@ -144,22 +118,16 @@ public class Kafka extends BaseInput {
 		} else {
 			this.encoding = "UTF8";
 		}
-
-		String codec = (String) this.config.get("codec");
-		if (codec != null && codec.equalsIgnoreCase("plain")) {
-			this.decoder = new PlainDecoder();
-		} else {
-			this.decoder = new JsonDecoder();
-		}
 	}
 
 	public void emit() {
 		Map<String, List<KafkaStream<byte[], byte[]>>> consumerMap = null;
 
-		consumerMap = consumer.createMessageStreams(this.topic);
+		Map<String, Integer> topics = (Map<String, Integer>) this.config
+				.get("topic");
+		consumerMap = consumer.createMessageStreams(topics);
 
-		Iterator<Entry<String, Integer>> topicIT = this.topic.entrySet()
-				.iterator();
+		Iterator<Entry<String, Integer>> topicIT = topics.entrySet().iterator();
 
 		while (topicIT.hasNext()) {
 			Map.Entry<String, Integer> entry = topicIT.next();
@@ -170,10 +138,8 @@ public class Kafka extends BaseInput {
 			executor = Executors.newFixedThreadPool(threads);
 
 			for (final KafkaStream<byte[], byte[]> stream : streams) {
-				executor.submit(new Consumer(stream, this.encoding,
-						this.decoder, this.filterProcessors, this.outputs));
+				executor.submit(new Consumer(stream, this));
 			}
 		}
-
 	}
 }
