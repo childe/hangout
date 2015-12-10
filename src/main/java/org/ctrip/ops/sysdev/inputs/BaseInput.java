@@ -7,13 +7,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.ctrip.ops.sysdev.outputs.BaseOutput;
 import org.ctrip.ops.sysdev.decoder.IDecode;
 import org.ctrip.ops.sysdev.decoder.JsonDecoder;
 import org.ctrip.ops.sysdev.decoder.PlainDecoder;
 import org.ctrip.ops.sysdev.filters.BaseFilter;
-import org.ctrip.ops.sysdev.outputs.BaseOutput;
 
-public class BaseInput {
+public abstract class BaseInput {
 	private static final Logger logger = Logger.getLogger(BaseInput.class
 			.getName());
 
@@ -106,6 +106,10 @@ public class BaseInput {
 
 	}
 
+	protected abstract void prepare();
+
+	public abstract void emit();
+
 	public void process(String message) {
 		Map<String, Object> event = this.decoder.decode(message);
 
@@ -124,6 +128,4 @@ public class BaseInput {
 		}
 	};
 
-	public void emit() {
-	};
 }

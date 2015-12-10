@@ -11,7 +11,7 @@ import org.ctrip.ops.sysdev.filters.BaseFilter;
 import org.ctrip.ops.sysdev.render.FreeMarkerRender;
 import org.ctrip.ops.sysdev.render.TemplateRender;
 
-public class BaseOutput {
+public abstract class BaseOutput {
 	private static final Logger logger = Logger.getLogger(BaseOutput.class
 			.getName());
 
@@ -38,11 +38,9 @@ public class BaseOutput {
 		this.prepare();
 	}
 
-	protected void prepare() {
-	};
+	protected abstract void prepare();
 
-	protected void emit(Map event) {
-	};
+	protected abstract void emit(Map event);
 
 	public void process(Map event) {
 		boolean succuess = true;

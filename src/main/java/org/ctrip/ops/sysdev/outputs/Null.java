@@ -12,6 +12,12 @@ public class Null extends BaseOutput {
 		super(config);
 	}
 
+	@Override
+	protected void prepare() {
+
+	}
+
+	@Override
 	protected void emit(Map event) {
 	}
 }
