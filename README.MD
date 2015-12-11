@@ -1,5 +1,8 @@
 模仿[logstash](https://www.elastic.co/products/logstash)做的一个应用.
 
+This product includes GeoLite2 data created by MaxMind, available from
+[http://www.maxmind.com](http://www.maxmind.com)
+
 我们一直用logstash从Kafka消费数据进ES, 随着数据量的越来越大, 需要的logstash实例和机器也越来越多. 
 
 于是就拿java实现了一下目前我们用到的Logstash的插件.   做为java初学者, 肯定有很多地方写的不好.

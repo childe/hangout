@@ -58,7 +58,7 @@
         <jruby-version>2.1.6</jruby-version>
         <joda-time-version>2.8.2</joda-time-version>
         <freemarker-gae-version>2.3.23</freemarker-gae-version>
-        <jinjava-version>1.0.9</jinjava-version>
+        <geoip2-version>2.3.1</geoip2-version>
         <common-cli-version>1.2</common-cli-version>
 
         <!-- test -->
@@ -103,10 +103,11 @@
             <artifactId>freemarker-gae</artifactId>
             <version>${freemarker-gae-version}</version>
         </dependency>
+
         <dependency>
-            <groupId>com.hubspot.jinjava</groupId>
-            <artifactId>jinjava</artifactId>
-            <version>${jinjava-version}</version>
+            <groupId>com.maxmind.geoip2</groupId>
+            <artifactId>geoip2</artifactId>
+            <version>${geoip2-version}</version>
         </dependency>
 
         <dependency>
