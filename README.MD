@@ -28,6 +28,7 @@ This product includes GeoLite2 data created by MaxMind, available from
 	* Add
 	* KV
 	* URLDecode
+	* GeoIP2
 	
 用一个典型配置做测试, 包括Grok Date AddField If条件判断等, 吞吐量是Logstash的5倍左右 .  
 不压测吞吐量, 正常消费的情况下, CPU使用率大概是Logstash的50%到25%.
