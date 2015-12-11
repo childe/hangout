@@ -113,6 +113,8 @@ geoip2里面可以获取的数据也比较多, 目前我只是用到了country_c
 **注意 geoip2里面不含有city_code值, 后续会增加GeoIP filter, 可以获取city_code值**  
 如果不需要, 还是建议用GeoIP2, 据[ELKstack-guide](https://github.com/garyelephant/ELKstack-guide-cn/blob/99550ba5cc4be177db1b6b62037fb77ce55c304f/logstash/develop_logstash_filter_geoip2.md), 速度比GeoIP有速倍的提升.
 
+maxmind也提供了数据的下载 [http://dev.maxmind.com/geoip/geoip2/geolite2/](http://dev.maxmind.com/geoip/geoip2/geolite2/)
+
 
     - GeoIP2:
         source: message # required
