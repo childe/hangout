@@ -97,6 +97,28 @@ Date是用的[jona-time](http://www.joda.org/joda-time/)做解析和格式化.
 	remove_fields: ['logtime']
 	tag_on_failure: datefail # default datefail
 
+### Json
+解析json字符串, **如果json里面的字段和原有的字段重复, 原有字段会被覆盖!**
+
+    - Json:
+        filed: message # required
+
+### GeoIP2
+geoip2用的是maxmind公司的开源数据和算法.
+This product includes GeoLite2 data created by MaxMind, available from
+[http://www.maxmind.com](http://www.maxmind.com)
+
+geoip2里面可以获取的数据也比较多, 目前我只是用到了country_code country_name city_name latitude longitude location 6个字段.
+
+**注意 geoip2里面不含有city_code值, 后续会增加GeoIP filter, 可以获取city_code值**  
+如果不需要, 还是建议用GeoIP2, 据[ELKstack-guide](https://github.com/garyelephant/ELKstack-guide-cn/blob/99550ba5cc4be177db1b6b62037fb77ce55c304f/logstash/develop_logstash_filter_geoip2.md), 速度比GeoIP有速倍的提升.
+
+
+    - GeoIP2:
+        source: message # required
+        target: geoip # default geoip
+        database: '/tmp/GeoLite2-City.mmdb'
+
 ### Drop
 没有额外参数, 配置if使用.
 

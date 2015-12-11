@@ -76,6 +76,12 @@ filters:
             time_taken: float
     - URLDecode:
         fields: ["query1","query2"]
+    - Json:
+        filed: message # required
+    - GeoIP2:
+        source: message # required
+        target: geoip # default geoip
+        database: '/tmp/GeoLite2-City.mmdb'
 
 outputs:
     - Stdout:
