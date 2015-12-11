@@ -1,7 +1,6 @@
 package org.ctrip.ops.sysdev;
 
 import org.apache.commons.cli.*;
-import org.ctrip.ops.sysdev.filters.BaseFilter;
 
 import org.ctrip.ops.sysdev.inputs.BaseInput;
 
