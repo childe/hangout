@@ -72,8 +72,12 @@ filters:
         remove_fields: ['msg']
     - Convert:
         fields:
-            cs_bytes: integer
-            time_taken: float
+            cs_bytes: 
+                to: integer
+                remove_if_fail: true # default false
+            time_taken: 
+                to: float
+                setto_if_fail: 0.0 # default NOT set anything; should set remove_if_fail to false
     - URLDecode:
         fields: ["query1","query2"]
     - Json:
