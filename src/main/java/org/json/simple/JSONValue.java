@@ -212,7 +212,7 @@ public class JSONValue {
 			return;
 		}
 		out.write('\"');
-		out.write(value.toString());
+		out.write(escape(value.toString()));
 		out.write('\"');
 	}
 
