@@ -4,7 +4,7 @@
 
     <groupId>hangout</groupId>
     <artifactId>hangout</artifactId>
-    <version>0.1.3</version>
+    <version>0.1.3.2</version>
     <packaging>jar</packaging>
 
     <name>hangout</name>
