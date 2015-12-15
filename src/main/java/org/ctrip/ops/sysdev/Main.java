@@ -40,8 +40,8 @@ public class Main {
 		options.addOption("h", false, "usage help");
 		options.addOption("help", false, "usage help");
 		options.addOption("f", true, "configuration file");
-		options.addOption("l", false, "log file");
-		options.addOption("w", false, "filter worker number");
+		options.addOption("l", true, "log file");
+		options.addOption("w", true, "filter worker number");
 		options.addOption("v", false, "print info log");
 		options.addOption("vv", false, "print debug log");
 		options.addOption("vvv", false, "print trace log");
