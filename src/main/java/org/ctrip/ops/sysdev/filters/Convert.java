@@ -1,22 +1,11 @@
 package org.ctrip.ops.sysdev.filters;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-
+import org.apache.log4j.Logger;
+import org.ctrip.ops.sysdev.converter.*;
 import scala.Tuple3;
 
-import org.apache.log4j.Logger;
-import org.ctrip.ops.sysdev.converter.BooleanConverter;
-import org.ctrip.ops.sysdev.converter.Converter;
-import org.ctrip.ops.sysdev.converter.DoubleConverter;
-import org.ctrip.ops.sysdev.converter.FloatConverter;
-import org.ctrip.ops.sysdev.converter.IntegerConverter;
-import org.ctrip.ops.sysdev.converter.LongConverter;
-import org.ctrip.ops.sysdev.converter.StringConverter;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class Convert extends BaseFilter {
 	private static final Logger logger = Logger.getLogger(Convert.class

@@ -1,14 +1,13 @@
 package org.ctrip.ops.sysdev.outputs;
 
-import java.util.Map;
-import java.util.Properties;
-
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
-
 import org.apache.log4j.Logger;
 import org.json.simple.JSONValue;
+
+import java.util.Map;
+import java.util.Properties;
 
 public class Kafka extends BaseOutput {
 	private static final Logger logger = Logger
@@ -30,7 +29,7 @@ public class Kafka extends BaseOutput {
 		ProducerConfig pconfig = new ProducerConfig(props);
 		this.topic = (String) this.config.get("topic");
 		producer = new Producer<>(pconfig);
-	};
+	}
 
 	protected void emit(Map event) {
 		producer.send(new KeyedMessage<>(topic, JSONValue.toJSONString(event)
