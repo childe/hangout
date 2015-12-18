@@ -8,9 +8,6 @@ inputs:
           group.id: hangout
           zookeeper.connect: 192.168.1.200:2181
           auto.commit.interval.ms: "1000"
-          socket.receive.buffer.bytes: "1048576"
-          fetch.message.max.bytes: "1048576"
-          num.consumer.fetchers: "4"
     - Kafka:
         codec: json
         topic: 
@@ -72,10 +69,20 @@ filters:
         remove_fields: ['msg']
     - Convert:
         fields:
-            cs_bytes: integer
-            time_taken: float
+            cs_bytes: 
+                to: integer
+                remove_if_fail: true # default false
+            time_taken: 
+                to: float
+                setto_if_fail: 0.0 # default NOT set anything; should set remove_if_fail to false
     - URLDecode:
         fields: ["query1","query2"]
+    - Json:
+        filed: message # required
+    - GeoIP2:
+        source: message # required
+        target: geoip # default geoip
+        database: '/tmp/GeoLite2-City.mmdb'
 
 outputs:
     - Stdout:

@@ -1,9 +1,8 @@
 package org.ctrip.ops.sysdev;
 
-import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.cli.*;
-import org.apache.log4j.*;
-import org.ctrip.ops.sysdev.configs.HangoutConfig;
+import org.ctrip.ops.sysdev.filters.BaseFilter;
+
 import org.ctrip.ops.sysdev.inputs.BaseInput;
 
 import java.lang.reflect.Constructor;
@@ -11,6 +10,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.DailyRollingFileAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+import org.ctrip.ops.sysdev.configs.HangoutConfig;
 
 public class Main {
 	private static final Logger logger = Logger.getLogger(Main.class.getName());
@@ -30,14 +36,13 @@ public class Main {
 	 * @return
 	 * @throws ParseException
 	 */
-	@VisibleForTesting
-	protected static CommandLine parseArg(String[] args) throws ParseException {
+	private static CommandLine parseArg(String[] args) throws ParseException {
 		Options options = new Options();
 		options.addOption("h", false, "usage help");
 		options.addOption("help", false, "usage help");
 		options.addOption("f", true, "configuration file");
-		options.addOption("l", true, "log file");
-		options.addOption("w", true, "filter worker number");
+		options.addOption("l", false, "log file");
+		options.addOption("w", false, "filter worker number");
 		options.addOption("v", false, "print info log");
 		options.addOption("vv", false, "print debug log");
 		options.addOption("vvv", false, "print trace log");
