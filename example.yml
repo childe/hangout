@@ -79,6 +79,7 @@ filters:
         fields: ["query1","query2"]
     - Json:
         filed: message # required
+        remove_fields: ['a', 'b']
     - GeoIP2:
         source: message # required
         target: geoip # default geoip
