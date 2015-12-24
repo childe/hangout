@@ -28,6 +28,7 @@ public class Metric extends BaseInput {
     private RuntimeMXBean jvmRT = null;
     private MemoryMXBean jvmMemRT = null;
     private int interval = 60;
+    private String type = "metric";
     private boolean _processWasCalled = false;
     private String encoding;
 
@@ -90,6 +91,9 @@ public class Metric extends BaseInput {
     protected void prepare() {
         // get the time interval
         interval = (Integer) config.get("interval");
+        if(config.get("type") != null) {
+            type = String.valueOf(config.get("type"));
+        }
         simpleDtFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         jvmRT = ManagementFactory.getRuntimeMXBean();
@@ -132,6 +136,13 @@ public class Metric extends BaseInput {
                     e.printStackTrace();
                 }
                 return "127.0.0.1";
+            }
+        });
+
+        metricMap.put("type", new IMetric() {
+            @Override
+            public Object getValueAndReset() {
+                return type;
             }
         });
 

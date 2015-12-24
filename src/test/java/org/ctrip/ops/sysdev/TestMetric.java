@@ -19,12 +19,13 @@ public class TestMetric {
         out.put("Stdout", new HashMap());
         Metric metric = new Metric(config, null, new ArrayList<Map>(){{add(out);}});
         metric.emit();
-        Thread.sleep(60000);
+        Thread.sleep(5000);
     }
 
     private Map mock() {
         Map config = new HashMap();
         config.put("interval", 1);
+        config.put("type", "heartbeat");
         return config;
     }
 }

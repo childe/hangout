@@ -19,6 +19,7 @@ inputs:
 
     - Metric:
         interval: 60s # default 60s， 每隔60秒，产生一个json string
+        type: heartbeat
 filters:
     - Grok:
         match:
