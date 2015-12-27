@@ -17,7 +17,7 @@ public class URLDecode extends BaseFilter {
 	}
 
 	private ArrayList<String> fields;
-	private String enc, tagOnFailure;
+	private String enc;
 
 	protected void prepare() {
 		this.fields = (ArrayList<String>) config.get("fields");
@@ -37,29 +37,20 @@ public class URLDecode extends BaseFilter {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	protected Map filter(final Map event) {
+		boolean success = true;
 		for (String f : this.fields) {
 			if (event.containsKey(f)) {
 				try {
 					event.put(f,
 							URLDecoder.decode((String) event.get(f), this.enc));
 				} catch (UnsupportedEncodingException e) {
-					if (!event.containsKey("tags")) {
-						event.put(
-								"tags",
-								new ArrayList<String>(Arrays
-										.asList(this.tagOnFailure)));
-					} else {
-						Object tags = event.get("tags");
-						if (tags.getClass() == ArrayList.class
-								&& ((ArrayList) tags)
-										.indexOf(this.tagOnFailure) == -1) {
-							((ArrayList) tags).add(this.tagOnFailure);
-						}
-					}
-
+					success = false;
 				}
 			}
 		}
+
+		this.postProcess(event, success);
+
 		return event;
 	}
 }

@@ -18,7 +18,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-
 import org.apache.log4j.Logger;
 import org.jcodings.specific.UTF8Encoding;
 import org.joni.Matcher;
@@ -30,12 +29,9 @@ import org.joni.Region;
 public class Grok extends BaseFilter {
 	private static final Logger logger = Logger.getLogger(Grok.class.getName());
 
-	private String tagOnFailure;
 	private String src;
 	private List<Regex> matches;
 	private Map<String, String> patterns;
-
-	private ArrayList<String> removeFields;
 
 	public Grok(Map config) {
 		super(config);
@@ -152,8 +148,8 @@ public class Grok extends BaseFilter {
 
 		} else { // Run with IDE
 			try {
-				load_patterns(new File(ClassLoader.getSystemResource(
-						"patterns").getFile()));
+				load_patterns(new File(ClassLoader
+						.getSystemResource("patterns").getFile()));
 			} catch (Exception e) {
 				logger.warn(e);
 			}
@@ -200,6 +196,7 @@ public class Grok extends BaseFilter {
 		}
 	};
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected Map filter(Map event) {
 		if (!event.containsKey(this.src)) {
@@ -242,79 +239,8 @@ public class Grok extends BaseFilter {
 			}
 		}
 
-		if (success == false) {
-			if (!event.containsKey("tags")) {
-				event.put("tags",
-						new ArrayList<String>(Arrays.asList(this.tagOnFailure)));
-			} else {
-				Object tags = event.get("tags");
-				if (tags.getClass() == ArrayList.class
-						&& ((ArrayList) tags).indexOf(this.tagOnFailure) == -1) {
-					((ArrayList) tags).add(this.tagOnFailure);
-				}
-			}
-		} else if (this.removeFields != null) {
-			for (String f : this.removeFields) {
-				event.remove(f);
-			}
-		}
+		this.postProcess(event, success);
 
 		return event;
 	};
-
-	public static void main(String[] argv) {
-
-		HashMap<String, String> patterns = new HashMap<String, String>();
-
-		try (BufferedReader br = new BufferedReader(new FileReader(
-				"/Users/liujia/Projects/hangout/p"))) {
-
-			String sCurrentLine;
-
-			while ((sCurrentLine = br.readLine()) != null) {
-				sCurrentLine = sCurrentLine.trim();
-				if (sCurrentLine.length() == 0
-						|| sCurrentLine.indexOf("#") == 0) {
-					continue;
-				}
-				patterns.put(sCurrentLine.split("\\s", 2)[0],
-						sCurrentLine.split("\\s", 2)[1]);
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		String p = "%{HTTPDATE:logtime}%{WORD:divice_id}\\s+id=%{WORD:id}\\s+time=\"%{DATA:logtime}\"\\s+fw=%{WORD:fw}\\s+pri=%{INT:pri:int}\\s+vpn=%{NOTSPACE:vpn}\\s+user=%{NOTSPACE:user}\\s+src=%{NOTSPACE:sip}\\s+sport=%{NOTSPACE:sport}\\s+type=%{NOTSPACE}\\s+msg=\"%{DATA:msg}\"";
-
-		String pattern = "\\%\\{[0-9a-zA-Z]+(:[-_.0-9a-zA-Z]+){0,2}\\}";
-		java.util.regex.Matcher m = java.util.regex.Pattern.compile(pattern)
-				.matcher(p);
-		String newPattern = "";
-		int last_end = 0;
-		while (m.find()) {
-			newPattern += p.substring(last_end, m.start());
-			String syntaxANDsemantic = m.group(0).substring(2,
-					m.group(0).length() - 1);
-			System.out.println(syntaxANDsemantic);
-			String syntax = "", semantic = "";
-			String[] syntaxANDsemanticArray = syntaxANDsemantic.split(":", 3);
-
-			syntax = syntaxANDsemanticArray[0];
-
-			if (syntaxANDsemanticArray.length > 1) {
-				semantic = syntaxANDsemanticArray[1];
-				newPattern += "(?<" + semantic + ">" + patterns.get(syntax)
-						+ ")";
-			} else {
-				newPattern += patterns.get(syntax);
-			}
-			System.out.println(syntax);
-			System.out.println(semantic);
-			last_end = m.end();
-		}
-		newPattern += p.substring(last_end);
-		System.out.println(newPattern);
-
-	}
 }
