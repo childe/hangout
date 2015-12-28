@@ -84,6 +84,8 @@ filters:
         source: message # required
         target: geoip # default geoip
         database: '/tmp/GeoLite2-City.mmdb'
+    - UA:
+        source: ua # required
 
 outputs:
     - Stdout:
