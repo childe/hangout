@@ -1,17 +1,14 @@
 package org.ctrip.ops.sysdev.filters;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
 
 import org.apache.log4j.Logger;
 
 public class KV extends BaseFilter {
 	private static final Logger logger = Logger.getLogger(KV.class.getName());
 
-	private String tagOnFailure;
 	private String source;
 	private String target;
 	private String field_split;
@@ -19,8 +16,9 @@ public class KV extends BaseFilter {
 	private String trim;
 	private String trimkey;
 
-	private ArrayList<String> removeFields, excludeKeys, includeKeys;
+	private ArrayList<String> excludeKeys, includeKeys;
 
+	@SuppressWarnings("rawtypes")
 	public KV(Map config) {
 		super(config);
 	}
@@ -73,6 +71,7 @@ public class KV extends BaseFilter {
 
 	};
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	protected Map filter(Map event) {
 		if (!event.containsKey(this.source)) {
@@ -122,22 +121,7 @@ public class KV extends BaseFilter {
 			success = false;
 		}
 
-		if (success == false) {
-			if (!event.containsKey("tags")) {
-				event.put("tags",
-						new ArrayList<String>(Arrays.asList(this.tagOnFailure)));
-			} else {
-				Object tags = event.get("tags");
-				if (tags.getClass() == ArrayList.class
-						&& ((ArrayList) tags).indexOf(this.tagOnFailure) == -1) {
-					((ArrayList) tags).add(this.tagOnFailure);
-				}
-			}
-		} else if (this.removeFields != null) {
-			for (String f : this.removeFields) {
-				event.remove(f);
-			}
-		}
+		this.postProcess(event, success);
 
 		return event;
 	};

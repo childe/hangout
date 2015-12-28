@@ -30,9 +30,10 @@ public class Elasticsearch extends BaseOutput {
 
 	private String index;
 	private String indexTimezone;
-	private TemplateRender indexTypeRender;
-	private TransportClient esclient;
 	private BulkProcessor bulkProcessor;
+	private TransportClient esclient;
+	private TemplateRender indexTypeRender;
+	private TemplateRender idRender;
 
 	public Elasticsearch(Map config) {
 		super(config);
@@ -45,6 +46,19 @@ public class Elasticsearch extends BaseOutput {
 			this.indexTimezone = (String) config.get("timezone");
 		} else {
 			this.indexTimezone = "UTC";
+		}
+
+		if (config.containsKey("document_id")) {
+			try {
+				this.idRender = new FreeMarkerRender(
+						(String) config.get("document_id"),
+						(String) config.get("document_id"));
+			} catch (IOException e) {
+				logger.fatal(e.getMessage());
+				System.exit(1);
+			}
+		} else {
+			this.idRender = null;
 		}
 
 		if (config.containsKey("index_type")) {
@@ -188,9 +202,14 @@ public class Elasticsearch extends BaseOutput {
 	protected void emit(final Map event) {
 		String _index = Formatter.format(event, index, indexTimezone);
 		String _indexType = indexTypeRender.render(event);
-
-		IndexRequest indexRequest = new IndexRequest(_index, _indexType)
-				.source(event);
+		IndexRequest indexRequest;
+		if (this.idRender == null) {
+			indexRequest = new IndexRequest(_index, _indexType).source(event);
+		} else {
+			String _id = idRender.render(event);
+			indexRequest = new IndexRequest(_index, _indexType, _id)
+					.source(event);
+		}
 		this.bulkProcessor.add(indexRequest);
 	}
 }
