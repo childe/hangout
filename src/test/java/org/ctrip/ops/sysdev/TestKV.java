@@ -169,7 +169,6 @@ public class TestKV {
 		event.put("msg", "a=aaa b=bbb c=ccc xyz=\"\txyzxyz\t\" 12=12=12 dddd 13=1313");
 
 		event = KVfilter.process(event);
-		System.out.println(event);
 		Assert.assertEquals(((Map)event.get("kv")).get("a"), "aaa");
 		Assert.assertEquals(((Map)event.get("kv")).get("12"), "12=12");
 		Assert.assertEquals(((Map)event.get("kv")).get("13"), "1313");
