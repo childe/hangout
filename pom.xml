@@ -60,7 +60,7 @@
         <geoip2-version>2.3.1</geoip2-version>
         <common-cli-version>1.2</common-cli-version>
         <commons-collections-version>3.2.1</commons-collections-version>
-        <hamcrest-version>3.2.1</hamcrest-version>
+        <hamcrest-version>1.1</hamcrest-version>
 
         <!-- test -->
         <mockito-version>1.10.19</mockito-version>
