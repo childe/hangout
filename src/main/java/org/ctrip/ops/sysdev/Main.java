@@ -44,7 +44,7 @@ public class Main {
 		options.addOption("w", true, "filter worker number");
 		options.addOption("v", false, "print info log");
 		options.addOption("vv", false, "print debug log");
-		options.addOption("vvv", false, "print trace log");
+		options.addOption("vvvv", false, "print trace log");
 
 		CommandLineParser paraer = new BasicParser();
 		CommandLine cmdLine = paraer.parse(options, args);
@@ -74,7 +74,7 @@ public class Main {
 				.append("-w").append("\t\t\tfilter worker numbers").append("\n")
 				.append("-v").append("\t\t\tprint info log").append("\n")
 				.append("-vv").append("\t\t\tprint debug log").append("\n")
-				.append("-vvv").append("\t\t\tprint trace log").append("\n");
+				.append("-vvvv").append("\t\t\tprint trace log").append("\n");
 
 		System.out.println(helpInfo.toString());
 	}
