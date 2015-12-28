@@ -24,7 +24,6 @@ public class GeoIP2 extends BaseFilter {
 		super(config);
 	}
 
-	private String tagOnFailure;
 	private String source;
 	private String target;
 	private DatabaseReader reader;
@@ -71,6 +70,8 @@ public class GeoIP2 extends BaseFilter {
 	@Override
 	protected Map filter(final Map event) {
 		if (event.containsKey(this.source)) {
+			
+			boolean success = true;
 
 			InetAddress ipAddress;
 			try {
@@ -109,19 +110,10 @@ public class GeoIP2 extends BaseFilter {
 				targetObj.put("location", new double[] { longitude, latitude });
 			} catch (Exception e) {
 				logger.debug(e);
-				if (!event.containsKey("tags")) {
-					event.put(
-							"tags",
-							new ArrayList<String>(Arrays
-									.asList(this.tagOnFailure)));
-				} else {
-					Object tags = event.get("tags");
-					if (tags.getClass() == ArrayList.class
-							&& ((ArrayList) tags).indexOf(this.tagOnFailure) == -1) {
-						((ArrayList) tags).add(this.tagOnFailure);
-					}
-				}
+				success = false;
 			}
+			
+			this.postProcess(event, success);
 		}
 
 		return event;

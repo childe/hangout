@@ -64,7 +64,7 @@ public class Parser {
   }
 
   private void initialize(InputStream regexYaml) {
-    Yaml yaml = new Yaml(new SafeConstructor());
+    Yaml yaml = new Yaml();
     @SuppressWarnings("unchecked")
     Map<String,List<Map<String,String>>> regexConfig = (Map<String,List<Map<String,String>>>) yaml.load(regexYaml);
 
