@@ -1,7 +1,5 @@
 package org.ctrip.ops.sysdev.filters;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,9 +13,7 @@ public class Json extends BaseFilter {
 		super(config);
 	}
 
-	private String tagOnFailure;
 	private String field;
-	private ArrayList<String> removeFields;
 
 	protected void prepare() {
 		if (!config.containsKey("field")) {
@@ -25,9 +21,6 @@ public class Json extends BaseFilter {
 			System.exit(1);
 		}
 		this.field = (String) config.get("field");
-
-		this.removeFields = (ArrayList<String>) this.config
-				.get("remove_fields");
 
 		if (config.containsKey("tag_on_failure")) {
 			this.tagOnFailure = (String) config.get("tag_on_failure");
@@ -42,28 +35,13 @@ public class Json extends BaseFilter {
 		if (event.containsKey(this.field)) {
 			obj = (HashMap<String, Object>) JSONValue.parse((String) event
 					.get(field));
-
 		}
 
-		if (obj == null) {
-			if (!event.containsKey("tags")) {
-				event.put("tags",
-						new ArrayList<String>(Arrays.asList(this.tagOnFailure)));
-			} else {
-				Object tags = event.get("tags");
-				if (tags.getClass() == ArrayList.class
-						&& ((ArrayList) tags).indexOf(this.tagOnFailure) == -1) {
-					((ArrayList) tags).add(this.tagOnFailure);
-				}
-			}
-		} else {
+		if (obj != null) {
 			event.putAll(obj);
-			if (this.removeFields != null) {
-				for (String f : this.removeFields) {
-					event.remove(f);
-				}
-			}
 		}
+
+		this.postProcess(event, obj != null);
 		return event;
 	}
 }
