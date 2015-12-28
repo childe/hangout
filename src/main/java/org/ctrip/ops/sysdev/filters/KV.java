@@ -1,7 +1,6 @@
 package org.ctrip.ops.sysdev.filters;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,7 +9,6 @@ import org.apache.log4j.Logger;
 public class KV extends BaseFilter {
 	private static final Logger logger = Logger.getLogger(KV.class.getName());
 
-	private String tagOnFailure;
 	private String source;
 	private String target;
 	private String field_split;
@@ -18,8 +16,9 @@ public class KV extends BaseFilter {
 	private String trim;
 	private String trimkey;
 
-	private ArrayList<String> removeFields, excludeKeys, includeKeys;
+	private ArrayList<String> excludeKeys, includeKeys;
 
+	@SuppressWarnings("rawtypes")
 	public KV(Map config) {
 		super(config);
 	}
@@ -72,6 +71,7 @@ public class KV extends BaseFilter {
 
 	};
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	protected Map filter(Map event) {
 		if (!event.containsKey(this.source)) {
