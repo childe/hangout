@@ -1,7 +1,6 @@
 package org.ctrip.ops.sysdev.filters;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
@@ -16,13 +15,10 @@ import org.ctrip.ops.sysdev.utils.dateparser.UnixParser;
 public class Date extends BaseFilter {
 	private static final Logger logger = Logger.getLogger(Date.class.getName());
 
-	private String tagOnFailure;
 	private String src;
 	private String target;
 	private boolean addYear;
 	private List<DateParser> parsers;
-
-	private ArrayList<String> removeFields;
 
 	public Date(Map config) {
 		super(config);
@@ -30,9 +26,6 @@ public class Date extends BaseFilter {
 
 	@SuppressWarnings("unchecked")
 	protected void prepare() {
-		this.removeFields = (ArrayList<String>) this.config
-				.get("remove_fields");
-
 		if (config.containsKey("src")) {
 			this.src = (String) config.get("src");
 		} else {
@@ -79,7 +72,6 @@ public class Date extends BaseFilter {
 
 		boolean success = false;
 
-		
 		String input = event.get(this.src).toString();
 
 		if (addYear) {
@@ -96,22 +88,7 @@ public class Date extends BaseFilter {
 			}
 		}
 
-		if (success == false) {
-			if (!event.containsKey("tags")) {
-				event.put("tags",
-						new ArrayList<String>(Arrays.asList(this.tagOnFailure)));
-			} else {
-				Object tags = event.get("tags");
-				if (tags.getClass() == ArrayList.class
-						&& ((ArrayList) tags).indexOf(this.tagOnFailure) == -1) {
-					((ArrayList) tags).add(this.tagOnFailure);
-				}
-			}
-		} else if (this.removeFields != null) {
-			for (String f : this.removeFields) {
-				event.remove(f);
-			}
-		}
+		postProcess(event, success);
 
 		return event;
 	};

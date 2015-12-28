@@ -2,6 +2,11 @@ package org.ctrip.ops.sysdev.filters;
 
 import org.apache.log4j.Logger;
 import org.ctrip.ops.sysdev.converter.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import scala.Tuple3;
 
 import java.util.*;
@@ -11,12 +16,11 @@ public class Convert extends BaseFilter {
 	private static final Logger logger = Logger.getLogger(Convert.class
 			.getName());
 
+	private Map<String, Tuple3> f;
+
 	public Convert(Map config) {
 		super(config);
 	}
-
-	private Map<String, Tuple3> f;
-	private String tagOnFailure;
 
 	protected void prepare() {
 
@@ -66,6 +70,7 @@ public class Convert extends BaseFilter {
 	@Override
 	protected Map filter(final Map event) {
 		Iterator<Entry<String, Tuple3>> it = f.entrySet().iterator();
+		boolean success = true;
 		while (it.hasNext()) {
 			Map.Entry<String, Tuple3> entry = it.next();
 			String field = entry.getKey();
@@ -74,19 +79,7 @@ public class Convert extends BaseFilter {
 				event.put(field,
 						((Converter) t3._1()).convert(event.get(field)));
 			} catch (Exception e) {
-				if (!event.containsKey("tags")) {
-					event.put(
-							"tags",
-							new ArrayList<String>(Arrays
-									.asList(this.tagOnFailure)));
-				} else {
-					Object tags = event.get("tags");
-					if (tags.getClass() == ArrayList.class
-							&& ((ArrayList) tags).indexOf(this.tagOnFailure) == -1) {
-						((ArrayList) tags).add(this.tagOnFailure);
-					}
-				}
-
+				success = false;
 				if ((boolean) t3._2()) {
 					event.remove(field);
 				} else {
@@ -96,6 +89,9 @@ public class Convert extends BaseFilter {
 				}
 			}
 		}
+		
+		this.postProcess(event, success);
+
 		return event;
 	}
 }
