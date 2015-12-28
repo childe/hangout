@@ -13,7 +13,7 @@ public class Json extends BaseFilter {
 		super(config);
 	}
 
-	private String field;
+	private String field, target;
 
 	protected void prepare() {
 		if (!config.containsKey("field")) {
@@ -21,6 +21,8 @@ public class Json extends BaseFilter {
 			System.exit(1);
 		}
 		this.field = (String) config.get("field");
+
+		this.target = (String) config.get("target");
 
 		if (config.containsKey("tag_on_failure")) {
 			this.tagOnFailure = (String) config.get("tag_on_failure");
@@ -37,11 +39,17 @@ public class Json extends BaseFilter {
 					.get(field));
 		}
 
+		boolean success = obj != null;
+
 		if (obj != null) {
-			event.putAll(obj);
+			if (this.target == null || this.target.equals("")) {
+				event.putAll(obj);
+			} else {
+				event.put(this.target, obj);
+			}
 		}
 
-		this.postProcess(event, obj != null);
+		this.postProcess(event, success);
 		return event;
 	}
 }
