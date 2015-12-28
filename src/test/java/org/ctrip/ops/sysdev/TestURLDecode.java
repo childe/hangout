@@ -4,76 +4,59 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.ctrip.ops.sysdev.filters.Convert;
-import org.ctrip.ops.sysdev.filters.Grok;
+import org.ctrip.ops.sysdev.filters.URLDecode;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.yaml.snakeyaml.Yaml;
 
 public class TestURLDecode {
 	@Test
-	@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
-	public void testGrok() {
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public void testURLDecode() {
 		String c = "fields: [\"query1\",\"query2\"]";
 		Yaml yaml = new Yaml();
 		Map config = (Map) yaml.load(c);
 		Assert.assertNotNull(config);
 
-		Grok grokfilter = new Grok(config);
+		URLDecode URLDecodefilter = new URLDecode(config);
 
-		// Match
+		// Yes
 		Map event = new HashMap();
-		event.put("message",
-				"2015-12-27T15:44:19+0800 childe - this is a test line");
+		event.put(
+				"query1",
+				"wd%3dq%2520gishp%2520su%26rsv_spt%3d1%26rsv_iqid%3d0xa37c438600003f19%26issp%3d1%26f%3d8%26rsv_bp%3d0%26rsv_idx%3d2%26ie%3dutf-8%26tn%3dbaiduhome_pg%26rsv_enter%3d1%26rsv_sug3%3d15%26rsv_sug1%3d6%26rsv_sug2%3d0%26rsv_sug7%3d100%26inputT%3d8493%26rsv_sug4%3d11379");
 
-		event = grokfilter.process(event);
-		Assert.assertEquals(event.get("user"), "childe");
-		Assert.assertNull(event.get("level"));
+		event = URLDecodefilter.process(event);
+		Assert.assertEquals(
+				event.get("query1"),
+				"wd=q%20gishp%20su&rsv_spt=1&rsv_iqid=0xa37c438600003f19&issp=1&f=8&rsv_bp=0&rsv_idx=2&ie=utf-8&tn=baiduhome_pg&rsv_enter=1&rsv_sug3=15&rsv_sug1=6&rsv_sug2=0&rsv_sug7=100&inputT=8493&rsv_sug4=11379");
 		Assert.assertNull(event.get("tags"));
 
-		// Not Match
+		// Exception
 		event = new HashMap();
-		event.put("message",
-				"2015-12-27T15:44:19 0800 childe.liu - this is a test line");
+		event.put(
+				"query1",
+				"wd%3dq%2520gishp%2520su%26rsv_spt%3d1%26rsv_iqid%3d0xa37c438600003f19%26issp%3d1%26f%3d8%26rsv_bp%3d0%26rsv_idx%3d2%26ie%3dutf-8%26tn%3dbaiduhome_pg%26rsv_enter%3d1%26rsv_sug3%3d15%26rsv_sug1%3d6%26rsv_sug2%3d0%26rsv_sug7%3d100%26inputT%3d8493%26rsv_sug4%3d11379");
 
-		event = grokfilter.process(event);
-		System.out.println(event);
-		Assert.assertNull(event.get("user"));
-		Assert.assertNull(event.get("level"));
-		Assert.assertEquals(((ArrayList) event.get("tags")).get(0), "grokfail");
+		event.put(
+				"query2",
+				"wd=q gishp%%0su&rsv_spt=1&rsv_iqid=0xa37c438600003f19&issp=1&f=8&rsv_bp=0&rsv_idx=2&ie=utf-8&tn=baiduhome_pg&rsv_enter=1&rsv_sug3=15&rsv_sug1=6&rsv_sug2=0&rsv_sug7=100&inputT=8493&rsv_sug4=11379");
+		event = URLDecodefilter.process(event);
+		Assert.assertEquals(((ArrayList) event.get("tags")).get(0),
+				"URLDecodefail");
 
-		// Not Match, But tags is a String
-		event = new HashMap();
-		event.put("message",
-				"2015-12-27T15:44:19 0800 childe.liu - this is a test line");
-		event.put("tags", "tag1");
-
-		event = grokfilter.process(event);
-		System.out.println(event);
-		Assert.assertNull(event.get("user"));
-		Assert.assertNull(event.get("level"));
-		Assert.assertEquals(event.get("tags").getClass(), String.class);
-		
-		// Not Match, Not Tags
-		c = String
-				.format("%s\n%s\n%s\n",
-						"match:",
-						"  - '^(?<logtime>\\S+) %{USER:user} (-|(?<level>\\w+)) %{DATA:msg}$'",
-						"tag_on_failure: null",
-						"remove_fields: ['message']");
+		// Exception, NO tag
+		c = "fields: [\"query1\",\"query2\"]\ntag_on_failure: null";
 		yaml = new Yaml();
 		config = (Map) yaml.load(c);
 		Assert.assertNotNull(config);
 
-		grokfilter = new Grok(config);
-
+		URLDecodefilter = new URLDecode(config);
 		event = new HashMap();
-		event.put("message",
-				"2015-12-27T15:44:19 0800 childe.liu - this is a test line");
-
-		event = grokfilter.process(event);
-		Assert.assertNull(event.get("user"));
-		Assert.assertNull(event.get("level"));
+		event.put(
+				"query2",
+				"wd=q gishp%%0su&rsv_spt=1&rsv_iqid=0xa37c438600003f19&issp=1&f=8&rsv_bp=0&rsv_idx=2&ie=utf-8&tn=baiduhome_pg&rsv_enter=1&rsv_sug3=15&rsv_sug1=6&rsv_sug2=0&rsv_sug7=100&inputT=8493&rsv_sug4=11379");
+		event = URLDecodefilter.process(event);
 		Assert.assertNull(event.get("tags"));
 	}
 }

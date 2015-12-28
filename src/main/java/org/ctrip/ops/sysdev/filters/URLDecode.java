@@ -1,9 +1,7 @@
 package org.ctrip.ops.sysdev.filters;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Map;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
 import org.apache.log4j.Logger;
@@ -12,6 +10,7 @@ import org.ctrip.ops.sysdev.Main;
 public class URLDecode extends BaseFilter {
 	private static final Logger logger = Logger.getLogger(Main.class.getName());
 
+	@SuppressWarnings("rawtypes")
 	public URLDecode(Map config) {
 		super(config);
 	}
@@ -19,6 +18,7 @@ public class URLDecode extends BaseFilter {
 	private ArrayList<String> fields;
 	private String enc;
 
+	@SuppressWarnings("unchecked")
 	protected void prepare() {
 		this.fields = (ArrayList<String>) config.get("fields");
 		if (config.containsKey("enc")) {
@@ -43,7 +43,8 @@ public class URLDecode extends BaseFilter {
 				try {
 					event.put(f,
 							URLDecoder.decode((String) event.get(f), this.enc));
-				} catch (UnsupportedEncodingException e) {
+				} catch (Exception e) {
+					logger.error("URLDecode failed", e);
 					success = false;
 				}
 			}
