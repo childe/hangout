@@ -17,6 +17,9 @@ inputs:
           zookeeper.connect: 192.168.1.201:2181
           auto.commit.interval.ms: "5000"
 
+    - Metric:
+        interval: 60s # default 60s， 每隔60秒，产生一个json string
+        type: heartbeat
 filters:
     - Grok:
         match:

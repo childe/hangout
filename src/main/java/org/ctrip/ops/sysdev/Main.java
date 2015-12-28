@@ -1,21 +1,16 @@
 package org.ctrip.ops.sysdev;
 
 import org.apache.commons.cli.*;
-
+import org.apache.log4j.*;
+import org.ctrip.ops.sysdev.configs.HangoutConfig;
 import org.ctrip.ops.sysdev.inputs.BaseInput;
+import org.elasticsearch.common.annotations.VisibleForTesting;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.DailyRollingFileAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-import org.ctrip.ops.sysdev.configs.HangoutConfig;
 
 public class Main {
 	private static final Logger logger = Logger.getLogger(Main.class.getName());
@@ -35,7 +30,8 @@ public class Main {
 	 * @return
 	 * @throws ParseException
 	 */
-	private static CommandLine parseArg(String[] args) throws ParseException {
+	@VisibleForTesting
+	protected static CommandLine parseArg(String[] args) throws ParseException {
 		Options options = new Options();
 		options.addOption("h", false, "usage help");
 		options.addOption("help", false, "usage help");
