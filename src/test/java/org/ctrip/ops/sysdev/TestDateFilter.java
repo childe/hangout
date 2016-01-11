@@ -26,19 +26,19 @@ public class TestDateFilter {
 
 		Map event = new HashMap();
 
-		// Message MATCH format
+		// MATCH
 		DateTime now = DateTime.now();
 		event.put("logtime", now.toString());
 		event = datefilter.process(event);
 		Assert.assertNull(event.get("tags"));
 		Assert.assertEquals(event.get("@timestamp").toString(), now.toString());
 
-		// Message Not match format
-		event.put("logtime", "abcd");
+		// Not match
+		event.put("logtime", "2015-12-28 09:40:20.285433");
 		event = datefilter.process(event);
 		Assert.assertEquals(((ArrayList) event.get("tags")).get(0), "datefail");
 
-		// Message Not match format , NOT add tag
+		// Not match, NO tags
 		c = "src: logtime\n" + "formats:\n"
 				+ "  - 'ISO8601'\n  - 'YYYY/MM/dd HH:mm.ss.SSS Z'\n"
 				+ "tag_on_failure: null\n" + "remove_fields: ['logtime']";
