@@ -78,7 +78,7 @@ filters:
     - URLDecode:
         fields: ["query1","query2"]
     - Json:
-        filed: message # required
+        field: message # required
         remove_fields: ['a', 'b']
     - GeoIP2:
         source: message # required
