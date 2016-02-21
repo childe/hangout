@@ -219,7 +219,9 @@ concurrent_requests设置成大于0的数, 意思着多线程处理, 以我应�
 	topic: test # required
 
 ### Stdout
-主要测试用吧.
+主要测试用吧. 因为配置是yml格式, 所以没有其它条件的话, 需要写成 
+
+    - Stdout: {}
 
 # 开发:
 如果需要新的插件, 可以从源码编译重新打包.  
