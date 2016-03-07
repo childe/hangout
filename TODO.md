@@ -4,4 +4,5 @@
 # 4. refactor baseinput in order to write new input easily
 5. heartbeat output
 # 6. geoip
-# 7. output to es 2.X
+7. output to es 2.X
+8. log detail error when init failed
