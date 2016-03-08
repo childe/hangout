@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import comt.ctrip.ops.sysdev.filters.URLDecode;
+import com.ctrip.ops.sysdev.filters.URLDecode;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.yaml.snakeyaml.Yaml;
