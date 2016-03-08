@@ -2,7 +2,7 @@ package com.ctrip.ops.sysdev;
 
 import org.apache.commons.cli.*;
 
-import org.ctrip.ops.sysdev.inputs.BaseInput;
+import com.ctrip.ops.sysdev.inputs.BaseInput;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import org.apache.log4j.DailyRollingFileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
-import org.ctrip.ops.sysdev.configs.HangoutConfig;
+import com.ctrip.ops.sysdev.configs.HangoutConfig;
 
 public class Main {
 	private static final Logger logger = Logger.getLogger(Main.class.getName());
@@ -101,7 +101,7 @@ public class Main {
 				Map inputConfig = inputEntry.getValue();
 
 				Class<?> inputClass = Class
-						.forName("org.ctrip.ops.sysdev.inputs." + inputType);
+						.forName("com.ctrip.ops.sysdev.inputs." + inputType);
 				Constructor<?> ctor = inputClass.getConstructor(Map.class,
 						ArrayList.class, ArrayList.class);
 				BaseInput inputInstance = (BaseInput) ctor.newInstance(

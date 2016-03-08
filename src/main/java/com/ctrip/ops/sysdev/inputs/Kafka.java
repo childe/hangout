@@ -12,9 +12,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
-import org.ctrip.ops.sysdev.decoder.IDecode;
-import org.ctrip.ops.sysdev.filters.BaseFilter;
-import org.ctrip.ops.sysdev.outputs.BaseOutput;
+import com.ctrip.ops.sysdev.decoder.IDecode;
+import com.ctrip.ops.sysdev.filters.BaseFilter;
+import com.ctrip.ops.sysdev.outputs.BaseOutput;
 
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.ConsumerIterator;

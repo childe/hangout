@@ -7,11 +7,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.ctrip.ops.sysdev.outputs.BaseOutput;
-import org.ctrip.ops.sysdev.decoder.IDecode;
-import org.ctrip.ops.sysdev.decoder.JsonDecoder;
-import org.ctrip.ops.sysdev.decoder.PlainDecoder;
-import org.ctrip.ops.sysdev.filters.BaseFilter;
+import com.ctrip.ops.sysdev.outputs.BaseOutput;
+import com.ctrip.ops.sysdev.decoder.IDecode;
+import com.ctrip.ops.sysdev.decoder.JsonDecoder;
+import com.ctrip.ops.sysdev.decoder.PlainDecoder;
+import com.ctrip.ops.sysdev.filters.BaseFilter;
 
 public abstract class BaseInput {
 	private static final Logger logger = Logger.getLogger(BaseInput.class

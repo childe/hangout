@@ -10,8 +10,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import scala.Tuple2;
 
 import org.apache.log4j.Logger;
-import org.ctrip.ops.sysdev.render.FreeMarkerRender;
-import org.ctrip.ops.sysdev.render.TemplateRender;
+import com.ctrip.ops.sysdev.render.FreeMarkerRender;
+import com.ctrip.ops.sysdev.render.TemplateRender;
 
 public class Add extends BaseFilter {
 	private static final Logger logger = Logger.getLogger(Add.class.getName());

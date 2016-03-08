@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.ctrip.ops.sysdev.render.Formatter;
-import org.ctrip.ops.sysdev.render.FreeMarkerRender;
-import org.ctrip.ops.sysdev.render.TemplateRender;
+import com.ctrip.ops.sysdev.render.Formatter;
+import com.ctrip.ops.sysdev.render.FreeMarkerRender;
+import com.ctrip.ops.sysdev.render.TemplateRender;
 import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkProcessor;

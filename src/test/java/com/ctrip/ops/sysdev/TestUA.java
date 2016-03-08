@@ -3,7 +3,7 @@ package com.ctrip.ops.sysdev;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.ctrip.ops.sysdev.filters.UA;
+import com.ctrip.ops.sysdev.filters.UA;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.yaml.snakeyaml.Yaml;

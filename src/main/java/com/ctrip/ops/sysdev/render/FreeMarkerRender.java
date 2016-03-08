@@ -5,7 +5,7 @@ import java.io.StringWriter;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.ctrip.ops.sysdev.filters.BaseFilter;
+import com.ctrip.ops.sysdev.filters.BaseFilter;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;

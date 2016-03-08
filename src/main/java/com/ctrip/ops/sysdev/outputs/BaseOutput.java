@@ -7,9 +7,9 @@ import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import org.apache.log4j.Logger;
-import org.ctrip.ops.sysdev.filters.BaseFilter;
-import org.ctrip.ops.sysdev.render.FreeMarkerRender;
-import org.ctrip.ops.sysdev.render.TemplateRender;
+import com.ctrip.ops.sysdev.filters.BaseFilter;
+import com.ctrip.ops.sysdev.render.FreeMarkerRender;
+import com.ctrip.ops.sysdev.render.TemplateRender;
 
 public abstract class BaseOutput {
 	private static final Logger logger = Logger.getLogger(BaseOutput.class

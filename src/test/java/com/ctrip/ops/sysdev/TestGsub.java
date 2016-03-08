@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.ctrip.ops.sysdev.filters.Gsub;
+import com.ctrip.ops.sysdev.filters.Gsub;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
 import org.testng.Assert;

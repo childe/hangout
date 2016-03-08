@@ -9,7 +9,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.yaml.snakeyaml.Yaml;
 import org.joda.time.DateTime;
-import org.ctrip.ops.sysdev.filters.Date;
+import com.ctrip.ops.sysdev.filters.Date;
 
 public class TestDateFilter {
 	@Test
