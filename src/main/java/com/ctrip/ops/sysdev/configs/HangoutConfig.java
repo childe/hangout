@@ -18,7 +18,7 @@ public class HangoutConfig {
     @SuppressWarnings("NestedMethodCall")
     public static Map parse(String filename) throws IOException {
         Yaml yaml = new Yaml();
-        if (HangoutConfig.HTTP.startsWith(filename) || filename.startsWith(HangoutConfig.HTTPS)) {
+        if (filename.startsWith(HangoutConfig.HTTP) || filename.startsWith(HangoutConfig.HTTPS)) {
             URL httpUrl;
             URLConnection connection;
             httpUrl = new URL(filename);
