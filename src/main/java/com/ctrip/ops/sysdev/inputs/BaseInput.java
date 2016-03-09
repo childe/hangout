@@ -40,7 +40,7 @@ public abstract class BaseInput {
 
 					try {
 						Class<?> filterClass = Class
-								.forName("org.ctrip.ops.sysdev.filters."
+								.forName("com.ctrip.ops.sysdev.filters."
 										+ filterType);
 						Constructor<?> ctor = filterClass
 								.getConstructor(Map.class);
@@ -74,7 +74,7 @@ public abstract class BaseInput {
 				Map outputConfig = outputEntry.getValue();
 				Class<?> outputClass;
 				try {
-					outputClass = Class.forName("org.ctrip.ops.sysdev.outputs."
+					outputClass = Class.forName("com.ctrip.ops.sysdev.outputs."
 							+ outputType);
 					Constructor<?> ctor = outputClass.getConstructor(Map.class);
 
