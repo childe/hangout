@@ -1,11 +1,16 @@
 package com.ctrip.ops.sysdev.outputs;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import com.ctrip.ops.sysdev.render.Formatter;
 import com.ctrip.ops.sysdev.render.FreeMarkerRender;
 import com.ctrip.ops.sysdev.render.TemplateRender;
@@ -15,10 +20,6 @@ import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.settings.ImmutableSettings;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
@@ -77,19 +78,24 @@ public class Elasticsearch extends BaseOutput {
 				System.exit(1);
 			}
 		}
-
-		this.initESClient();
+		try {
+			this.initESClient();
+		} catch (Exception e) {
+			logger.error(e);
+			System.exit(1);
+		}
 	};
 
-	private void initESClient() {
+	@SuppressWarnings("unchecked")
+	private void initESClient() throws NumberFormatException,
+			UnknownHostException {
 
 		String clusterName = (String) config.get("cluster");
 
-		Settings settings = ImmutableSettings.settingsBuilder()
+		Settings settings = Settings.settingsBuilder()
 				.put("client.transport.sniff", true)
 				.put("cluster.name", clusterName).build();
-
-		this.esclient = new TransportClient(settings);
+		esclient = TransportClient.builder().settings(settings).build();
 
 		ArrayList<String> hosts = (ArrayList<String>) config.get("hosts");
 		for (String host : hosts) {
@@ -102,8 +108,8 @@ public class Elasticsearch extends BaseOutput {
 				h = hp[0];
 				p = "9300";
 			}
-			this.esclient.addTransportAddress(new InetSocketTransportAddress(h,
-					Integer.parseInt(p)));
+			esclient.addTransportAddress(new InetSocketTransportAddress(
+					InetAddress.getByName(h), Integer.parseInt(p)));
 		}
 
 		int bulkActions = 20000, bulkSize = 15, flushInterval = 10, concurrentRequests = 0;
@@ -121,7 +127,8 @@ public class Elasticsearch extends BaseOutput {
 		}
 
 		bulkProcessor = BulkProcessor
-				.builder(this.esclient, new BulkProcessor.Listener() {
+				.builder(esclient, new BulkProcessor.Listener() {
+
 					@Override
 					public void afterBulk(long arg0, BulkRequest arg1,
 							BulkResponse arg2) {
@@ -169,6 +176,7 @@ public class Elasticsearch extends BaseOutput {
 								e.printStackTrace();
 							}
 						}
+
 					}
 
 					@Override
@@ -184,6 +192,7 @@ public class Elasticsearch extends BaseOutput {
 						logger.info("numberOfActions: "
 								+ arg1.numberOfActions());
 					}
+
 				}).setBulkActions(bulkActions)
 				.setBulkSize(new ByteSizeValue(bulkSize, ByteSizeUnit.MB))
 				.setFlushInterval(TimeValue.timeValueSeconds(flushInterval))
