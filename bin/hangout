@@ -1,0 +1,10 @@
+#!/bin/sh
+
+HO_HEAP_SIZE="${HO_HEAP_SIZE:=2000m}"
+
+unset CDPATH
+basedir=$(cd `dirname $0`/..; pwd)
+
+JAVA_OPTS="$JAVA_OPTS -Xmx${HO_HEAP_SIZE}"
+JAVA_OPTS="$JAVA_OPTS -Xms${HO_HEAP_SIZE}"
+exec java $JAVA_OPTS -cp $basedir/lib/hangout-X.X.X.jar:$basedir/vender/* com.ctrip.ops.sysdev.Main "$@"
