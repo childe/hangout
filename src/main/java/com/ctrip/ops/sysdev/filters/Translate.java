@@ -28,6 +28,8 @@ public class Translate extends BaseFilter {
     private HashMap dictionary;
 
     private void loadDictionary() {
+        logger.info("begin to loadDictionary: " + this.dictionaryPath);
+
         if (dictionaryPath == null) {
             dictionary = null;
             logger.warn("dictionary_path is null");
