@@ -1,12 +1,6 @@
 package com.ctrip.ops.sysdev.filters;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -213,7 +207,13 @@ public class Grok extends BaseFilter {
         }
         boolean success = false;
         String input = ((String) event.get(this.src));
-        byte[] bs = input.getBytes();
+        byte[] bs = new byte[0];
+        try {
+            bs = input.getBytes(this.encoding);
+        } catch (UnsupportedEncodingException e) {
+            logger.error("input.getBytes error, maybe wrong encoding? try do NOT use encoding");
+            bs = input.getBytes();
+        }
 
         for (Regex regex : this.matches) {
             try {
