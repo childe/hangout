@@ -62,6 +62,7 @@ public class Translate extends BaseFilter {
             }
         }
 
+        logger.info("loadDictionary done: " + this.dictionaryPath);
     }
 
     protected void prepare() {
