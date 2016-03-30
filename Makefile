@@ -17,6 +17,7 @@ build:
 	cp example.yml $(RELEASEPATH)
 	cp LICENSE $(RELEASEPATH)
 	cp bin/hangout $(RELEASEPATH)/bin
+	git rev-parse --short HEAD > $(RELEASEPATH)/VERSION
 	mvn clean package
 	mvn dependency:copy-dependencies
 	cp target/hangout-$(VERSION).jar $(RELEASEPATH)/lib
