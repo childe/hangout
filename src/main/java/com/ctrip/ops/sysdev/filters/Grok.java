@@ -168,9 +168,16 @@ public class Grok extends BaseFilter {
 
         for (String matchString : (ArrayList<String>) this.config.get("match")) {
             matchString = convertPattern(matchString);
-            Regex regex = new Regex(matchString.getBytes(), 0,
-                    matchString.getBytes().length, Option.NONE,
-                    UTF8Encoding.INSTANCE);
+            Regex regex = null;
+            try {
+                regex = new Regex(matchString.getBytes("UTF8"), 0,
+                        matchString.getBytes("UTF8").length, Option.NONE,
+                        UTF8Encoding.INSTANCE);
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+                logger.error("failed to compile match pattern.");
+                System.exit(1);
+            }
 
             matches.add(regex);
         }
