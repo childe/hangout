@@ -3,6 +3,7 @@ package com.ctrip.ops.sysdev.decoder;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jcodings.util.Hash;
 import org.joda.time.DateTime;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
@@ -17,11 +18,13 @@ public class JsonDecoder implements IDecode {
     @Override
     public Map<String, Object> decode(final String message) {
         Map<String, Object> event = null;
+        Object e = null;
         try {
-            event = (HashMap<String, Object>) JSONValue
+            e = JSONValue
                     .parseWithException(message);
-        } catch (Exception e) {
-            logger.warn("failed to json parse message to a Map");
+        } catch (ParseException exception) {
+            logger.warn("failed to json parse message");
+            logger.warn(exception.getLocalizedMessage());
             event = new HashMap<String, Object>() {
                 {
                     put("message", message);
@@ -38,10 +41,23 @@ public class JsonDecoder implements IDecode {
                 }
             };
         } else {
-            if (!event.containsKey("@timestamp")) {
-                event.put("@timestamp", DateTime.now());
+            try {
+                event = (HashMap<String, Object>) e;
+                if (!event.containsKey("@timestamp")) {
+                    event.put("@timestamp", DateTime.now());
+                }
+            } catch (Exception exception) {
+                logger.warn("failed to convert event to Map object");
+                logger.warn(exception.getLocalizedMessage());
+                event = new HashMap<String, Object>() {
+                    {
+                        put("message", message);
+                        put("@timestamp", DateTime.now());
+                    }
+                };
             }
         }
+
         return event;
     }
 }
