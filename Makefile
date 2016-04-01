@@ -25,6 +25,9 @@ build:
 	sed -i '' 's/X.X.X/$(VERSION)/' $(RELEASEPATH)/bin/hangout
 	tar -cf release/$(FULLVERSION).tar -C release $(FULLVERSION)
 
+test:
+	$(MAKE) build FULLVERSION=hangout-test GITBRANCH=$@
+
 dev:
 	$(MAKE) build FULLVERSION=hangout-dev GITBRANCH=$@
 
