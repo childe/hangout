@@ -5,27 +5,43 @@ import java.util.Map;
 
 import org.joda.time.DateTime;
 import org.json.simple.JSONValue;
+import org.json.simple.parser.ParseException;
+
+import org.apache.log4j.Logger;
 
 public class JsonDecoder implements IDecode {
+    private static final Logger logger = Logger
+            .getLogger(JsonDecoder.class.getName());
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public Map<String, Object> decode(final String message) {
-		Map<String, Object> event = (HashMap<String, Object>) JSONValue
-				.parse(message);
+    @SuppressWarnings("unchecked")
+    @Override
+    public Map<String, Object> decode(final String message) {
+        Map<String, Object> event = null;
+        try {
+            event = (HashMap<String, Object>) JSONValue
+                    .parseWithException(message);
+        } catch (Exception e) {
+            logger.warn("failed to json parse message to a Map");
+            event = new HashMap<String, Object>() {
+                {
+                    put("message", message);
+                    put("@timestamp", DateTime.now());
+                }
+            };
+        }
 
-		if (event == null) {
-			event = new HashMap<String, Object>() {
-				{
-					put("message", message);
-					put("@timestamp", DateTime.now());
-				}
-			};
-		} else {
-			if (!event.containsKey("@timestamp")) {
-				event.put("@timestamp", DateTime.now());
-			}
-		}
-		return event;
-	}
+        if (event == null) {
+            event = new HashMap<String, Object>() {
+                {
+                    put("message", message);
+                    put("@timestamp", DateTime.now());
+                }
+            };
+        } else {
+            if (!event.containsKey("@timestamp")) {
+                event.put("@timestamp", DateTime.now());
+            }
+        }
+        return event;
+    }
 }
