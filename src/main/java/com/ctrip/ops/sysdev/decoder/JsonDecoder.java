@@ -3,7 +3,6 @@ package com.ctrip.ops.sysdev.decoder;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jcodings.util.Hash;
 import org.joda.time.DateTime;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
@@ -31,31 +30,32 @@ public class JsonDecoder implements IDecode {
                     put("@timestamp", DateTime.now());
                 }
             };
+            return event;
         }
 
-        if (event == null) {
+        if (e == null) {
             event = new HashMap<String, Object>() {
                 {
                     put("message", message);
                     put("@timestamp", DateTime.now());
                 }
             };
-        } else {
-            try {
-                event = (HashMap<String, Object>) e;
-                if (!event.containsKey("@timestamp")) {
-                    event.put("@timestamp", DateTime.now());
-                }
-            } catch (Exception exception) {
-                logger.warn("failed to convert event to Map object");
-                logger.warn(exception.getLocalizedMessage());
-                event = new HashMap<String, Object>() {
-                    {
-                        put("message", message);
-                        put("@timestamp", DateTime.now());
-                    }
-                };
+            return event;
+        }
+
+        try {
+            event = (HashMap<String, Object>) e;
+            if (!event.containsKey("@timestamp")) {
+                event.put("@timestamp", DateTime.now());
             }
+        } catch (Exception exception) {
+            logger.warn("failed to convert event to Map object");
+            event = new HashMap<String, Object>() {
+                {
+                    put("@timestamp", DateTime.now());
+                }
+            };
+            event.put("message", e);
         }
 
         return event;
