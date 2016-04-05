@@ -19,7 +19,7 @@
             </resource>
         </resources>
         <plugins>
-             <plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
@@ -80,26 +80,37 @@
             <artifactId>kafka_2.10</artifactId>
             <version>${kafka-version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch</artifactId>
             <version>${elasticsearch-version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.jruby.joni</groupId>
             <artifactId>joni</artifactId>
             <version>${jruby-version}</version>
         </dependency>
+
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
             <version>${joda-time-version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker-gae</artifactId>
             <version>${freemarker-gae-version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>${snakeyaml-version}</version>
+        </dependency>
+
 
         <dependency>
             <groupId>com.maxmind.geoip2</groupId>
@@ -146,14 +157,7 @@
             <artifactId>hamcrest-all</artifactId>
             <version>1.1</version>
             <scope>${hamcrest-version}</scope>
-    </dependency>
-
-    <dependency>
-        <groupId>org.yaml</groupId>
-        <artifactId>snakeyaml</artifactId>
-        <version>${snakeyaml-version}</version>
-    </dependency>
-
+        </dependency>
 
     </dependencies>
 </project>
