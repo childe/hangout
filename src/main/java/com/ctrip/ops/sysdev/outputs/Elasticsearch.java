@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import com.ctrip.ops.sysdev.render.Formatter;
@@ -98,10 +99,11 @@ public class Elasticsearch extends BaseOutput {
             sniff = (Boolean) config.get("sniff");
         }
 
-        Settings settings = Settings.settingsBuilder()
-                .put("client.transport.sniff", sniff)
+        Settings settings = ImmutableSettings.settingsBuilder()
+                .put("client.transport.sniff", true)
                 .put("cluster.name", clusterName).build();
-        esclient = TransportClient.builder().settings(settings).build();
+
+        this.esclient = new TransportClient(settings);
 
         ArrayList<String> hosts = (ArrayList<String>) config.get("hosts");
         for (String host : hosts) {
@@ -114,8 +116,9 @@ public class Elasticsearch extends BaseOutput {
                 h = hp[0];
                 p = "9300";
             }
-            esclient.addTransportAddress(new InetSocketTransportAddress(
-                    InetAddress.getByName(h), Integer.parseInt(p)));
+
+            this.esclient.addTransportAddress(new InetSocketTransportAddress(h,
+                    Integer.parseInt(p)));
         }
 
         int bulkActions = 20000, bulkSize = 15, flushInterval = 10, concurrentRequests = 0;
