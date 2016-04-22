@@ -17,6 +17,7 @@ build:
 	cp example.yml $(RELEASEPATH)
 	cp LICENSE $(RELEASEPATH)
 	cp bin/hangout $(RELEASEPATH)/bin
+	sed -i "" 's/\<elasticsearch-version\>[0-9.]*/<elasticsearch-version\>$(ESVERSION)/' pom.xml
 	git rev-parse --short HEAD > $(RELEASEPATH)/VERSION
 	mvn clean package
 	mvn dependency:copy-dependencies
@@ -24,27 +25,28 @@ build:
 	cp target/dependency/* $(RELEASEPATH)/vender
 	sed -i '' 's/X.X.X/$(VERSION)/' $(RELEASEPATH)/bin/hangout
 	tar -cf release/$(FULLVERSION).tar -C release $(FULLVERSION)
+	git reset --hard
 
 test:
-	$(MAKE) build FULLVERSION=hangout-test GITBRANCH=$@
+	$(MAKE) build FULLVERSION=hangout-test GITBRANCH=$@ ESVERSION=2.2.0
 
 dev:
-	$(MAKE) build FULLVERSION=hangout-dev GITBRANCH=$@
+	$(MAKE) build FULLVERSION=hangout-dev GITBRANCH=$@ ESVERSION=2.2.0
 
 2.2:
-	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=$@
+	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=es2.X ESVERSION=$@
 
 2.1:
-	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=$@
+	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=es2.X ESVERSION=$@
 
 2.0:
-	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=$@
+	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=es2.X ESVERSION=$@
 
 1.7:
-	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=$@
+	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=es1.X ESVERSION=$@
 
 1.6:
-	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=$@
+	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=es1.X ESVERSION=$@
 
 1.5:
-	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=$@
+	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=es1.X ESVERSION=$@
