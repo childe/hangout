@@ -8,7 +8,9 @@ This product includes GeoLite2 data created by MaxMind, available from
 于是就拿java实现了一下目前我们用到的Logstash的插件.   做为java初学者, 肯定有很多地方写的不好.
 
 - input
+	 * stdin
 	 * kafka
+	 * newKafka
 - output
 	* elastickseach
 	* kafka
@@ -53,6 +55,12 @@ This product includes GeoLite2 data created by MaxMind, available from
 [可以参考一个配置的示例](https://github.com/childe/hangout/blob/master/example.yml)
 
 ## Input
+### stdin
+
+    - Stdin:
+        codec: plain
+        hostname: true # if add hostname to event; default false
+
 ### kafka
 从Kafka读数据. 下面示例是说, 开2个线程取app这个topic的数据, 编码格式为plain纯文本.  consumer_settings中的参数, 参考[kafka]官方文档](http://kafka.apache.org/documentation.html#consumerconfigs), 所有参数都可以在这里配置. 比较重要的是group.id, zookeeper.connect这两个, 一定要有.   zookeeper.connect的格式为 hostname1:port1,hostname2:port2,hostname3:port3.
 
@@ -68,6 +76,10 @@ This product includes GeoLite2 data created by MaxMind, available from
           num.consumer.fetchers: "4"
         codec: plain
 
+### kafka
+新的kafka api.[http://kafka.apache.org/documentation.html#newconsumerapi](http://kafka.apache.org/documentation.html#newconsumerapi)
+
+所有可以配置的参数[http://kafka.apache.org/documentation.html#newconsumerconfigs](http://kafka.apache.org/documentation.html#newconsumerconfigs)
 
 ## Filter
 ### Grok
@@ -200,8 +212,6 @@ If 条件和addfileds等插件使用[freemarker](http://freemarker.org/)模板�
 
 concurrent_requests设置成大于0的数, 意思着多线程处理, 以我应用的经验,还有是一定OOM风险的. 因为在执行bulk的时候, bulkProcessor还在继续接收新的文档, 如果bulk失败了, 会把失败的actionrequest继续放到bulkProcessor里面. 一段时间内, 由于各种原因一直失败的话, 内存就会越用越多. 
 
-看了一下ES的代码, 现在的bulk就是对原来的bulkRequest简单封装, 又是异步又是回调, 我这种新手有些控制不了, 考虑要不要换回bulkRequest自己控制.
-
 	cluster: prod # cluster name, required
 	hosts: # required
 		- 192.168.1.100
@@ -226,3 +236,27 @@ concurrent_requests设置成大于0的数, 意思着多线程处理, 以我应�
 # 开发:
 如果需要新的插件, 可以从源码编译重新打包.  
 或者编译成jar包, 加入到class path(尚未开发完成).
+
+
+# LICENSE
+The MIT License (MIT)
+
+Copyright (c) 2015 Childe, https://github.com/childe
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
