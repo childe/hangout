@@ -3,7 +3,7 @@ RELEASEPATH = release/$(FULLVERSION)
 
 default: 2.2
 
-all: 2.2 2.1 2.0 1.7 1.6 1.5 fws-hermes uat-hermes prod-hermes
+all: 2.2 2.1 2.0 1.7 1.6 1.5
 
 clean:
 	rm -rf release
