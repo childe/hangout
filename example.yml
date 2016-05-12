@@ -104,6 +104,7 @@ outputs:
         flush_interval: 10 # default 10 seconds
         concurrent_requests: 0 # default 0, concurrent_requests设置成大于0的数, 意思着多线程处理, 以我应用的经验,还有是一定OOM风险的,强烈建议设置为0
         timezone: "Asia/Shanghai" # defaut UTC 时区. 只用于生成索引名字的字符串格式化
+        sniff: false #default true
     - Kafka:
         broker_list: 192.168.1.200:9092
         topic: test2
