@@ -55,13 +55,13 @@ This product includes GeoLite2 data created by MaxMind, available from
 [可以参考一个配置的示例](https://github.com/childe/hangout/blob/master/example.yml)
 
 ## Input
-### stdin
+### Stdin
 
     - Stdin:
         codec: plain
         hostname: true # if add hostname to event; default false
 
-### kafka
+### Kafka
 从Kafka读数据. 下面示例是说, 开2个线程取app这个topic的数据, 编码格式为plain纯文本.  consumer_settings中的参数, 参考[kafka]官方文档](http://kafka.apache.org/documentation.html#consumerconfigs), 所有参数都可以在这里配置. 比较重要的是group.id, zookeeper.connect这两个, 一定要有.   zookeeper.connect的格式为 hostname1:port1,hostname2:port2,hostname3:port3.
 
     - Kafka:
@@ -76,7 +76,7 @@ This product includes GeoLite2 data created by MaxMind, available from
           num.consumer.fetchers: "4"
         codec: plain
 
-### kafka
+### newKafka
 新的kafka api.[http://kafka.apache.org/documentation.html#newconsumerapi](http://kafka.apache.org/documentation.html#newconsumerapi)
 
 所有可以配置的参数[http://kafka.apache.org/documentation.html#newconsumerconfigs](http://kafka.apache.org/documentation.html#newconsumerconfigs)
@@ -212,6 +212,8 @@ If 条件和addfileds等插件使用[freemarker](http://freemarker.org/)模板�
 
 concurrent_requests设置成大于0的数, 意思着多线程处理, 以我应用的经验,还有是一定OOM风险的. 因为在执行bulk的时候, bulkProcessor还在继续接收新的文档, 如果bulk失败了, 会把失败的actionrequest继续放到bulkProcessor里面. 一段时间内, 由于各种原因一直失败的话, 内存就会越用越多. 
 
+sniff设置为true的话, 会把hosts当做一个入口, 然后去寻找真正的data nodes写数据. 如果设置成false,数据就直接写在配置的hosts列表机器上,可以缓解data node上面的流量压力和小部分CPU压力.
+
 	cluster: prod # cluster name, required
 	hosts: # required
 		- 192.168.1.100
@@ -222,6 +224,7 @@ concurrent_requests设置成大于0的数, 意思着多线程处理, 以我应�
 	bulk_size: 15	#default 15
 	flush_interval: 10	#default 10
 	concurrent_requests: 0	#default 0
+    sniff: false #default true
 
 ### Kafka
 	#broker_list format is host1:port1,host2:port2, and the list can be a subset of brokers or a VIP pointing to a subset of brokers.
