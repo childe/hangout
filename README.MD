@@ -31,6 +31,7 @@ This product includes GeoLite2 data created by MaxMind, available from
 	* KV
 	* URLDecode
 	* GeoIP2
+	* Filters
 	
 用一个典型配置做测试, 包括Grok Date AddField If条件判断等, 吞吐量是Logstash的5倍左右 .  
 不压测吞吐量, 正常消费的情况下, CPU使用率大概是Logstash的50%到25%.
@@ -192,6 +193,9 @@ trimkey和trim类似, 处理的是字段名称.
         trimkey: '\"'  # default null
         tag_on_failure: "KVfail" # default "KVfail"
         remove_fields: ['msg']
+
+### Filters
+    可以在一个If条件下,顺序的执行多个filters, 而不用每次都执行If判断.
 
 ### 其它filter
 配置都比较简单, 可以参考[配置文件示例](https://github.com/childe/hangout/blob/master/example.yml)
