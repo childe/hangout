@@ -18,6 +18,23 @@ inputs:
           auto.commit.interval.ms: "5000"
 
 filters:
+    - Filters:
+        if:
+          - '<#if message??>true</#if>'
+          - '<#if message?contains("liu")>true<#elseif message?contains("warn")>true</#if>'
+        filters:
+            - Grok:
+                match:
+                  - '^(?<logtime>\S+) (?<user>.+) (-|(?<level>\w+)) %{DATA:msg}$'
+                remove_fields: ['message']
+            - Add:
+                fields:
+                    test: 'abcd'
+            - Date:
+                src: logtime
+                formats:
+                    - 'ISO8601'
+                remove_fields: ['logtime']
     - Grok:
         match:
           - '^(?<logtime>\S+) (?<user>.+) (-|(?<level>\w+)) %{DATA:msg}$'
