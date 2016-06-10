@@ -1,4 +1,4 @@
-VERSION := 0.1.6
+VERSION := 0.1.7
 RELEASEPATH = release/$(FULLVERSION)
 
 default: 2.3
@@ -28,10 +28,10 @@ build:
 	git reset --hard
 
 test:
-	$(MAKE) build FULLVERSION=hangout-test GITBRANCH=$@ ESVERSION=2.2.0
+	$(MAKE) build FULLVERSION=hangout-test GITBRANCH=$@ ESVERSION=2.3.0
 
 dev:
-	$(MAKE) build FULLVERSION=hangout-dev GITBRANCH=$@ ESVERSION=2.2.0
+	$(MAKE) build FULLVERSION=hangout-dev GITBRANCH=$@ ESVERSION=2.3.0
 
 2.3:
 	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=es2.X ESVERSION=2.3.0
