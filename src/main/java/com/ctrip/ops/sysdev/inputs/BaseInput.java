@@ -113,25 +113,4 @@ public abstract class BaseInput {
     protected abstract void prepare();
 
     public abstract void emit();
-
-    public void process(String message) {
-        Map<String, Object> event = this.decoder.decode(message);
-
-        if (this.filterProcessors != null) {
-            for (BaseFilter bf : filterProcessors) {
-                if (event == null) {
-                    break;
-                }
-                event = bf.process(event);
-            }
-        }
-        if (event != null) {
-            for (BaseOutput bo : outputProcessors) {
-                bo.process(event);
-            }
-        }
-    }
-
-    ;
-
 }
