@@ -27,7 +27,6 @@ public class NewKafka extends BaseInput {
     public NewKafka(Map<String, Object> config, ArrayList<Map> filter,
                  ArrayList<Map> outputs) throws Exception {
         super(config, filter, outputs);
-        this.prepare();
     }
 
     private class Consumer implements Runnable {

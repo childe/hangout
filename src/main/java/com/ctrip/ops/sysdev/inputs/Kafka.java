@@ -92,7 +92,6 @@ public class Kafka extends BaseInput {
 	public Kafka(Map<String, Object> config, ArrayList<Map> filter,
 			ArrayList<Map> outputs) throws Exception {
 		super(config, filter, outputs);
-		this.prepare();
 	}
 
 	@SuppressWarnings("unchecked")

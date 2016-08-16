@@ -108,6 +108,7 @@ public abstract class BaseInput {
         this.filters = filters;
         this.outputs = outputs;
 
+        this.prepare();
     }
 
     protected abstract void prepare();
