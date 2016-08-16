@@ -102,10 +102,16 @@ public abstract class BaseInput {
         }
     }
 
+    public void shutdown(){}
+
     protected void registerShutdownHook() {
+        final Object inputclass = this;
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
+                logger.info("start to shutdown " + inputclass.getClass().getName());
+                shutdown();
+
                 logger.info("start to shutdown all output plugin");
                 for (BaseOutput bo : outputProcessors) {
                     bo.shutdown();
