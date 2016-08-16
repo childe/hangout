@@ -36,4 +36,9 @@ public class Kafka extends BaseOutput {
 		producer.send(new KeyedMessage<>(topic, JSONValue.toJSONString(event)
 				.getBytes()));
 	}
+
+	public void shutdown() {
+		logger.info("close producer and then shutdown");
+		producer.close();
+	}
 }

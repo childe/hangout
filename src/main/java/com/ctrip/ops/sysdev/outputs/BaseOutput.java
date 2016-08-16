@@ -42,6 +42,10 @@ public abstract class BaseOutput {
 
 	protected abstract void emit(Map event);
 
+    public void shutdown() {
+        logger.info("shutdown" + this.getClass().getName());
+	}
+
 	public void process(Map event) {
 		boolean succuess = true;
 		if (this.IF != null) {

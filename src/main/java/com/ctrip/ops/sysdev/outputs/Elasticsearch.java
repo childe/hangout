@@ -6,6 +6,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.elasticsearch.client.transport.TransportClient;
@@ -221,5 +222,15 @@ public class Elasticsearch extends BaseOutput {
                     .source(event);
         }
         this.bulkProcessor.add(indexRequest);
+    }
+
+    public void shutdown(){
+        logger.info("flush docs and then shutdown");
+        try {
+            this.bulkProcessor.awaitClose(10, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            logger.error("failed to bulk docs before shutdown");
+            logger.error(e);
+        }
     }
 }

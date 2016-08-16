@@ -102,6 +102,18 @@ public abstract class BaseInput {
         }
     }
 
+    protected void registerShutdownHook() {
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                logger.info("start to shutdown all output plugin");
+                for (BaseOutput bo : outputProcessors) {
+                    bo.shutdown();
+                }
+            }
+        });
+    }
+
     public BaseInput(Map config, ArrayList<Map> filters, ArrayList<Map> outputs)
             throws Exception {
         this.config = config;
@@ -109,6 +121,8 @@ public abstract class BaseInput {
         this.outputs = outputs;
 
         this.prepare();
+
+        this.registerShutdownHook();
     }
 
     protected abstract void prepare();
