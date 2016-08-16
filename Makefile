@@ -1,9 +1,9 @@
 VERSION := 0.1.8
 RELEASEPATH = release/$(FULLVERSION)
 
-default: 2.3
+default: 2.3.2
 
-all: 2.3 2.2 2.1 2.0 1.7 1.6 1.5
+all: 2.3.2 2.3.5
 
 clean:
 	rm -rf release
@@ -28,28 +28,13 @@ build:
 	git reset --hard
 
 test:
-	$(MAKE) build FULLVERSION=hangout-test GITBRANCH=$@ ESVERSION=2.3.0
+	$(MAKE) build FULLVERSION=hangout-test GITBRANCH=$@ ESVERSION=2.3.5
 
 dev:
-	$(MAKE) build FULLVERSION=hangout-dev GITBRANCH=$@ ESVERSION=2.3.0
+	$(MAKE) build FULLVERSION=hangout-dev GITBRANCH=$@ ESVERSION=2.3.5
 
-2.3:
-	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=es2.X ESVERSION=2.3.5
+2.3.2:
+	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=master ESVERSION=2.3.2
 
-2.2:
-	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=es2.X ESVERSION=2.2.2
-
-2.1:
-	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=es2.X ESVERSION=2.1.2
-
-2.0:
-	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=es2.X ESVERSION=2.0.2
-
-1.7:
-	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=es1.X ESVERSION=1.7.5
-
-1.6:
-	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=es1.X ESVERSION=1.6.2
-
-1.5:
-	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=es1.X ESVERSION=1.5.2
+2.3.5:
+	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=master ESVERSION=2.3.5
