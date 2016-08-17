@@ -56,6 +56,7 @@ public abstract class BaseInput {
                 }
             }
         }
+        this.registerShutdownHook(outputProcessors);
         return outputProcessors;
     }
 
@@ -68,23 +69,32 @@ public abstract class BaseInput {
         }
     }
 
-    public void shutdown(){}
+    public void shutdown() {
+    }
 
-    protected void registerShutdownHook() {
-        final Object inputclass = this;
+    protected void registerShutdownHookForSelf() {
+        final Object inputClass = this;
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                logger.info("start to shutdown " + inputclass.getClass().getName());
+                logger.info("start to shutdown " + inputClass.getClass().getName());
                 shutdown();
+            }
+        });
+    }
 
+    protected void registerShutdownHook(final BaseOutput[] bos) {
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
                 logger.info("start to shutdown all output plugin");
-                for (BaseOutput bo : outputProcessors) {
+                for (BaseOutput bo : bos) {
                     bo.shutdown();
                 }
             }
         });
     }
+
 
     public BaseInput(Map config, ArrayList<Map> filters, ArrayList<Map> outputs)
             throws Exception {
@@ -94,7 +104,7 @@ public abstract class BaseInput {
 
         this.prepare();
 
-        this.registerShutdownHook();
+        this.registerShutdownHookForSelf();
     }
 
     protected abstract void prepare();
