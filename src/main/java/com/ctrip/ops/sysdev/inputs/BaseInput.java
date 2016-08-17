@@ -12,6 +12,7 @@ import com.ctrip.ops.sysdev.decoder.IDecode;
 import com.ctrip.ops.sysdev.decoder.JsonDecoder;
 import com.ctrip.ops.sysdev.decoder.PlainDecoder;
 import com.ctrip.ops.sysdev.filters.BaseFilter;
+import com.ctrip.ops.sysdev.filters.Utils;
 
 public abstract class BaseInput {
     private static final Logger logger = Logger.getLogger(BaseInput.class
@@ -25,42 +26,7 @@ public abstract class BaseInput {
     protected ArrayList<Map> outputs;
 
     public BaseFilter[] createFilterProcessors() {
-        if (filters != null) {
-            filterProcessors = new BaseFilter[filters.size()];
-
-            int idx = 0;
-            for (Map filter : filters) {
-                Iterator<Entry<String, Map>> filterIT = filter.entrySet()
-                        .iterator();
-
-                while (filterIT.hasNext()) {
-                    Map.Entry<String, Map> filterEntry = filterIT.next();
-                    String filterType = filterEntry.getKey();
-                    Map filterConfig = filterEntry.getValue();
-
-                    try {
-                        logger.info("begin to build filter " + filterType);
-                        Class<?> filterClass = Class
-                                .forName("com.ctrip.ops.sysdev.filters."
-                                        + filterType);
-                        Constructor<?> ctor = filterClass
-                                .getConstructor(Map.class);
-
-                        BaseFilter filterInstance = (BaseFilter) ctor
-                                .newInstance(filterConfig);
-                        filterProcessors[idx] = filterInstance;
-                        logger.info("build filter " + filterType + " done");
-                    } catch (Exception e) {
-                        logger.error(e);
-                        System.exit(1);
-                    }
-                    idx++;
-                }
-            }
-        } else {
-            filterProcessors = null;
-        }
-        return filterProcessors;
+        return Utils.createFilterProcessors(filters);
     }
 
     public BaseOutput[] createOutputProcessors() {
