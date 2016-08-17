@@ -1,4 +1,4 @@
-VERSION := 0.1.8
+VERSION := 0.1.8.2
 RELEASEPATH = release/$(FULLVERSION)
 
 default: 2.3.2
