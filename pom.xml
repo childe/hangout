@@ -155,8 +155,8 @@
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-all</artifactId>
-            <version>1.1</version>
-            <scope>${hamcrest-version}</scope>
+            <version>${hamcrest-version}</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
