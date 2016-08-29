@@ -234,16 +234,27 @@ public class Grok extends BaseFilter {
                     for (Iterator<NameEntry> entry = regex
                             .namedBackrefIterator(); entry.hasNext(); ) {
                         NameEntry e = entry.next();
-                        int number = e.getBackRefs()[0]; // can have many refs
-                        // per name
-                        int begin = region.beg[number];
-                        int end = region.end[number];
-                        if (begin != -1) {
+                        int[] backRefs = e.getBackRefs();
+                        if (backRefs.length == 1) {
+                            int number = backRefs[0];
+                            int begin = region.beg[number];
+                            int end = region.end[number];
+                            if (begin != -1) {
+                                event.put(new String(e.name, e.nameP, e.nameEnd
+                                        - e.nameP), new String(bs, begin, end - begin, this.encoding));
+                            }
+                        } else {
+                            ArrayList<String> value = new ArrayList<String>();
+                            for (int number : backRefs) {
+                                int begin = region.beg[number];
+                                int end = region.end[number];
+                                if (begin != -1) {
+                                    value.add(new String(bs, begin, end - begin, this.encoding));
+                                }
+                            }
                             event.put(new String(e.name, e.nameP, e.nameEnd
-                                    - e.nameP), new String(bs, begin, end
-                                    - begin, this.encoding));
+                                    - e.nameP), value);
                         }
-
                     }
                     break;
                 }
