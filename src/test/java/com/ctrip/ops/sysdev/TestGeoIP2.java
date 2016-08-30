@@ -11,20 +11,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TestGeoIP2 {
-	@Test
-	public void testGsub() throws UnsupportedEncodingException {
-		String s = "61.240.136.69";
-		HashMap config = new HashMap() {
-			{
-				put("source", "clientip");
-			}
-		};
+    @Test
+    public void testGsub() throws UnsupportedEncodingException {
+        String s = "61.240.136.69";
+        HashMap config = new HashMap() {
+            {
+                put("source", "clientip");
+                put("database", "/Users/liujia/Desktop/es/mydata4vipday2.datx");
+            }
+        };
 
-		GeoIP2 geoip2Filter = new GeoIP2(config);
+        GeoIP2 geoip2Filter = new GeoIP2(config);
 
-		Map event = new HashMap();
-		event.put("clientip", s);
-		event = geoip2Filter.process(event);
-		System.out.println(event);
-	}
+        Map event = new HashMap();
+        event.put("clientip", s);
+        event = geoip2Filter.process(event);
+        System.out.println(event);
+    }
 }
