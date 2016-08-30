@@ -30,7 +30,6 @@ public class TestGrok {
                 "2015-12-27T15:44:19+0800 childe - this is a test line");
 
         event = grokfilter.process(event);
-        System.out.println(event);
         Assert.assertEquals(event.get("user"), "childe");
         Assert.assertNull(event.get("level"));
         Assert.assertNull(event.get("tags"));
