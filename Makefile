@@ -1,4 +1,4 @@
-VERSION := 0.1.8.2
+VERSION := 0.1.9
 RELEASEPATH = release/$(FULLVERSION)
 
 UNAME := $(shell uname)
