@@ -5,6 +5,7 @@ import com.ctrip.ops.sysdev.filters.GeoIP2;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 
 import java.util.ArrayList;
@@ -13,7 +14,12 @@ import java.util.Map;
 
 public class TestGeoIP2 {
     @Test
-    public void testGeoIP2() throws UnsupportedEncodingException {
+    public void testGeoIP2() throws Exception {
+        File f = new File("/tmp/GeoLite2-City.mmdb");
+        if (!f.exists() || f.isDirectory()) {
+            throw new Exception("please put /tmp/GeoLite2-City.mmdb and then test");
+        }
+
         HashMap config = new HashMap() {
             {
                 put("source", "clientip");
@@ -26,7 +32,7 @@ public class TestGeoIP2 {
         Map event = new HashMap();
         event.put("clientip", "61.240.136.69");
         event = geoip2Filter.process(event);
-        Assert.assertEquals(((Map)event.get("geoip")).get("country_name"), "China");
+        Assert.assertEquals(((Map) event.get("geoip")).get("country_name"), "China");
 
         event = new HashMap();
         event.put("clientip", "10.10.10.10");
