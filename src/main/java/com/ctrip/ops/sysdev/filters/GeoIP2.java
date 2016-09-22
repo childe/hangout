@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.maxmind.geoip2.record.Subdivision;
 import org.apache.log4j.Logger;
 
 import com.maxmind.geoip2.DatabaseReader;
@@ -103,31 +104,20 @@ public class GeoIP2 extends BaseFilter {
             try {
                 ipAddress = InetAddress.getByName((String) event.get(source));
 
-                // Replace "city" with the appropriate method for your database,
-                // e.g.,
-                // "country".
                 CityResponse response = reader.city(ipAddress);
 
                 Country country = response.getCountry();
-
-                // Subdivision subdivision =
-                response.getMostSpecificSubdivision();
-                // Subdivision subdivision =
-                // response.getMostSpecificSubdivision();
-                // System.out.println(subdivision.getName());
-                // System.out.println(subdivision.getIsoCode());
-
+                Subdivision subdivision =
+                        response.getMostSpecificSubdivision();
                 City city = response.getCity();
-
-                // Postal postal = response.getPostal();
-                // System.out.println(postal.getCode());
-
                 Location location = response.getLocation();
 
                 Map targetObj = new HashMap();
                 event.put(this.target, targetObj);
                 targetObj.put("country_code", country.getIsoCode());
                 targetObj.put("country_name", country.getName());
+                targetObj.put("subdivision_name", subdivision.getName());
+                targetObj.put("country_isocode", country.getIsoCode());
                 targetObj.put("city_name", city.getName());
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
