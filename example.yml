@@ -1,4 +1,13 @@
 inputs:
+    - NewKafka:
+        topic:
+            nginx: 1
+        codec: json
+        consumer_settings:
+            bootstrap.servers: 192.168.0.1:9092
+            value.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+            key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+            group.id: hangout
     - Kafka:
         codec: plain
         encoding: UTF8 # defaut UTF8

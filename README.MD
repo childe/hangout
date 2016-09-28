@@ -80,6 +80,16 @@ This product includes GeoLite2 data created by MaxMind, available from
 ### newKafka
 新的kafka api.[http://kafka.apache.org/documentation.html#newconsumerapi](http://kafka.apache.org/documentation.html#newconsumerapi)
 
+    - NewKafka:
+        topic:
+            nginx: 1
+        codec: json
+        consumer_settings:
+            bootstrap.servers: 192.168.0.1:9092
+            value.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+            key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+            group.id: hangout
+
 所有可以配置的参数[http://kafka.apache.org/documentation.html#newconsumerconfigs](http://kafka.apache.org/documentation.html#newconsumerconfigs)
 
 ## Filter
