@@ -110,7 +110,8 @@ filters:
         source: message # required
         target: geoip # default geoip
         database: '/tmp/GeoLite2-City.mmdb'
-        remove_fields: ['country_code', 'location']
+        country_code: false #default true
+        location: false #default true
     - UA:
         source: ua # required
 
