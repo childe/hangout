@@ -143,8 +143,14 @@ maxmind也提供了数据的下载 [http://dev.maxmind.com/geoip/geoip2/geolite2
         source: message # required
         target: geoip # default geoip
         database: '/tmp/GeoLite2-City.mmdb'
-        country_code: false #default true
-        location: false #default true
+        country_code: false # default true
+        country_name: false # default true
+        country_isocode: false # default true
+        subdivision_name: false # default true
+        city_name: false # default true
+        latitude: false # default true
+        longitude: false # default true
+        location: false # default true
 
 ### Drop
 没有额外参数, 配置if使用.
