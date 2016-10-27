@@ -24,6 +24,7 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
 public class Elasticsearch extends BaseOutput {
     private static final Logger logger = Logger.getLogger(Elasticsearch.class
@@ -99,10 +100,11 @@ public class Elasticsearch extends BaseOutput {
             sniff = (Boolean) config.get("sniff");
         }
 
-        Settings settings = Settings.settingsBuilder()
+        Settings settings = Settings.builder()
                 .put("client.transport.sniff", sniff)
                 .put("cluster.name", clusterName).build();
-        esclient = TransportClient.builder().settings(settings).build();
+
+        esclient = new PreBuiltTransportClient(settings);
 
         ArrayList<String> hosts = (ArrayList<String>) config.get("hosts");
         for (String host : hosts) {
@@ -140,7 +142,7 @@ public class Elasticsearch extends BaseOutput {
                     public void afterBulk(long arg0, BulkRequest arg1,
                                           BulkResponse arg2) {
                         logger.info("bulk done with executionId: " + arg0);
-                        List<ActionRequest> requests = arg1.requests();
+                        List<ActionRequest<?>> requests = arg1.requests();
                         int toberetry = 0;
                         int totalFailed = 0;
                         for (BulkItemResponse item : arg2.getItems()) {
