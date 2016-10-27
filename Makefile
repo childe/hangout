@@ -24,7 +24,7 @@ build:
 	cp example.yml $(RELEASEPATH)
 	cp LICENSE $(RELEASEPATH)
 	cp bin/hangout $(RELEASEPATH)/bin
-	$(SED) 's/\<elasticsearch-version\>[0-9.]*/<elasticsearch-version\>$(ESVERSION)/' pom.xml
+	#$(SED) 's/\<elasticsearch-version\>[0-9.]*/<elasticsearch-version\>$(ESVERSION)/' pom.xml
 	git rev-parse --short HEAD > $(RELEASEPATH)/VERSION
 	mvn clean package
 	mvn dependency:copy-dependencies
@@ -45,3 +45,6 @@ dev:
 
 2.3.5:
 	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=master ESVERSION=2.3.5
+
+5.0.0:
+	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=5.x
