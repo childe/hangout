@@ -1,3 +1,7 @@
+**notice**  
+升级ES到5.0.0之后, 原来的api以及transport协议都有些不一样, 紧急改了下. 但是原来的打包方式有点问题还没解决.  
+如果用5.0.0的话, 可以直接到[https://github.com/childe/hangout/releases/tag/5.0.0](https://github.com/childe/hangout/releases/tag/5.0.0) 下载, 或者是mvn package打包后用with-dependencies版本.
+
 模仿[logstash](https://www.elastic.co/products/logstash)做的一个应用.
 
 This product includes GeoLite2 data created by MaxMind, available from
