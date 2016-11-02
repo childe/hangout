@@ -47,4 +47,15 @@ dev:
 	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=master ESVERSION=2.3.5
 
 5.0.0:
-	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=5.x
+	#git checkout 5.0.0
+	mkdir -p release/hangout-$(VERSION)-ES5.0.0
+	mkdir -p release/hangout-$(VERSION)-ES5.0.0/bin
+	mkdir -p release/hangout-$(VERSION)-ES5.0.0/lib
+	cp example.yml release/hangout-$(VERSION)-ES5.0.0
+	cp LICENSE release/hangout-$(VERSION)-ES5.0.0
+	cp bin/hangout release/hangout-$(VERSION)-ES5.0.0/bin
+	git rev-parse --short HEAD > release/hangout-$(VERSION)-ES5.0.0/VERSION
+	mvn clean package
+	cp target/hangout-$(VERSION)-with-dependencies.jar release/hangout-$(VERSION)-ES5.0.0/lib
+	$(SED) 's/X.X.X/$(VERSION)-with-dependencies/' release/hangout-$(VERSION)-ES5.0.0/bin/hangout
+	tar -cf release/hangout-$(VERSION)-ES5.0.0.tar -C release hangout-$(VERSION)-ES5.0.0
