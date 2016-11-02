@@ -40,8 +40,20 @@ test:
 dev:
 	$(MAKE) build FULLVERSION=hangout-dev GITBRANCH=$@ ESVERSION=2.3.5
 
-2.3.2:
-	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=master ESVERSION=2.3.2
-
 2.3.5:
 	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=master ESVERSION=2.3.5
+
+5.0.0:
+	git checkout 5.0.0
+	mkdir -p $(RELEASEPATH)
+	mkdir -p $(RELEASEPATH)/bin
+	mkdir -p $(RELEASEPATH)/lib
+	mkdir -p $(RELEASEPATH)/vender
+	cp example.yml $(RELEASEPATH)
+	cp LICENSE $(RELEASEPATH)
+	cp bin/hangout $(RELEASEPATH)/bin
+	git rev-parse --short HEAD > $(RELEASEPATH)/VERSION
+	mvn clean package
+	cp target/hangout-0.1.9-with-dependencies.jar $(RELEASEPATH)/lib
+	$(SED) 's/X.X.X/$(VERSION)-with-dependencies/' $(RELEASEPATH)/bin/hangout
+	tar -cf release/$(FULLVERSION).tar -C release $(FULLVERSION)
