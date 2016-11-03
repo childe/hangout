@@ -1,3 +1,7 @@
+**notice**  
+升级ES到5.0.0之后, 原来的api以及transport协议都有些不一样, 紧急改了下. 但是原来的打包方式有点问题还没解决.  
+如果用5.0.0的话, 可以直接到[https://github.com/childe/hangout/releases/tag/5.0.0](https://github.com/childe/hangout/releases/tag/5.0.0) 下载, 或者是mvn package打包后用with-dependencies版本.
+
 模仿[logstash](https://www.elastic.co/products/logstash)做的一个应用.
 
 This product includes GeoLite2 data created by MaxMind, available from
@@ -134,8 +138,7 @@ This product includes GeoLite2 data created by MaxMind, available from
 
 geoip2里面可以获取的数据也比较多, 目前我只是用到了country_code country_name city_name latitude longitude location 6个字段.
 
-**注意 geoip2里面不含有city_code值, 后续会增加GeoIP filter, 可以获取city_code值**  
-如果不需要, 还是建议用GeoIP2, 据[ELKstack-guide](https://github.com/garyelephant/ELKstack-guide-cn/blob/99550ba5cc4be177db1b6b62037fb77ce55c304f/logstash/develop_logstash_filter_geoip2.md), 速度比GeoIP有速倍的提升.
+据[ELKstack-guide](https://github.com/garyelephant/ELKstack-guide-cn/blob/99550ba5cc4be177db1b6b62037fb77ce55c304f/logstash/develop_logstash_filter_geoip2.md), 速度比GeoIP有速倍的提升.
 
 maxmind也提供了数据的下载 [http://dev.maxmind.com/geoip/geoip2/geolite2/](http://dev.maxmind.com/geoip/geoip2/geolite2/)
 
@@ -144,6 +147,14 @@ maxmind也提供了数据的下载 [http://dev.maxmind.com/geoip/geoip2/geolite2
         source: message # required
         target: geoip # default geoip
         database: '/tmp/GeoLite2-City.mmdb'
+        country_code: false # default true
+        country_name: false # default true
+        country_isocode: false # default true
+        subdivision_name: false # default true
+        city_name: false # default true
+        latitude: false # default true
+        longitude: false # default true
+        location: false # default true
 
 ### Drop
 没有额外参数, 配置if使用.

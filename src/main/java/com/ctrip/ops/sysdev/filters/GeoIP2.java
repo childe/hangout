@@ -2,6 +2,7 @@ package com.ctrip.ops.sysdev.filters;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
@@ -30,6 +31,7 @@ public class GeoIP2 extends BaseFilter {
     private String source;
     private String target;
     private DatabaseReader reader;
+    private boolean country_code, country_name, country_isocode, subdivision_name, city_name, latitude, longitude, location;
 
     protected void prepare() {
         if (!config.containsKey("source")) {
@@ -55,6 +57,28 @@ public class GeoIP2 extends BaseFilter {
             logger.error("no database configured in GeoIP");
             System.exit(1);
         }
+
+        if (config.containsKey("country_code")) {
+            this.country_code = (boolean) config.get("country_code");
+        } else {
+            this.country_code = true;
+        }
+
+        for (String fieldname : Arrays.asList("country_code", "country_name", "subdivision_name", "country_isocode", "city_name", "latitude", "longitude", "location")) {
+            try {
+                Field f = this.getClass().getDeclaredField(fieldname);
+                if (config.containsKey(fieldname)) {
+                    f.set(this, (boolean) config.get(fieldname));
+                } else {
+                    f.set(this, true);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.error("could not get/set " + fieldname + " as boolean value");
+                System.exit(1);
+            }
+        }
+
 
         String databasePath = (String) config.get("database");
         if (databasePath.startsWith("http://") || databasePath.startsWith("https://")) {
@@ -114,16 +138,24 @@ public class GeoIP2 extends BaseFilter {
 
                 Map targetObj = new HashMap();
                 event.put(this.target, targetObj);
-                targetObj.put("country_code", country.getIsoCode());
-                targetObj.put("country_name", country.getName());
-                targetObj.put("subdivision_name", subdivision.getName());
-                targetObj.put("country_isocode", country.getIsoCode());
-                targetObj.put("city_name", city.getName());
+                if (this.country_code)
+                    targetObj.put("country_code", country.getIsoCode());
+                if (this.country_name)
+                    targetObj.put("country_name", country.getName());
+                if (this.subdivision_name)
+                    targetObj.put("subdivision_name", subdivision.getName());
+                if (this.country_isocode)
+                    targetObj.put("country_isocode", country.getIsoCode());
+                if (this.city_name)
+                    targetObj.put("city_name", city.getName());
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
-                targetObj.put("latitude", latitude);
-                targetObj.put("longitude", longitude);
-                targetObj.put("location", new double[]{longitude, latitude});
+                if (this.latitude)
+                    targetObj.put("latitude", latitude);
+                if (this.longitude)
+                    targetObj.put("longitude", longitude);
+                if (this.location)
+                    targetObj.put("location", new double[]{longitude, latitude});
             } catch (Exception e) {
                 logger.debug(e);
                 success = false;
