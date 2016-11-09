@@ -4,7 +4,9 @@ import org.apache.commons.cli.*;
 
 import com.ctrip.ops.sysdev.inputs.BaseInput;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
@@ -54,9 +56,8 @@ public class Main {
 			System.exit(-1);
 		}
 
-		// TODO need process invalid arguments
 		if(!cmdLine.hasOption("f")) {
-			throw new IllegalArgumentException("Required -f argument to specify config file");
+			throw new ParseException("Required -f argument to specify config file");
 		}
 
 		return cmdLine;
@@ -80,36 +81,60 @@ public class Main {
 	}
 
 
-	public static void main(String[] args) throws Exception {
-		CommandLine cmdLine = parseArg(args);
-		setupLogger(cmdLine);
+	public static void main(String[] args) {
+        CommandLine cmdLine = null;
+        try {
+            cmdLine = parseArg(args);
+        } catch (ParseException e) {
+            System.out.println(e.getMessage());
+            System.exit(-1);
+        }
+        setupLogger(cmdLine);
 
-		// parse configure file
-		Map configs = HangoutConfig.parse(cmdLine.getOptionValue("f"));
-		logger.debug(configs);
+        // parse configure file
+        Map configs = null;
+        try {
+            configs = HangoutConfig.parse(cmdLine.getOptionValue("f"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        logger.debug(configs);
 
 
-		// for input in all_inputs
-		ArrayList<Map> inputs = (ArrayList<Map>) configs.get("inputs");
+        // for input in all_inputs
+        ArrayList<Map> inputs = (ArrayList<Map>) configs.get("inputs");
 
-		for (Map input : inputs) {
-			Iterator<Entry<String, Map>> inputIT = input.entrySet().iterator();
+        for (Map input : inputs) {
+            Iterator<Entry<String, Map>> inputIT = input.entrySet().iterator();
 
-			while (inputIT.hasNext()) {
-				Map.Entry<String, Map> inputEntry = inputIT.next();
-				String inputType = inputEntry.getKey();
-				Map inputConfig = inputEntry.getValue();
+            while (inputIT.hasNext()) {
+                Map.Entry<String, Map> inputEntry = inputIT.next();
+                String inputType = inputEntry.getKey();
+                Map inputConfig = inputEntry.getValue();
 
-				Class<?> inputClass = Class
-						.forName("com.ctrip.ops.sysdev.inputs." + inputType);
-				Constructor<?> ctor = inputClass.getConstructor(Map.class,
-						ArrayList.class, ArrayList.class);
-				BaseInput inputInstance = (BaseInput) ctor.newInstance(
-						inputConfig, configs.get("filters"), configs.get("outputs"));
-				inputInstance.emit();
-			}
-		}
-	}
+                Class<?> inputClass = null;
+                try {
+                    inputClass = Class
+                            .forName("com.ctrip.ops.sysdev.inputs." + inputType);
+                    Constructor<?> ctor = inputClass.getConstructor(Map.class,
+                            ArrayList.class, ArrayList.class);
+                    BaseInput inputInstance = (BaseInput) ctor.newInstance(
+                            inputConfig, configs.get("filters"), configs.get("outputs"));
+                    inputInstance.emit();
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
 	/**
 	 * Setup logger according arguments
