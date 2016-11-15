@@ -22,7 +22,6 @@ public class Stdin extends BaseInput {
     public Stdin(Map<String, Object> config, ArrayList<Map> filter,
                  ArrayList<Map> outputs) throws Exception {
         super(config, filter, outputs);
-        this.prepare();
     }
 
     @Override
