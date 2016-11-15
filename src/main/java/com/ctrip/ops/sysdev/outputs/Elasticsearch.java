@@ -6,6 +6,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.elasticsearch.client.transport.TransportClient;
@@ -14,6 +15,7 @@ import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import com.ctrip.ops.sysdev.render.Formatter;
 import com.ctrip.ops.sysdev.render.FreeMarkerRender;
 import com.ctrip.ops.sysdev.render.TemplateRender;
+import com.ctrip.ops.sysdev.monitor.SinkCounter;
 import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkProcessor;
@@ -34,6 +36,7 @@ public class Elasticsearch extends BaseOutput {
     private TransportClient esclient;
     private TemplateRender indexTypeRender;
     private TemplateRender idRender;
+    private SinkCounter sc = new SinkCounter("EsConsumer");
 
     public Elasticsearch(Map config) {
         super(config);
@@ -135,6 +138,7 @@ public class Elasticsearch extends BaseOutput {
         bulkProcessor = BulkProcessor
                 .builder(esclient, new BulkProcessor.Listener() {
 
+
                     @Override
                     public void afterBulk(long arg0, BulkRequest arg1,
                                           BulkResponse arg2) {
@@ -142,15 +146,18 @@ public class Elasticsearch extends BaseOutput {
                         List<ActionRequest> requests = arg1.requests();
                         int toberetry = 0;
                         int totalFailed = 0;
+                        sc.start();
                         for (BulkItemResponse item : arg2.getItems()) {
                             if (item.isFailed()) {
                                 switch (item.getFailure().getStatus()) {
                                     case TOO_MANY_REQUESTS:
+                                        sc.incrementWriteDataToEsException();
                                     case SERVICE_UNAVAILABLE:
                                         if (toberetry == 0) {
                                             logger.error("bulk has failed item which NEED to retry");
                                             logger.error(item.getFailureMessage());
                                         }
+                                        sc.incrementWriteDataToEsException();
                                         toberetry++;
                                         bulkProcessor.add(requests.get(item
                                                 .getItemId()));
@@ -160,11 +167,13 @@ public class Elasticsearch extends BaseOutput {
                                             logger.error("bulk has failed item which do NOT need to retry");
                                             logger.error(item.getFailureMessage());
                                         }
+                                        sc.incrementWriteDataToEsException();
                                         break;
                                 }
 
                                 totalFailed++;
                             }
+                            sc.incrementWriteDataToEsCount();
                         }
 
                         if (totalFailed > 0) {
@@ -221,5 +230,24 @@ public class Elasticsearch extends BaseOutput {
                     .source(event);
         }
         this.bulkProcessor.add(indexRequest);
+    }
+
+    public void shutdown() {
+        logger.info("flush docs and then shutdown");
+
+        //flush immediately
+        this.bulkProcessor.flush();
+
+        // await for some time for rest data from kafka
+        int flushInterval = 10;
+        if (config.containsKey("flush_interval")) {
+            flushInterval = (int) config.get("flush_interval");
+        }
+        try {
+            this.bulkProcessor.awaitClose(flushInterval, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            logger.error("failed to bulk docs before shutdown");
+            logger.error(e);
+        }
     }
 }

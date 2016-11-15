@@ -16,6 +16,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import com.ctrip.ops.sysdev.configs.HangoutConfig;
+import com.ctrip.ops.sysdev.monitor.http.HTTPMetricsServer;
 
 public class Main {
 	private static final Logger logger = Logger.getLogger(Main.class.getName());
@@ -87,6 +88,15 @@ public class Main {
 		// parse configure file
 		Map configs = HangoutConfig.parse(cmdLine.getOptionValue("f"));
 		logger.debug(configs);
+
+		//start metrics server
+		HTTPMetricsServer http = new HTTPMetricsServer();
+		try{
+			http.start();
+		}catch (Exception ex){
+			logger.fatal(String.format("Start metrics server error->",ex.getMessage().toString()));
+			System.exit(1);
+		}
 
 
 		// for input in all_inputs
