@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 import com.ctrip.ops.sysdev.decoder.IDecode;
 import com.ctrip.ops.sysdev.filters.BaseFilter;
 import com.ctrip.ops.sysdev.outputs.BaseOutput;
+import com.ctrip.ops.sysdev.monitor.SinkCounter;
 
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.ConsumerIterator;
@@ -37,6 +38,7 @@ public class Kafka extends BaseInput {
         private String encoding;
         private BaseFilter[] filterProcessors;
         private BaseOutput[] outputProcessors;
+        private SinkCounter sc;
 
         public Consumer(KafkaStream<byte[], byte[]> a_stream, Kafka kafkaInput) {
             this.m_stream = a_stream;
@@ -45,17 +47,21 @@ public class Kafka extends BaseInput {
             this.decoder = kafkaInput.createDecoder();
             this.filterProcessors = kafkaInput.createFilterProcessors();
             this.outputProcessors = kafkaInput.createOutputProcessors();
+            this.sc = new SinkCounter("KafkaComsumer");
         }
 
         public void run() {
             try {
                 ConsumerIterator<byte[], byte[]> it = m_stream.iterator();
+                this.sc.start();
                 while (it.hasNext()) {
                     String m = null;
                     try {
                         m = new String(it.next().message(),
                                 this.kafkaInput.encoding);
+                        this.sc.incrementConsumerOfKafkaCount();
                     } catch (UnsupportedEncodingException e1) {
+                        this.sc.incrementConsumerOfKafkaException();
                         e1.printStackTrace();
                         logger.error(e1);
                     }
@@ -78,6 +84,7 @@ public class Kafka extends BaseInput {
                             }
                         }
                     } catch (Exception e) {
+                        this.sc.incrementConsumerOfKafkaException();
                         logger.error("process event failed:" + m);
                         e.printStackTrace();
                         logger.error(e);
@@ -85,8 +92,12 @@ public class Kafka extends BaseInput {
 
                 }
             } catch (Throwable t) {
+                this.sc.incrementWriteDataToEsException();
                 logger.error(t);
                 System.exit(1);
+            }
+            finally {
+                this.sc.stop();
             }
         }
     }
