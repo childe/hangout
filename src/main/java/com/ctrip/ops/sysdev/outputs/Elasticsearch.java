@@ -36,6 +36,7 @@ public class Elasticsearch extends BaseOutput {
     private TransportClient esclient;
     private TemplateRender indexTypeRender;
     private TemplateRender idRender;
+    private TemplateRender parentRender;
 
     public Elasticsearch(Map config) {
         super(config);
@@ -61,6 +62,19 @@ public class Elasticsearch extends BaseOutput {
             }
         } else {
             this.idRender = null;
+        }
+
+        if (config.containsKey("document_parent")) {
+            try {
+                this.parentRender = new FreeMarkerRender(
+                        (String) config.get("document_parent"),
+                        (String) config.get("document_parent"));
+            } catch (IOException e) {
+                logger.fatal(e.getMessage());
+                System.exit(1);
+            }
+        } else {
+            this.parentRender = null;
         }
 
         if (config.containsKey("index_type")) {
@@ -95,13 +109,23 @@ public class Elasticsearch extends BaseOutput {
             UnknownHostException {
 
         String clusterName = (String) config.get("cluster");
+
         Boolean sniff = true;
         if (config.containsKey("sniff")) {
             sniff = (Boolean) config.get("sniff");
         }
+<<<<<<< HEAD
 
         Settings settings = Settings.builder()
+=======
+        Boolean compress = false;
+        if (config.containsKey("compress")) {
+            sniff = (Boolean) config.get("compress");
+        }
+        Settings settings = Settings.settingsBuilder()
+>>>>>>> master
                 .put("client.transport.sniff", sniff)
+                .put("transport.tcp.compress", compress)
                 .put("cluster.name", clusterName).build();
 
         esclient = new PreBuiltTransportClient(settings);
@@ -222,6 +246,9 @@ public class Elasticsearch extends BaseOutput {
             String _id = idRender.render(event);
             indexRequest = new IndexRequest(_index, _indexType, _id)
                     .source(event);
+        }
+        if (this.parentRender != null) {
+            indexRequest.parent(parentRender.render(event));
         }
         this.bulkProcessor.add(indexRequest);
     }

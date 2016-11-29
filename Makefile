@@ -26,7 +26,7 @@ build:
 	cp bin/hangout $(RELEASEPATH)/bin
 	#$(SED) 's/\<elasticsearch-version\>[0-9.]*/<elasticsearch-version\>$(ESVERSION)/' pom.xml
 	git rev-parse --short HEAD > $(RELEASEPATH)/VERSION
-	mvn clean package
+	mvn clean package -DskipTests
 	mvn dependency:copy-dependencies
 	cp target/hangout-$(VERSION).jar $(RELEASEPATH)/lib
 	cp target/dependency/* $(RELEASEPATH)/vender
@@ -39,9 +39,6 @@ test:
 
 dev:
 	$(MAKE) build FULLVERSION=hangout-dev GITBRANCH=$@ ESVERSION=2.3.5
-
-2.3.2:
-	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=master ESVERSION=2.3.2
 
 2.3.5:
 	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=master ESVERSION=2.3.5
