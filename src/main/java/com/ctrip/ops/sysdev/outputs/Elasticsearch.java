@@ -114,16 +114,13 @@ public class Elasticsearch extends BaseOutput {
         if (config.containsKey("sniff")) {
             sniff = (Boolean) config.get("sniff");
         }
-<<<<<<< HEAD
 
-        Settings settings = Settings.builder()
-=======
         Boolean compress = false;
         if (config.containsKey("compress")) {
             sniff = (Boolean) config.get("compress");
         }
-        Settings settings = Settings.settingsBuilder()
->>>>>>> master
+
+        Settings settings = Settings.builder()
                 .put("client.transport.sniff", sniff)
                 .put("transport.tcp.compress", compress)
                 .put("cluster.name", clusterName).build();
