@@ -94,13 +94,18 @@ public class Elasticsearch extends BaseOutput {
             UnknownHostException {
 
         String clusterName = (String) config.get("cluster");
+
         Boolean sniff = true;
         if (config.containsKey("sniff")) {
             sniff = (Boolean) config.get("sniff");
         }
-
+        Boolean compress = false;
+        if (config.containsKey("compress")) {
+            sniff = (Boolean) config.get("compress");
+        }
         Settings settings = Settings.settingsBuilder()
                 .put("client.transport.sniff", sniff)
+                .put("transport.tcp.compress", compress)
                 .put("cluster.name", clusterName).build();
         esclient = TransportClient.builder().settings(settings).build();
 
