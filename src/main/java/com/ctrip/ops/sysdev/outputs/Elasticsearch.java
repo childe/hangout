@@ -35,6 +35,7 @@ public class Elasticsearch extends BaseOutput {
     private TransportClient esclient;
     private TemplateRender indexTypeRender;
     private TemplateRender idRender;
+    private TemplateRender parentRender;
 
     public Elasticsearch(Map config) {
         super(config);
@@ -60,6 +61,19 @@ public class Elasticsearch extends BaseOutput {
             }
         } else {
             this.idRender = null;
+        }
+
+        if (config.containsKey("document_parent")) {
+            try {
+                this.parentRender = new FreeMarkerRender(
+                        (String) config.get("document_parent"),
+                        (String) config.get("document_parent"));
+            } catch (IOException e) {
+                logger.fatal(e.getMessage());
+                System.exit(1);
+            }
+        } else {
+            this.parentRender = null;
         }
 
         if (config.containsKey("index_type")) {
@@ -225,6 +239,9 @@ public class Elasticsearch extends BaseOutput {
             String _id = idRender.render(event);
             indexRequest = new IndexRequest(_index, _indexType, _id)
                     .source(event);
+        }
+        if (this.parentRender != null) {
+            indexRequest.parent(parentRender.render(event));
         }
         this.bulkProcessor.add(indexRequest);
     }
