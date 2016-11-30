@@ -45,7 +45,7 @@ public class Json extends BaseFilter {
                         .parseWithException((String) event.get(this.field));
                 success = true;
             } catch (Exception e) {
-                logger.warn("failed to json parse field: " + this.field);
+                logger.debug("failed to json parse field: " + this.field);
             }
         }
 
