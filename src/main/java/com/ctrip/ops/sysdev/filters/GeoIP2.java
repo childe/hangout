@@ -133,8 +133,6 @@ public class GeoIP2 extends BaseFilter {
                 return event;
             }
 
-            Map targetObj = new HashMap();
-            event.put(this.target, targetObj);
 
             try {
                 CityResponse response = reader.city(ipAddress);
@@ -144,6 +142,8 @@ public class GeoIP2 extends BaseFilter {
                 City city = response.getCity();
                 Location location = response.getLocation();
 
+                Map targetObj = new HashMap();
+                event.put(this.target, targetObj);
                 if (this.country_code)
                     targetObj.put("country_code", country.getIsoCode());
                 if (this.country_name)
@@ -174,13 +174,16 @@ public class GeoIP2 extends BaseFilter {
             try {
                 CountryResponse response = reader.country(ipAddress);
                 Country country = response.getCountry();
+
+                Map targetObj = new HashMap();
+                event.put(this.target, targetObj);
                 if (this.country_code)
                     targetObj.put("country_code", country.getIsoCode());
                 if (this.country_name)
                     targetObj.put("country_name", country.getName());
                 if (this.country_isocode)
                     targetObj.put("country_isocode", country.getIsoCode());
-                if (this.city_name);
+                if (this.city_name) ;
 
             } catch (Exception e) {
                 logger.debug(e);
