@@ -24,6 +24,7 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
 public class Elasticsearch extends BaseOutput {
     private static final Logger logger = Logger.getLogger(Elasticsearch.class
@@ -35,6 +36,7 @@ public class Elasticsearch extends BaseOutput {
     private TransportClient esclient;
     private TemplateRender indexTypeRender;
     private TemplateRender idRender;
+    private TemplateRender parentRender;
 
     public Elasticsearch(Map config) {
         super(config);
@@ -60,6 +62,19 @@ public class Elasticsearch extends BaseOutput {
             }
         } else {
             this.idRender = null;
+        }
+
+        if (config.containsKey("document_parent")) {
+            try {
+                this.parentRender = new FreeMarkerRender(
+                        (String) config.get("document_parent"),
+                        (String) config.get("document_parent"));
+            } catch (IOException e) {
+                logger.fatal(e.getMessage());
+                System.exit(1);
+            }
+        } else {
+            this.parentRender = null;
         }
 
         if (config.containsKey("index_type")) {
@@ -94,15 +109,23 @@ public class Elasticsearch extends BaseOutput {
             UnknownHostException {
 
         String clusterName = (String) config.get("cluster");
+
         Boolean sniff = true;
         if (config.containsKey("sniff")) {
             sniff = (Boolean) config.get("sniff");
         }
 
-        Settings settings = Settings.settingsBuilder()
+        Boolean compress = false;
+        if (config.containsKey("compress")) {
+            sniff = (Boolean) config.get("compress");
+        }
+
+        Settings settings = Settings.builder()
                 .put("client.transport.sniff", sniff)
+                .put("transport.tcp.compress", compress)
                 .put("cluster.name", clusterName).build();
-        esclient = TransportClient.builder().settings(settings).build();
+
+        esclient = new PreBuiltTransportClient(settings);
 
         ArrayList<String> hosts = (ArrayList<String>) config.get("hosts");
         for (String host : hosts) {
@@ -140,7 +163,7 @@ public class Elasticsearch extends BaseOutput {
                     public void afterBulk(long arg0, BulkRequest arg1,
                                           BulkResponse arg2) {
                         logger.info("bulk done with executionId: " + arg0);
-                        List<ActionRequest> requests = arg1.requests();
+                        List<ActionRequest<?>> requests = arg1.requests();
                         int toberetry = 0;
                         int totalFailed = 0;
                         for (BulkItemResponse item : arg2.getItems()) {
@@ -220,6 +243,9 @@ public class Elasticsearch extends BaseOutput {
             String _id = idRender.render(event);
             indexRequest = new IndexRequest(_index, _indexType, _id)
                     .source(event);
+        }
+        if (this.parentRender != null) {
+            indexRequest.parent(parentRender.render(event));
         }
         this.bulkProcessor.add(indexRequest);
     }

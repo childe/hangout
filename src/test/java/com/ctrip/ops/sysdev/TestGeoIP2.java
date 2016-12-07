@@ -78,5 +78,24 @@ public class TestGeoIP2 {
         Assert.assertNull(((Map) event.get("geoip")).get("longitude"));
         Assert.assertEquals(((double[]) ((Map) event.get("geoip")).get("location"))[0], 120.1614);
         Assert.assertEquals(((double[]) ((Map) event.get("geoip")).get("location"))[1], 30.2936);
+
+        f = new File("/tmp/GeoLite2-Country.mmdb");
+        if (f.exists() && !f.isDirectory()) {
+            config = new HashMap() {
+                {
+                    put("source", "clientip");
+                    put("database", "/tmp/GeoLite2-Country.mmdb");
+                }
+            };
+            geoip2Filter = new GeoIP2(config);
+
+            event = new HashMap();
+            event.put("clientip", "115.239.211.112");
+            event = geoip2Filter.process(event);
+            Assert.assertEquals(((Map) event.get("geoip")).get("country_name"), "China");
+            Assert.assertEquals(((Map) event.get("geoip")).get("country_code"), "CN");
+            Assert.assertEquals(((Map) event.get("geoip")).get("country_isocode"), "CN");
+            Assert.assertNull(((Map) event.get("geoip")).get("city_name"));
+        }
     }
 }

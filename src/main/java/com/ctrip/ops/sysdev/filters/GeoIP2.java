@@ -6,11 +6,12 @@ import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.maxmind.geoip2.model.CountryResponse;
 import com.maxmind.geoip2.record.Subdivision;
 import org.apache.log4j.Logger;
 
@@ -122,14 +123,19 @@ public class GeoIP2 extends BaseFilter {
     protected Map filter(final Map event) {
         if (event.containsKey(this.source)) {
 
-            boolean success = true;
-
             InetAddress ipAddress;
+
             try {
                 ipAddress = InetAddress.getByName((String) event.get(source));
+            } catch (UnknownHostException e) {
+                logger.debug("NOT a valid IP address");
+                this.postProcess(event, false);
+                return event;
+            }
 
+
+            try {
                 CityResponse response = reader.city(ipAddress);
-
                 Country country = response.getCountry();
                 Subdivision subdivision =
                         response.getMostSpecificSubdivision();
@@ -156,12 +162,34 @@ public class GeoIP2 extends BaseFilter {
                     targetObj.put("longitude", longitude);
                 if (this.location)
                     targetObj.put("location", new double[]{longitude, latitude});
+
+                this.postProcess(event, true);
+                return event;
             } catch (Exception e) {
                 logger.debug(e);
-                success = false;
+                logger.debug("maybe your DB doesn't support city lelel.");
             }
 
-            this.postProcess(event, success);
+
+            try {
+                CountryResponse response = reader.country(ipAddress);
+                Country country = response.getCountry();
+
+                Map targetObj = new HashMap();
+                event.put(this.target, targetObj);
+                if (this.country_code)
+                    targetObj.put("country_code", country.getIsoCode());
+                if (this.country_name)
+                    targetObj.put("country_name", country.getName());
+                if (this.country_isocode)
+                    targetObj.put("country_isocode", country.getIsoCode());
+                if (this.city_name) ;
+
+            } catch (Exception e) {
+                logger.debug(e);
+                this.postProcess(event, false);
+                return event;
+            }
         }
 
         return event;

@@ -53,6 +53,7 @@ public abstract class BaseInput {
                     idx++;
                 } catch (Exception e) {
                     e.printStackTrace();
+                    System.exit(1);
                 }
             }
         }
