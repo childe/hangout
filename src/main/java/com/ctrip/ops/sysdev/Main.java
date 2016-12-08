@@ -141,6 +141,7 @@ public class Main {
 	 * @param cmdLine
 	 */
 	private static void setupLogger(CommandLine cmdLine) {
+		//TODO duplicated code
 		if (cmdLine.hasOption("l")) {
 			DailyRollingFileAppender fa = new DailyRollingFileAppender();
 			fa.setName("FileLogger");
