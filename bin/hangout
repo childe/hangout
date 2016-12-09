@@ -7,4 +7,4 @@ basedir=$(cd `dirname $0`/..; pwd)
 
 JAVA_OPTS="$JAVA_OPTS -Xmx${HO_HEAP_SIZE}"
 JAVA_OPTS="$JAVA_OPTS -Xms${HO_HEAP_SIZE}"
-exec java $JAVA_OPTS -cp $basedir/target/hangout-0.1.9-with-dependencies.jar:$basedir/vender/* com.ctrip.ops.sysdev.Main "$@"
+exec java $JAVA_OPTS -cp $basedir/libs/*:$basedir/modules/* com.ctrip.ops.sysdev.core.Main "$@"
