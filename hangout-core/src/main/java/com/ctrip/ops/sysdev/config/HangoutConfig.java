@@ -9,7 +9,6 @@ import java.util.Map;
 
 import org.yaml.snakeyaml.Yaml;
 
-@SuppressWarnings("rawtypes")
 public class HangoutConfig {
     private static final String HTTP = "http://";
     private static final String HTTPS = "https://";

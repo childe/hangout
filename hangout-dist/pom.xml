@@ -20,17 +20,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>hangout-config</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>hangout-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>hangout-decoders</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -71,6 +61,4 @@
             </plugin>
         </plugins>
     </build>
-
-
 </project>

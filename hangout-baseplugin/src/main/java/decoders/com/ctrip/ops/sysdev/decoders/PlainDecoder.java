@@ -1,4 +1,4 @@
-package com.ctrip.ops.sysdev.decoders;
+package decoders.com.ctrip.ops.sysdev.decoders;
 
 import org.joda.time.DateTime;
 

@@ -1,8 +1,8 @@
 package com.ctrip.ops.sysdev.baseplugin;
 
-import com.ctrip.ops.sysdev.decoders.IDecode;
-import com.ctrip.ops.sysdev.decoders.JsonDecoder;
-import com.ctrip.ops.sysdev.decoders.PlainDecoder;
+import decoders.com.ctrip.ops.sysdev.decoders.IDecode;
+import decoders.com.ctrip.ops.sysdev.decoders.JsonDecoder;
+import decoders.com.ctrip.ops.sysdev.decoders.PlainDecoder;
 import org.apache.log4j.Logger;
 
 import java.lang.reflect.Constructor;

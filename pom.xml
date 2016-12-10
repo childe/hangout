@@ -13,8 +13,6 @@
         <module>hangout-core</module>
         <module>hangout-output-plugins</module>
         <module>hangout-filters</module>
-        <module>hangout-decoders</module>
-        <module>hangout-config</module>
         <module>hangout-baseplugin</module>
         <module>hangout-dist</module>
     </modules>

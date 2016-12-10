@@ -24,18 +24,13 @@
         </dependency>
         <dependency>
             <groupId>ctrip</groupId>
-            <artifactId>hangout-config</artifactId>
-            <version>0.1.9</version>
-        </dependency>
-        <dependency>
-            <groupId>ctrip</groupId>
             <artifactId>hangout-baseplugin</artifactId>
             <version>0.1.9</version>
         </dependency>
         <dependency>
-            <groupId>ctrip</groupId>
-            <artifactId>hangout-decoders</artifactId>
-            <version>0.1.9</version>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.17</version>
         </dependency>
         <dependency>
             <groupId>ctrip</groupId>
@@ -62,7 +57,6 @@
             <artifactId>testng</artifactId>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
 

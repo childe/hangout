@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
 import com.ctrip.ops.sysdev.baseplugin.BaseInput;
 import com.ctrip.ops.sysdev.baseplugin.BaseOutput;
-import com.ctrip.ops.sysdev.decoders.IDecode;
+import decoders.com.ctrip.ops.sysdev.decoders.IDecode;
 import org.apache.log4j.Logger;
 
 import kafka.consumer.ConsumerConfig;
