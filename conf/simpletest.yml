@@ -1,0 +1,16 @@
+inputs:
+   - Stdin:
+        codec: plain
+        hostname: true # if add hostname to event; default false
+
+filters:
+    - Filters:
+        if:
+          - '<#if message??>true</#if>'
+          - '<#if message?contains("liu")>true<#elseif message?contains("warn")>true</#if>'
+        filters:
+            - Add:
+                fields:
+                    test: 'abcd'
+outputs:
+    - Stdout: {}
