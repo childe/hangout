@@ -57,24 +57,6 @@
             <artifactId>testng</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.4</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/args4j/args4j -->
-        <dependency>
-            <groupId>args4j</groupId>
-            <artifactId>args4j</artifactId>
-            <version>2.33</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok-maven -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.16.10</version>
-        </dependency>
-
     </dependencies>
 
 
