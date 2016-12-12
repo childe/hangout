@@ -1,4 +1,4 @@
-package decoders.com.ctrip.ops.sysdev.decoders;
+package com.ctrip.ops.sysdev.decoders;
 
 import java.util.Map;
 

@@ -1,4 +1,4 @@
-package decoders.com.ctrip.ops.sysdev.decoders;
+package com.ctrip.ops.sysdev.decoders;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;

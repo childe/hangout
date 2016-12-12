@@ -2,7 +2,6 @@ package com.ctrip.ops.sysdev.log;
 
 import com.ctrip.ops.sysdev.config.CommandLineValues;
 import lombok.extern.log4j.Log4j;
-import org.apache.commons.cli.CommandLine;
 import org.apache.log4j.*;
 
 /**
