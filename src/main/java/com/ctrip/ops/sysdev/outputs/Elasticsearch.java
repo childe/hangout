@@ -117,7 +117,7 @@ public class Elasticsearch extends BaseOutput {
 
         Boolean compress = false;
         if (config.containsKey("compress")) {
-            sniff = (Boolean) config.get("compress");
+            compress = (Boolean) config.get("compress");
         }
 
         Settings settings = Settings.builder()
