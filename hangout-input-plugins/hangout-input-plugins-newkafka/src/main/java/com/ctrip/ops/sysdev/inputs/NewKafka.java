@@ -12,7 +12,7 @@ import java.util.concurrent.Executors;
 import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
 import com.ctrip.ops.sysdev.baseplugin.BaseInput;
 import com.ctrip.ops.sysdev.baseplugin.BaseOutput;
-import decoders.com.ctrip.ops.sysdev.decoders.IDecode;
+import com.ctrip.ops.sysdev.decoders.IDecode;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
