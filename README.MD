@@ -107,6 +107,13 @@ Grok是为了把一个字符串切割成多个field, 用的是[Joni库](https://
 	remove_fields: ['message']
 	tag_on_failure: grokfail #default grokfail
 
+可以添加自己的Grok Pattern:
+
+    pattern_paths:
+        - '/opt/hangout/grokpatternpaths'
+    match:
+        - '(%{NGINXACCESSLOG})'
+
 ### Date
 Date是用的[jona-time](http://www.joda.org/joda-time/)做解析和格式化.
 
