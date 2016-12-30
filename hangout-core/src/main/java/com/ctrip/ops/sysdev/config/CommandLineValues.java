@@ -1,6 +1,5 @@
 package com.ctrip.ops.sysdev.config;
 
-import com.ctrip.ops.sysdev.exception.NotSupportException;
 import lombok.Data;
 import lombok.extern.log4j.Log4j;
 import org.apache.log4j.Level;
