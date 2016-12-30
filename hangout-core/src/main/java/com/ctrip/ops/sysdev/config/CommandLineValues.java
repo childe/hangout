@@ -26,7 +26,7 @@ public class CommandLineValues {
     @Option(name = "-ll",aliases = {"--loglevel"},usage = "Set log level: INFO (default), DEBUG, TRACE",required = false, handler = LogLevelOptionhandler.class)
     private Level logLevel = Level.INFO;
 
-    @Option(name = "-f" , aliases = {"--configfile"},usage = " Specify a config file", required = false)
+    @Option(name = "-f" , aliases = {"--configfile"},usage = " Specify a config file", required = true)
     private File configFile;
 
     @Option(name = "-l", aliases = {"--logfile"},usage = "Specify a log file", required = false)
