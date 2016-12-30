@@ -132,7 +132,7 @@ Date是用的[jona-time](http://www.joda.org/joda-time/)做解析和格式化.
 解析json字符串, **如果json里面的字段和原有的字段重复, 原有字段会被覆盖!**
 
     - Json:
-        filed: message # required
+        field: message # required
 
 ### GeoIP2
 geoip2用的是maxmind公司的开源数据和算法.
