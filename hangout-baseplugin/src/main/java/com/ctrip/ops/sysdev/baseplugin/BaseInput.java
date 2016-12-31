@@ -72,25 +72,19 @@ public abstract class BaseInput {
 
     protected void registerShutdownHookForSelf() {
         final Object inputClass = this;
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                logger.info("start to shutdown " + inputClass.getClass().getName());
-                shutdown();
-            }
-        });
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            logger.info("start to shutdown " + inputClass.getClass().getName());
+            shutdown();
+        }));
     }
 
     protected void registerShutdownHook(final BaseOutput[] bos) {
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                logger.info("start to shutdown all output plugin");
-                for (BaseOutput bo : bos) {
-                    bo.shutdown();
-                }
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            logger.info("start to shutdown all output plugin");
+            for (BaseOutput bo : bos) {
+                bo.shutdown();
             }
-        });
+        }));
     }
 
 
