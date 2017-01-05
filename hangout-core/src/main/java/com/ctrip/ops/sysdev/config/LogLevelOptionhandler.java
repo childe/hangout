@@ -19,16 +19,18 @@ public class LogLevelOptionhandler extends OneArgumentOptionHandler<Level> {
 
     @Override
     protected Level parse(String s) throws NumberFormatException, CmdLineException {
-            switch (s.toLowerCase()){
-                case "error":
-                    return Level.ERROR;
-                case "debug":
-                    return Level.DEBUG;
-                case "trace":
-                    return Level.TRACE;
-                case "info":
-                    default:
-                    return Level.INFO;
-            }
+        switch (s.toLowerCase()) {
+            case "error":
+                return Level.ERROR;
+            case "debug":
+                return Level.DEBUG;
+            case "trace":
+                return Level.TRACE;
+            case "info":
+                return Level.INFO;
+            case "warn":
+            default:
+                return Level.WARN;
+        }
     }
 }

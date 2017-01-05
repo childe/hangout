@@ -16,22 +16,20 @@ public class LogSetter {
      */
     public void initLogger(CommandLineValues cmdLine) {
         WriterAppender wa = null;
-        String logPath = System.getenv("basedir")+"/logs/hangout.log";
 
-        //If set log file, override default
-        if(cmdLine.getLogFile()!=null){
-            logPath = cmdLine.getLogFile();
+        if (cmdLine.getLogFile() != null) {
+            String logPath = cmdLine.getLogFile();
+            wa = new DailyRollingFileAppender(); // Pull up
+            DailyRollingFileAppender da = (DailyRollingFileAppender) wa; // Pull down
+            da.setName("FileLogger");
+            ((DailyRollingFileAppender) wa).setFile(logPath);
+            setLogger(cmdLine, wa, Logger.getRootLogger());
+        } else {
+            //Set Console Log
+            wa = new ConsoleAppender(); //Pull up
+            ConsoleAppender ca = (ConsoleAppender) wa; // Pull down
+            setLogger(cmdLine, wa, Logger.getRootLogger());
         }
-        wa = new DailyRollingFileAppender(); // Pull up
-        DailyRollingFileAppender da = (DailyRollingFileAppender) wa; // Pull down
-        da.setName("FileLogger");
-        ((DailyRollingFileAppender) wa).setFile(logPath);
-        setLogger(cmdLine, wa, Logger.getRootLogger());
-
-        //Set Console Log
-        wa = new ConsoleAppender(); //Pull up
-        ConsoleAppender ca = (ConsoleAppender) wa; // Pull down
-        setLogger(cmdLine, wa, Logger.getRootLogger());
     }
 
 
@@ -40,8 +38,8 @@ public class LogSetter {
         PatternLayout patternLayout = new PatternLayout(PATTERN);
         appender.setLayout(patternLayout);
         appender.activateOptions();
-        appender.setThreshold(cmdLine.getLogLevel());
-        logger.setLevel(cmdLine.getLogLevel());
+        appender.setThreshold(cmdLine.customGetLogLevel());
+        logger.setLevel(cmdLine.customGetLogLevel());
         logger.addAppender(appender);
     }
 }

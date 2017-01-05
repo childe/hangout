@@ -20,23 +20,29 @@ public class CommandLineValues {
     private final String[] arguments;
     private CmdLineParser parser;
 
-    @Option(name = "-h", aliases = {"--help"},usage = "Print Help Information", required = false, help = true)
+    @Option(name = "-h", aliases = {"--help"}, usage = "Print Help Information", required = false, help = true)
     private boolean isHelp = false;
 
-    @Option(name = "-ll",aliases = {"--loglevel"},usage = "Set log level: INFO (default), DEBUG, TRACE",required = false, handler = LogLevelOptionhandler.class)
-    private Level logLevel = Level.INFO;
+    @Option(name = "-ll", aliases = {"--loglevel"}, usage = "Set log level: INFO (default), DEBUG, TRACE", required = false, handler = LogLevelOptionhandler.class)
+    private Level logLevel = Level.WARN;
 
-    @Option(name = "-f" , aliases = {"--configfile"},usage = " Specify a config file", required = true)
+    @Option(name = "-f", aliases = {"--configfile"}, usage = " Specify a config file", required = true)
     private File configFile;
 
-    @Option(name = "-l", aliases = {"--logfile"},usage = "Specify a log file", required = false)
+    @Option(name = "-l", aliases = {"--logfile"}, usage = "Specify a log file", required = false)
     private String logFile;
 
-    @Option(name = "-w", aliases = {"--workers"}, usage = "Set How many workers in the filter part", required = false)
-    private int workercount;
-
-    @Option(name = "-v", aliases = {"--version"}, usage = "Show Hangout Version", required = false)
+    @Option(name = "--version", usage = "Show Hangout Version", required = false)
     private boolean isShowVersion;
+
+    @Option(name = "-v", usage = "set log level to info", required = false)
+    private boolean infoLevel = false;
+
+    @Option(name = "-vv", usage = "set log level to debug", required = false)
+    private boolean debugLevel = false;
+
+    @Option(name = "-vvvv", usage = "set log level to trace", required = false)
+    private boolean traceLevel = false;
 
     public CommandLineValues(String... args) {
         parser = new CmdLineParser(this);
@@ -50,7 +56,7 @@ public class CommandLineValues {
             parser.parseArgument(arguments);
 
             // If help is needed
-            if (isHelp()) {
+            if (isHelp) {
                 parser.printUsage(System.err);
                 System.exit(0);
             }
@@ -61,7 +67,7 @@ public class CommandLineValues {
         }
     }
 
-    private void printVersion(){
+    private void printVersion() {
         System.out.println("Hangout  Version:" + getVersion() + "  Copyright @Ctrip   Author : childe@github, guuhpc@github");
     }
 
@@ -70,9 +76,23 @@ public class CommandLineValues {
         return "0.19";
     }
 
-    private void printUsage(){
+    private void printUsage() {
         System.out.println("hangout [options...] arguments...");
         parser.printUsage(System.out);
         System.err.println();
+    }
+
+    public Level customGetLogLevel() {
+        if (this.traceLevel) {
+            return Level.TRACE;
+        }
+        if (this.debugLevel) {
+            return Level.DEBUG;
+        }
+        if (this.infoLevel) {
+            return Level.INFO;
+        }
+
+        return this.logLevel;
     }
 }
