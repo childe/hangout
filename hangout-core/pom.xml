@@ -13,19 +13,9 @@
     <dependencies>
         <!--下列的dependency并非这个core都需要，大部分是Iead多项目调试需要-->
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
-        </dependency>
-        <dependency>
             <groupId>ctrip</groupId>
             <artifactId>hangout-baseplugin</artifactId>
             <version>0.1.9</version>
-        </dependency>
-        <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-            <version>1.17</version>
         </dependency>
         <dependency>
             <groupId>ctrip</groupId>
@@ -43,15 +33,17 @@
             <version>0.1.9</version>
         </dependency>
         <dependency>
-            <groupId>ctrip</groupId>
-            <artifactId>hangout-filters-add</artifactId>
-            <version>0.1.9</version>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
         </dependency>
+
         <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <scope>test</scope>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.17</version>
         </dependency>
+
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
@@ -68,6 +60,11 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.16.10</version>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
