@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>hangout</artifactId>
+        <groupId>ctrip</groupId>
+        <version>0.1.9</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>hangout-core</artifactId>
+    <dependencies>
+        <!--下列的dependency并非这个core都需要，大部分是Iead多项目调试需要-->
+        <dependency>
+            <groupId>ctrip</groupId>
+            <artifactId>hangout-baseplugin</artifactId>
+            <version>0.1.9</version>
+        </dependency>
+        <dependency>
+            <groupId>ctrip</groupId>
+            <artifactId>hangout-input-plugins-stdin</artifactId>
+            <version>0.1.9</version>
+        </dependency>
+        <dependency>
+            <groupId>ctrip</groupId>
+            <artifactId>hangout-output-plugins-stdout</artifactId>
+            <version>0.1.9</version>
+        </dependency>
+        <dependency>
+            <groupId>ctrip</groupId>
+            <artifactId>hangout-filters-filters</artifactId>
+            <version>0.1.9</version>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.17</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/args4j/args4j -->
+        <dependency>
+            <groupId>args4j</groupId>
+            <artifactId>args4j</artifactId>
+            <version>2.33</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok-maven -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.16.10</version>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+
+</project>

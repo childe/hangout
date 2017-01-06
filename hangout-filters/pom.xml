@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>hangout</artifactId>
+        <groupId>ctrip</groupId>
+        <version>0.1.9</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>hangout-filters</artifactId>
+    <packaging>pom</packaging>
+    <modules>
+        <module>hangout-filters-add</module>
+        <module>hangout-filters-convert</module>
+        <module>hangout-filters-date</module>
+        <module>hangout-filters-drop</module>
+        <module>hangout-filters-filters</module>
+        <module>hangout-filters-geoip2</module>
+        <module>hangout-filters-grok</module>
+        <module>hangout-filters-gsub</module>
+        <module>hangout-filters-json</module>
+        <module>hangout-filters-kv</module>
+        <module>hangout-filters-lowercase</module>
+        <module>hangout-filters-uppercase</module>
+        <module>hangout-filters-remove</module>
+        <module>hangout-filters-rename</module>
+        <module>hangout-filters-replace</module>
+        <module>hangout-filters-translate</module>
+        <module>hangout-filters-trim</module>
+        <module>hangout-filters-ua</module>
+        <module>hangout-filters-urldecode</module>
+    </modules>
+
+
+</project>
