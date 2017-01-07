@@ -45,6 +45,8 @@ filters:
                     - 'ISO8601'
                 remove_fields: ['logtime']
     - Grok:
+        pattern_paths: #opttional
+            - '/opt/hangout/grokpatternpaths'
         match:
           - '^(?<logtime>\S+) (?<user>.+) (-|(?<level>\w+)) %{DATA:msg}$'
         remove_fields: ['message']

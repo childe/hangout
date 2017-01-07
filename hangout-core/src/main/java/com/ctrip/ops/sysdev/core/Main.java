@@ -34,8 +34,6 @@ public class Main {
             System.exit(-1);
         }
         log.debug(configs);
-        //log.trace("Tracetest");
-
 
         // for input in all_inputs
         List<HashMap<String, Map>> inputs = (ArrayList<HashMap<String, Map>>) configs.get("inputs");

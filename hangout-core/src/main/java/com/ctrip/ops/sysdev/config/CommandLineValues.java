@@ -27,7 +27,7 @@ public class CommandLineValues {
     private Level logLevel = Level.WARN;
 
     @Option(name = "-f", aliases = {"--configfile"}, usage = " Specify a config file", required = true)
-    private File configFile;
+    private String configFile;
 
     @Option(name = "-l", aliases = {"--logfile"}, usage = "Specify a log file", required = false)
     private String logFile;
