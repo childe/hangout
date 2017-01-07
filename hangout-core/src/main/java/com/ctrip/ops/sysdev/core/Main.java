@@ -3,12 +3,11 @@ package com.ctrip.ops.sysdev.core;
 import com.ctrip.ops.sysdev.baseplugin.BaseInput;
 import com.ctrip.ops.sysdev.config.CommandLineValues;
 import com.ctrip.ops.sysdev.config.HangoutConfig;
-import com.ctrip.ops.sysdev.log.*;
+import com.ctrip.ops.sysdev.log.LogSetter;
 import lombok.extern.log4j.Log4j;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,32 +41,30 @@ public class Main {
         List<HashMap<String, Map>> inputs = (ArrayList<HashMap<String, Map>>) configs.get("inputs");
 
         //Go through every input and emit immediately
-        for (HashMap<String, Map> input : inputs) {
-            for (Map.Entry<String, Map> entry : input.entrySet()) {
-                String inputType = entry.getKey();
-                Map inputConfig = entry.getValue();
-                Class<?> inputClass = null;
-                try {
-                    inputClass = Class
-                            .forName("com.ctrip.ops.sysdev.inputs." + inputType);
-                    Constructor<?> ctor = inputClass.getConstructor(Map.class,
-                            ArrayList.class, ArrayList.class);
-                    BaseInput inputInstance = (BaseInput) ctor.newInstance(
-                            inputConfig, configs.get("filters"), configs.get("outputs"));
-                    inputInstance.emit();
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                } catch (NoSuchMethodException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+        Map finalConfigs = configs;
+        inputs.forEach(
+                input -> {
+                    input.forEach((inputType, inputConfig) -> {
+                        Class<?> inputClass = null;
+                        try {
+                            inputClass = Class.forName("com.ctrip.ops.sysdev.inputs." + inputType);
+                            //Get Constructor for each input
+                            Constructor<?> ctor = inputClass.getConstructor(
+                                    Map.class,
+                                    ArrayList.class,
+                                    ArrayList.class);
+                            //instantiate the input
+                            BaseInput inputInstance = (BaseInput) ctor.newInstance(
+                                    inputConfig,
+                                    finalConfigs.get("filters"),
+                                    finalConfigs.get("outputs"));
+                            //Start working,guy.
+                            inputInstance.emit();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    });
+                });
     }
 }
 
