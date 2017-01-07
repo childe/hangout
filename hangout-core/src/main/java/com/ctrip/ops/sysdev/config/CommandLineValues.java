@@ -1,15 +1,10 @@
 package com.ctrip.ops.sysdev.config;
 
 import lombok.Data;
-import lombok.extern.log4j.Log4j;
 import org.apache.log4j.Level;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
-import lombok.Getter;
-import lombok.Setter;
-
-import java.io.File;
 
 /**
  * Created by gnuhpc on 2016/12/11.
@@ -23,7 +18,8 @@ public class CommandLineValues {
     @Option(name = "-h", aliases = {"--help"}, usage = "Print Help Information", required = false, help = true)
     private boolean isHelp = false;
 
-    @Option(name = "-ll", aliases = {"--loglevel"}, usage = "Set log level: INFO (default), DEBUG, TRACE", required = false, handler = LogLevelOptionhandler.class)
+    @Option(name = "-ll", aliases = {"--loglevel"}, usage = "Set log level: INFO (default), DEBUG, TRACE",
+            required = false, handler = LogLevelOptionhandler.class,forbids = {"-v","-vv","-vvvv"})
     private Level logLevel = Level.WARN;
 
     @Option(name = "-f", aliases = {"--configfile"}, usage = " Specify a config file", required = true)
