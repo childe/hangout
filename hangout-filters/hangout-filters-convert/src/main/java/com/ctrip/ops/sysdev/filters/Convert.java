@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+@SuppressWarnings("ALL")
 public class Convert extends BaseFilter {
 	private static final Logger logger = Logger.getLogger(Convert.class
 			.getName());
@@ -62,9 +63,9 @@ public class Convert extends BaseFilter {
 
 			f.put(field, new Tuple3(converter, remove_if_fail, setto_if_fail));
 		}
-	};
+	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	protected Map filter(final Map event) {
 		Iterator<Entry<String, Tuple3>> it = f.entrySet().iterator();

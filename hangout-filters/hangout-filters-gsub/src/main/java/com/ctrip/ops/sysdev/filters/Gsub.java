@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+@SuppressWarnings("ALL")
 public class Gsub extends BaseFilter {
 	public Gsub(Map config) {
 		super(config);
@@ -16,9 +17,9 @@ public class Gsub extends BaseFilter {
 
 	protected void prepare() {
 		this.fields = (Map<String, List<String>>) config.get("fields");
-	};
+	}
 
-	@Override
+    @Override
 	protected Map filter(final Map event) {
 		Iterator<Entry<String, List<String>>> it = fields.entrySet().iterator();
 		while (it.hasNext()) {

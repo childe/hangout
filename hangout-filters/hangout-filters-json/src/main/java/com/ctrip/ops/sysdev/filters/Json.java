@@ -6,6 +6,7 @@ import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONValue;
 
+@SuppressWarnings("ALL")
 public class Json extends BaseFilter {
     private static final Logger logger = Logger.getLogger(Json.class.getName());
 
@@ -33,8 +34,6 @@ public class Json extends BaseFilter {
             this.tagOnFailure = "jsonfail";
         }
     }
-
-    ;
 
     @Override
     protected Map filter(final Map event) {

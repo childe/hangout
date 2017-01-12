@@ -27,6 +27,7 @@ import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
+@SuppressWarnings("ALL")
 public class Elasticsearch extends BaseOutput {
     private static final Logger logger = Logger.getLogger(Elasticsearch.class
             .getName());
@@ -102,8 +103,6 @@ public class Elasticsearch extends BaseOutput {
             System.exit(1);
         }
     }
-
-    ;
 
     @SuppressWarnings("unchecked")
     private void initESClient() throws NumberFormatException,

@@ -5,6 +5,7 @@ import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
 import java.util.ArrayList;
 import java.util.Map;
 
+@SuppressWarnings("ALL")
 public class Remove extends BaseFilter {
 	public Remove(Map config ) {
 		super(config);
@@ -14,9 +15,9 @@ public class Remove extends BaseFilter {
 
 	protected void prepare() {
 		this.fields = (ArrayList<String>) config.get("fields");
-	};
+	}
 
-	@Override
+    @Override
 	protected Map filter(final Map event) {
 		for (String t : this.fields) {
 			event.remove(t);

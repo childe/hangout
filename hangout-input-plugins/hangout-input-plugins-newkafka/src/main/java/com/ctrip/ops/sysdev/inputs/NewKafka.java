@@ -18,6 +18,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.log4j.Logger;
 
+@SuppressWarnings("ALL")
 public class NewKafka extends BaseInput {
     private static final Logger logger = Logger
             .getLogger(NewKafka.class.getName());

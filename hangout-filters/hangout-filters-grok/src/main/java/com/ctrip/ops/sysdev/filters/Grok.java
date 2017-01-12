@@ -41,7 +41,7 @@ public class Grok extends BaseFilter {
             newPattern += p.substring(last_end, m.start());
             String syntaxANDsemantic = m.group(0).substring(2,
                     m.group(0).length() - 1);
-            String syntax = "", semantic = "";
+            String syntax, semantic;
             String[] syntaxANDsemanticArray = syntaxANDsemantic.split(":", 3);
 
             syntax = syntaxANDsemanticArray[0];
@@ -99,7 +99,7 @@ public class Grok extends BaseFilter {
 
     @SuppressWarnings("unchecked")
     protected void prepare() {
-        this.patterns = new HashMap<String, String>();
+        this.patterns = new HashMap<>();
 
         final String path = "patterns";
         final File jarFile = new File(getClass().getProtectionDomain()
@@ -163,7 +163,7 @@ public class Grok extends BaseFilter {
             }
         }
 
-        this.matches = new ArrayList<Regex>();
+        this.matches = new ArrayList<>();
 
         for (String matchString : (ArrayList<String>) this.config.get("match")) {
             matchString = convertPattern(matchString);
@@ -203,8 +203,6 @@ public class Grok extends BaseFilter {
         }
     }
 
-    ;
-
     @SuppressWarnings("unchecked")
     @Override
     protected Map filter(Map event) {
@@ -243,7 +241,7 @@ public class Grok extends BaseFilter {
                                         - e.nameP), new String(bs, begin, end - begin, this.encoding));
                             }
                         } else {
-                            ArrayList<String> value = new ArrayList<String>();
+                            ArrayList<String> value = new ArrayList<>();
                             for (int number : backRefs) {
                                 int begin = region.beg[number];
                                 int end = region.end[number];
@@ -270,5 +268,4 @@ public class Grok extends BaseFilter {
         return event;
     }
 
-    ;
 }

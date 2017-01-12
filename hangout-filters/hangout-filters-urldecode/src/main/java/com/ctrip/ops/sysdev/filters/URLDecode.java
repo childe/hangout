@@ -32,9 +32,9 @@ public class URLDecode extends BaseFilter {
 		} else {
 			this.tagOnFailure = "URLDecodefail";
 		}
-	};
+	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	protected Map filter(final Map event) {
 		boolean success = true;

@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("ALL")
 @Log4j
 public class Main {
     private static LogSetter logSetter = new LogSetter();

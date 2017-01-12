@@ -12,6 +12,7 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.Map;
 
+@SuppressWarnings("ALL")
 public class Stdin extends BaseInput {
     private static final Logger logger = Logger
             .getLogger(Stdin.class.getName());
@@ -36,7 +37,7 @@ public class Stdin extends BaseInput {
             this.hostname = false;
         }
 
-        if (this.hostname == true) {
+        if (this.hostname) {
             try {
                 this.hostnameValue = InetAddress.getLocalHost().getHostName();
             } catch (UnknownHostException e) {
@@ -59,7 +60,7 @@ public class Stdin extends BaseInput {
                     Map<String, Object> event = this.decoder
                             .decode(input);
 
-                    if (this.hostname == true) {
+                    if (this.hostname) {
                         event.put("hostname", this.hostnameValue);
                     }
 

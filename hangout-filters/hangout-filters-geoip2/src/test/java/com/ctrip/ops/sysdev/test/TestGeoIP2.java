@@ -6,12 +6,12 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("ALL")
 public class TestGeoIP2 {
     @Test
     public void testGeoIP2() throws Exception {

@@ -13,6 +13,7 @@ import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
 import org.apache.log4j.Logger;
 import org.yaml.snakeyaml.Yaml;
 
+@SuppressWarnings("ALL")
 public class Translate extends BaseFilter {
     private static final Logger logger = Logger.getLogger(Translate.class
             .getName());
@@ -81,8 +82,6 @@ public class Translate extends BaseFilter {
         }
         nextLoadTime = System.currentTimeMillis() + refreshInterval * 1000;
     }
-
-    ;
 
     @Override
     protected Map filter(final Map event) {

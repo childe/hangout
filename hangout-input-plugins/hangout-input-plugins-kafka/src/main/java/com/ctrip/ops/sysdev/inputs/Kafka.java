@@ -23,6 +23,7 @@ import kafka.consumer.ConsumerIterator;
 import kafka.consumer.KafkaStream;
 import kafka.javaapi.consumer.ConsumerConnector;
 
+@SuppressWarnings("ALL")
 public class Kafka extends BaseInput {
     private static final Logger logger = Logger
             .getLogger(Kafka.class.getName());

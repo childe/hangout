@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+@SuppressWarnings("ALL")
 public abstract class BaseInput {
     private static final Logger logger = Logger.getLogger(BaseInput.class
             .getName());
