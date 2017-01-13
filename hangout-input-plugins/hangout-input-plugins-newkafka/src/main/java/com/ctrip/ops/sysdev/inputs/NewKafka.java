@@ -35,7 +35,7 @@ public class NewKafka extends BaseInput {
         private IDecode decoder;
         private KafkaConsumer<String, String> consumer;
         private BaseFilter[] filterProcessors;
-        private BaseOutput[] outputProcessors;
+        private List<BaseOutput> outputProcessors;
 
         public Consumer(String topicName, NewKafka kafkaInput) {
             this.kafkaInput = kafkaInput;

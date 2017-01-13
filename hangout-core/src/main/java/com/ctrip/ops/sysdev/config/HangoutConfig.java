@@ -4,11 +4,13 @@ package com.ctrip.ops.sysdev.config;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Map;
 
 import org.yaml.snakeyaml.Yaml;
+
 
 @SuppressWarnings("rawtypes")
 public class HangoutConfig {
@@ -17,18 +19,27 @@ public class HangoutConfig {
 //    private static final Logger logger = Logger.getLogger(HangoutConfig.class.getName());
 
     @SuppressWarnings("NestedMethodCall")
-    public static Map parse(String filename) throws IOException {
+    public static Map parse(String filename) throws Exception{
         Yaml yaml = new Yaml();
+        InputStream is;
         if (filename.startsWith(HangoutConfig.HTTP) || filename.startsWith(HangoutConfig.HTTPS)) {
             URL httpUrl;
             URLConnection connection;
             httpUrl = new URL(filename);
             connection = httpUrl.openConnection();
             connection.connect();
-            return (Map) yaml.load(connection.getInputStream());
+            is = connection.getInputStream();
         } else {
-            FileInputStream input = new FileInputStream(new File(filename));
-            return (Map) yaml.load(input);
+            is = new FileInputStream(new File(filename));
         }
+
+        Map configs = (Map) yaml.load(is);
+
+        if (configs.get("inputs")==null||configs.get("outputs")==null){
+            System.err.println("Error: No inputs or outputs!");
+            throw new Exception();
+        }
+
+        return configs;
     }
 }

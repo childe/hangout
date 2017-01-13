@@ -38,7 +38,7 @@ public class Kafka extends BaseInput {
         private IDecode decoder;
         private String encoding;
         private BaseFilter[] filterProcessors;
-        private BaseOutput[] outputProcessors;
+        private List<BaseOutput> outputProcessors;
 
         public Consumer(KafkaStream<byte[], byte[]> a_stream, Kafka kafkaInput) {
             this.m_stream = a_stream;

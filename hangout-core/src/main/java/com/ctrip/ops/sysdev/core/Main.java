@@ -30,18 +30,19 @@ public class Main {
         Map configs = null;
         try {
             configs = HangoutConfig.parse(cm.getConfigFile());
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             System.exit(-1);
         }
         log.debug(configs);
 
         // for input in all_inputs
-        List<HashMap<String, Map>> inputs = (ArrayList<HashMap<String, Map>>) configs.get("inputs");
+        final List<HashMap<String, Map>> inputConfigs = (ArrayList<HashMap<String, Map>>) configs.get("inputs");
+        final List<HashMap<String, Map>> filterConfigs= (ArrayList<HashMap<String, Map>>) configs.get("filters");
+        final List<HashMap<String, Map>> outputConfigs= (ArrayList<HashMap<String, Map>>) configs.get("outputs");
 
         //Go through every input and emit immediately
-        Map finalConfigs = configs;
-        inputs.forEach(
+        inputConfigs.forEach(
                 input -> {
                     input.forEach((inputType, inputConfig) -> {
                         Class<?> inputClass = null;
@@ -55,8 +56,8 @@ public class Main {
                             //instantiate the input
                             BaseInput inputInstance = (BaseInput) ctor.newInstance(
                                     inputConfig,
-                                    finalConfigs.get("filters"),
-                                    finalConfigs.get("outputs"));
+                                    filterConfigs,
+                                    outputConfigs);
                             //Start working,guy.
                             inputInstance.emit();
                         } catch (Exception e) {
