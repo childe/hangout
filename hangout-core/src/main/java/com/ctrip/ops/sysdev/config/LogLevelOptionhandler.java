@@ -6,12 +6,10 @@ import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.OptionDef;
 import org.kohsuke.args4j.spi.*;
 
-import java.util.Arrays;
-import java.util.List;
-
 /**
  * Created by gnuhpc on 2016/12/12.
  */
+@SuppressWarnings("ALL")
 public class LogLevelOptionhandler extends OneArgumentOptionHandler<Level> {
     public LogLevelOptionhandler(CmdLineParser parser, OptionDef option, Setter<? super Level> setter) {
         super(parser, option, setter);

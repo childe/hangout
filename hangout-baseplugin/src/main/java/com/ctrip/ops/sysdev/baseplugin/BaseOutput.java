@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import com.ctrip.ops.sysdev.render.FreeMarkerRender;
 import com.ctrip.ops.sysdev.render.TemplateRender;
 
+@SuppressWarnings("ALL")
 public abstract class BaseOutput {
 	private static final Logger logger = Logger.getLogger(BaseOutput.class
 			.getName());
@@ -54,7 +55,7 @@ public abstract class BaseOutput {
 				}
 			}
 		}
-		if (succuess == true) {
+		if (succuess) {
 			this.emit(event);
 		}
 	}

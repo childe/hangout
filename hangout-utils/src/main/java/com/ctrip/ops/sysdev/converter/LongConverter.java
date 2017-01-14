@@ -6,7 +6,7 @@ public class LongConverter implements Converter {
 		if (from instanceof Number) {
 			return ((Number) from).longValue();
 		} else if (from instanceof Boolean) {
-			return ((Boolean) from).booleanValue() ? Long.valueOf(1) : 0;
+			return (Boolean) from ? 1L : 0;
 		} else {
 			return Long.valueOf(from.toString());
 		}

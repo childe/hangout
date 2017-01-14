@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+@SuppressWarnings("ALL")
 public class Rename extends BaseFilter {
 	public Rename(Map config) {
 		super(config);
@@ -15,9 +16,9 @@ public class Rename extends BaseFilter {
 
 	protected void prepare() {
 		this.fields = (Map<String, String>) config.get("fields");
-	};
+	}
 
-	@Override
+    @Override
 	protected Map filter(final Map event) {
 		Iterator<Entry<String, String>> it = fields.entrySet().iterator();
 		while (it.hasNext()) {

@@ -10,8 +10,6 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.yaml.snakeyaml.Yaml;
 
-;
-
 public class TestConvertFilter {
 	@Test
 	@SuppressWarnings({ "rawtypes", "unchecked", "serial" })

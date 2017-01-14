@@ -10,6 +10,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
+@SuppressWarnings("ALL")
 public class Formatter {
 	private static Pattern p = Pattern.compile("(\\%\\{.*?\\})");
 	private static DateTimeFormatter ISOformatter = ISODateTimeFormat

@@ -10,6 +10,7 @@ import com.ctrip.ops.sysdev.render.FreeMarkerRender;
 import com.ctrip.ops.sysdev.render.TemplateRender;
 import org.apache.log4j.Logger;
 
+@SuppressWarnings("ALL")
 public class BaseFilter {
 
 	private static final Logger logger = Logger.getLogger(BaseFilter.class
@@ -51,7 +52,7 @@ public class BaseFilter {
 	}
 
 	protected void prepare() {
-	};
+	}
 
 	public Map process(Map event) {
 		boolean succuess = true;
@@ -63,19 +64,19 @@ public class BaseFilter {
 				}
 			}
 		}
-		if (succuess == true) {
+		if (succuess) {
 			event = this.filter(event);
 		}
 
 		return event;
-	};
+	}
 
 	protected Map filter(Map event) {
 		return null;
 	}
 
 	public void postProcess(Map event, boolean ifsuccess) {
-		if (ifsuccess == false) {
+		if (!ifsuccess) {
 			if (this.tagOnFailure == null) {
 				return;
 			}

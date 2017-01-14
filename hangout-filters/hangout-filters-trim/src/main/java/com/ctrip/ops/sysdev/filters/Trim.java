@@ -5,6 +5,7 @@ import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
 import java.util.ArrayList;
 import java.util.Map;
 
+@SuppressWarnings("ALL")
 public class Trim extends BaseFilter {
 	public Trim(Map config) {
 		super(config);
@@ -14,9 +15,9 @@ public class Trim extends BaseFilter {
 
 	protected void prepare() {
 		this.fields = (ArrayList<String>) config.get("fields");
-	};
+	}
 
-	@Override
+    @Override
 	protected Map filter(final Map event) {
 		for (String field : fields) {
 			if (event.containsKey(field)) {

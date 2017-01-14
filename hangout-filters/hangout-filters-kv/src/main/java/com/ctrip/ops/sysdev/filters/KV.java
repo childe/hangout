@@ -70,9 +70,9 @@ public class KV extends BaseFilter {
 		this.excludeKeys = (ArrayList<String>) this.config.get("exclude_keys");
 		this.includeKeys = (ArrayList<String>) this.config.get("include_keys");
 
-	};
+	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	protected Map filter(Map event) {
 		if (!event.containsKey(this.source)) {
@@ -125,5 +125,5 @@ public class KV extends BaseFilter {
 		this.postProcess(event, success);
 
 		return event;
-	};
+	}
 }

@@ -7,6 +7,7 @@ import org.apache.log4j.*;
 /**
  * Created by gnuhpc on 2016/12/12.
  */
+@SuppressWarnings("ALL")
 @Log4j
 public class LogSetter {
     /**
@@ -15,7 +16,7 @@ public class LogSetter {
      * @param cmdLine
      */
     public void initLogger(CommandLineValues cmdLine) {
-        WriterAppender wa = null;
+        WriterAppender wa;
 
         if (cmdLine.getLogFile() != null) {
             String logPath = cmdLine.getLogFile();

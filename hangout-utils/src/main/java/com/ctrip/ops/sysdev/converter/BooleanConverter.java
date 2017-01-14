@@ -20,12 +20,8 @@ public class BooleanConverter implements Converter {
 
 			if (text == null || text.length() == 0) {
 				return false;
-			} else if ("false".equals(text) || "0".equals(text)
-					|| "no".equals(text) || "F".equals(text)) {
-				return false;
-			} else {
-				return true;
-			}
+			} else return !("false".equals(text) || "0".equals(text)
+					|| "no".equals(text) || "F".equals(text));
 		}
 	}
 }

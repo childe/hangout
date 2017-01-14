@@ -117,8 +117,6 @@ public class GeoIP2 extends BaseFilter {
         }
     }
 
-    ;
-
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
     protected Map filter(final Map event) {

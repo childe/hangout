@@ -44,9 +44,11 @@ public class TestGsub {
 		Assert.assertNotNull(JSONValue.parse(payload));
 	}
 
+	@SuppressWarnings("SameReturnValue")
 	private class Filter {
+		@SuppressWarnings("UnusedReturnValue")
 		public boolean process(Map event) {
-			event = null;
+//			event = null;
 			return true;
 		}
 	}

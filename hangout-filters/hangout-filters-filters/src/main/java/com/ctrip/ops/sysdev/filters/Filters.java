@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import java.util.ArrayList;
 import java.util.Map;
 
+@SuppressWarnings("ALL")
 public class Filters extends BaseFilter {
     private static final Logger logger = Logger.getLogger(Filters.class.getName());
 
@@ -21,8 +22,6 @@ public class Filters extends BaseFilter {
 
         this.filterProcessors = Utils.createFilterProcessors(filters);
     }
-
-    ;
 
     @Override
     protected Map filter(Map event) {

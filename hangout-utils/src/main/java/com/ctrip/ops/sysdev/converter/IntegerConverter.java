@@ -6,9 +6,9 @@ public class IntegerConverter implements Converter {
 		if (from instanceof Number) {
 			return ((Number) from).intValue();
 		} else if (from instanceof Boolean) {
-			return ((Boolean) from).booleanValue() ? Integer.valueOf(1) : 0;
+			return (Boolean) from ? 1 : 0;
 		} else if (from instanceof Enum) {
-			return Integer.valueOf(((Enum<?>) from).ordinal());
+			return ((Enum<?>) from).ordinal();
 		} else {
 			return Integer.valueOf(from.toString().trim());
 		}

@@ -18,6 +18,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.log4j.Logger;
 
+@SuppressWarnings("ALL")
 public class NewKafka extends BaseInput {
     private static final Logger logger = Logger
             .getLogger(NewKafka.class.getName());
@@ -34,7 +35,7 @@ public class NewKafka extends BaseInput {
         private IDecode decoder;
         private KafkaConsumer<String, String> consumer;
         private BaseFilter[] filterProcessors;
-        private BaseOutput[] outputProcessors;
+        private List<BaseOutput> outputProcessors;
 
         public Consumer(String topicName, NewKafka kafkaInput) {
             this.kafkaInput = kafkaInput;

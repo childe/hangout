@@ -5,7 +5,6 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.yaml.snakeyaml.Yaml;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 

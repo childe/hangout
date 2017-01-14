@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 
+@SuppressWarnings("ALL")
 public class Utils {
     private static final Logger logger = Logger.getLogger(Utils.class
             .getName());

@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
-import freemarker.template.TemplateException;
 
 public class FreeMarkerRender extends TemplateRender {
 	private static final Logger logger = Logger.getLogger(BaseFilter.class
