@@ -50,6 +50,7 @@ filters:
         match:
           - '^(?<logtime>\S+) (?<user>.+) (-|(?<level>\w+)) %{DATA:msg}$'
         remove_fields: ['message']
+        tag_on_failure: '' # do not add tags; deafult "grokfail"
     - Add:
         fields:
             test: 'abcd'
@@ -96,6 +97,7 @@ filters:
         tag_on_failure: "KVfail"
         remove_fields: ['msg']
     - Convert:
+        tag_on_failure: '' # do not add tags; deafult "convertfail"
         fields:
             cs_bytes: 
                 to: integer
@@ -108,6 +110,7 @@ filters:
     - Json:
         field: message # required
         remove_fields: ['a', 'b']
+        tag_on_failure: '' # do not add tags; deafult "jsonfail"
     - GeoIP2:
         source: message # required
         target: geoip # default geoip
@@ -120,6 +123,7 @@ filters:
         latitude: false # default true
         longitude: false # default true
         location: false # default true
+        tag_on_failure: '' # do not add tags; deafult "geoipfail"
     - UA:
         source: ua # required
 
