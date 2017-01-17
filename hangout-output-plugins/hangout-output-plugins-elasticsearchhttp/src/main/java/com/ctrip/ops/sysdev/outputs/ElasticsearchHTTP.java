@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.Map;
 
+@SuppressWarnings("ALL")
 public class ElasticsearchHTTP extends BaseOutput {
     private static final Logger logger = Logger.getLogger(ElasticsearchHTTP.class
             .getName());
@@ -73,8 +74,6 @@ public class ElasticsearchHTTP extends BaseOutput {
             System.exit(1);
         }
     }
-
-    ;
 
     @SuppressWarnings("unchecked")
     private void initESClient() throws NumberFormatException,

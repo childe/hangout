@@ -23,6 +23,7 @@ import kafka.consumer.ConsumerIterator;
 import kafka.consumer.KafkaStream;
 import kafka.javaapi.consumer.ConsumerConnector;
 
+@SuppressWarnings("ALL")
 public class Kafka extends BaseInput {
     private static final Logger logger = Logger
             .getLogger(Kafka.class.getName());
@@ -37,7 +38,7 @@ public class Kafka extends BaseInput {
         private IDecode decoder;
         private String encoding;
         private BaseFilter[] filterProcessors;
-        private BaseOutput[] outputProcessors;
+        private List<BaseOutput> outputProcessors;
 
         public Consumer(KafkaStream<byte[], byte[]> a_stream, Kafka kafkaInput) {
             this.m_stream = a_stream;

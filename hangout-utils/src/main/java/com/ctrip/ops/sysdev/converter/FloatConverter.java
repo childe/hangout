@@ -6,9 +6,9 @@ public class FloatConverter implements Converter {
 		if (from instanceof Number) {
 			return ((Number) from).floatValue();
 		} else if (from instanceof Boolean) {
-			return ((Boolean) from).booleanValue() ? Float.valueOf(1) : 0;
+			return (Boolean) from ? 1f : 0;
 		} else if (from instanceof Enum) {
-			return Float.valueOf(((Enum<?>) from).ordinal());
+			return (float) ((Enum<?>) from).ordinal();
 		} else {
 			return Float.valueOf(from.toString());
 		}

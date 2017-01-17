@@ -13,7 +13,7 @@ public class JsonDecoder implements IDecode {
 
     @SuppressWarnings("unchecked")
     public Map<String, Object> decode(final String message) {
-        Map<String, Object> event = null;
+        Map<String, Object> event;
         try {
             event = (HashMap) JSONValue
                     .parseWithException(message);

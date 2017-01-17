@@ -10,34 +10,35 @@ import org.kohsuke.args4j.Option;
  * Created by gnuhpc on 2016/12/11.
  */
 
+@SuppressWarnings("ALL")
 @Data
 public class CommandLineValues {
     private final String[] arguments;
     private CmdLineParser parser;
 
-    @Option(name = "-h", aliases = {"--help"}, usage = "Print Help Information", required = false, help = true)
+    @Option(name = "-h", aliases = {"--help"}, usage = "Print Help Information", help = true)
     private boolean isHelp = false;
 
     @Option(name = "-ll", aliases = {"--loglevel"}, usage = "Set log level: INFO (default), DEBUG, TRACE",
-            required = false, handler = LogLevelOptionhandler.class,forbids = {"-v","-vv","-vvvv"})
+            handler = LogLevelOptionhandler.class,forbids = {"-v","-vv","-vvvv"})
     private Level logLevel = Level.WARN;
 
     @Option(name = "-f", aliases = {"--configfile"}, usage = " Specify a config file", required = true)
     private String configFile;
 
-    @Option(name = "-l", aliases = {"--logfile"}, usage = "Specify a log file", required = false)
+    @Option(name = "-l", aliases = {"--logfile"}, usage = "Specify a log file")
     private String logFile;
 
-    @Option(name = "--version", usage = "Show Hangout Version", required = false)
+    @Option(name = "--version", usage = "Show Hangout Version")
     private boolean isShowVersion;
 
-    @Option(name = "-v", usage = "set log level to info", required = false)
+    @Option(name = "-v", usage = "set log level to info")
     private boolean infoLevel = false;
 
-    @Option(name = "-vv", usage = "set log level to debug", required = false)
+    @Option(name = "-vv", usage = "set log level to debug")
     private boolean debugLevel = false;
 
-    @Option(name = "-vvvv", usage = "set log level to trace", required = false)
+    @Option(name = "-vvvv", usage = "set log level to trace")
     private boolean traceLevel = false;
 
     public CommandLineValues(String... args) {

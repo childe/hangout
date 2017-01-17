@@ -11,6 +11,7 @@ import kafka.producer.ProducerConfig;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONValue;
 
+@SuppressWarnings("ALL")
 public class Kafka extends BaseOutput {
 	private static final Logger logger = Logger
 			.getLogger(Kafka.class.getName());
@@ -31,9 +32,9 @@ public class Kafka extends BaseOutput {
 		ProducerConfig pconfig = new ProducerConfig(props);
 		this.topic = (String) this.config.get("topic");
 		producer = new Producer<>(pconfig);
-	};
+	}
 
-	protected void emit(Map event) {
+    protected void emit(Map event) {
 		producer.send(new KeyedMessage<>(topic, JSONValue.toJSONString(event)
 				.getBytes()));
 	}

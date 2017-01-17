@@ -10,6 +10,7 @@ import com.ctrip.ops.sysdev.render.FreeMarkerRender;
 import com.ctrip.ops.sysdev.render.TemplateRender;
 import org.apache.log4j.Logger;
 
+@SuppressWarnings("ALL")
 public class BaseFilter {
 
     private static final Logger logger = Logger.getLogger(BaseFilter.class

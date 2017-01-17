@@ -5,6 +5,7 @@ import java.util.Map;
 import com.ctrip.ops.sysdev.baseplugin.BaseOutput;
 import org.apache.log4j.Logger;
 
+@SuppressWarnings("ALL")
 public class Stdout extends BaseOutput {
 	private static final Logger logger = Logger.getLogger(Stdout.class
 			.getName());

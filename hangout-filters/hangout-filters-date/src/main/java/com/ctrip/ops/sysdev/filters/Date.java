@@ -9,6 +9,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("ALL")
 public class Date extends BaseFilter {
 	private static final Logger logger = Logger.getLogger(Date.class.getName());
 
@@ -59,9 +60,9 @@ public class Date extends BaseFilter {
 						.get("timezone"), (String) config.get("locale")));
 			}
 		}
-	};
+	}
 
-	@Override
+    @Override
 	protected Map filter(Map event) {
 		if (!event.containsKey(this.src)) {
 			return event;
@@ -88,6 +89,6 @@ public class Date extends BaseFilter {
 		postProcess(event, success);
 
 		return event;
-	};
+	}
 
 }

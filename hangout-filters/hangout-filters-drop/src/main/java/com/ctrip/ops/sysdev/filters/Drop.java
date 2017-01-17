@@ -9,10 +9,7 @@ public class Drop extends BaseFilter {
 		super(config);
 	}
 
-	protected void prepare() {
-	};
-
-	protected Map filter(Map event) {
+    protected Map filter(Map event) {
 		return null;
 	}
 }

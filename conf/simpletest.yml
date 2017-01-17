@@ -12,5 +12,6 @@ filters:
             - Add:
                 fields:
                     test: 'abcd'
+
 outputs:
     - Stdout: {}

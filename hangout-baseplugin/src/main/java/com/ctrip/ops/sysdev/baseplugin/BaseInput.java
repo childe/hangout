@@ -6,11 +6,13 @@ import com.ctrip.ops.sysdev.decoders.PlainDecoder;
 import org.apache.log4j.Logger;
 
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+@SuppressWarnings("ALL")
 public abstract class BaseInput {
     private static final Logger logger = Logger.getLogger(BaseInput.class
             .getName());
@@ -18,7 +20,7 @@ public abstract class BaseInput {
     protected Map<String, Object> config;
     protected IDecode decoder;
     protected BaseFilter[] filterProcessors;
-    protected BaseOutput[] outputProcessors;
+    protected List<BaseOutput> outputProcessors;
     protected ArrayList<Map> filters;
     protected ArrayList<Map> outputs;
 
@@ -26,34 +28,26 @@ public abstract class BaseInput {
         return Utils.createFilterProcessors(filters);
     }
 
-    public BaseOutput[] createOutputProcessors() {
-        outputProcessors = new BaseOutput[outputs.size()];
-        int idx = 0;
-        for (Map output : outputs) {
-            Iterator<Entry<String, Map>> outputIT = output.entrySet()
-                    .iterator();
-
-            while (outputIT.hasNext()) {
-                Map.Entry<String, Map> outputEntry = outputIT.next();
-                String outputType = outputEntry.getKey();
-                Map outputConfig = outputEntry.getValue();
-                Class<?> outputClass;
-                try {
-                    logger.info("begin to build output " + outputType);
-                    outputClass = Class.forName("com.ctrip.ops.sysdev.outputs."
-                            + outputType);
-                    Constructor<?> ctor = outputClass.getConstructor(Map.class);
-
-                    outputProcessors[idx] = (BaseOutput) ctor
-                            .newInstance(outputConfig);
-                    logger.info("build output " + outputType + " done");
-                    idx++;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    System.exit(1);
-                }
+    public List<BaseOutput> createOutputProcessors() {
+        outputProcessors = outputs.stream().collect(HashMap::new, Map::putAll, Map::putAll).entrySet().stream().map((Entry<Object, Object> output) -> {
+            BaseOutput bo=null;
+            String outputType = (String) output.getKey();
+            Map outputConfig = (Map) output.getValue();
+            Class<?> outputClass;
+            Constructor<?> ctor = null;
+            logger.info("begin to build output " + outputType);
+            try {
+                outputClass = Class.forName("com.ctrip.ops.sysdev.outputs." + outputType);
+                ctor = outputClass.getConstructor(Map.class);
+                logger.info("build output " + outputType + " done");
+                bo = (BaseOutput) ctor.newInstance(outputConfig);
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.exit(-1);
             }
-        }
+            return bo;
+        }).collect(Collectors.toList());
+
         this.registerShutdownHook(outputProcessors);
         return outputProcessors;
     }
@@ -78,7 +72,7 @@ public abstract class BaseInput {
         }));
     }
 
-    protected void registerShutdownHook(final BaseOutput[] bos) {
+    protected void registerShutdownHook(final List<BaseOutput> bos) {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             logger.info("start to shutdown all output plugin");
             for (BaseOutput bo : bos) {

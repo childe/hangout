@@ -8,6 +8,7 @@ import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
 import org.apache.log4j.Logger;
 import com.ctrip.ops.sysdev.render.FreeMarkerRender;
 
+@SuppressWarnings("ALL")
 public class Replace extends BaseFilter {
 	private static final Logger logger = Logger.getLogger(Replace.class
 			.getName());
@@ -29,9 +30,9 @@ public class Replace extends BaseFilter {
 			logger.fatal(e.getMessage());
 			System.exit(1);
 		}
-	};
+	}
 
-	@Override
+    @Override
 	protected Map filter(final Map event) {
 		if (event.containsKey(this.src)) {
 			event.put(this.src, render.render(this.value, new HashMap() {

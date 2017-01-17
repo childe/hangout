@@ -6,7 +6,7 @@ public class DoubleConverter implements Converter {
 		if (from instanceof Number) {
 			return ((Number) from).doubleValue();
 		} else if (from instanceof Boolean) {
-			return ((Boolean) from).booleanValue() ? Double.valueOf(1) : 0;
+			return (Boolean) from ? 1d : 0;
 		} else {
 			return Double.valueOf(from.toString().trim());
 		}
