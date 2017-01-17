@@ -76,10 +76,11 @@ public class BaseFilter {
 
 	public void postProcess(Map event, boolean ifsuccess) {
 		if (ifsuccess == false) {
-			if (this.tagOnFailure == null) {
+			if (this.tagOnFailure == null || this.tagOnFailure.length() <=0) {
 				return;
 			}
 			if (!event.containsKey("tags")) {
+
 				event.put("tags",
 						new ArrayList<String>(Arrays.asList(this.tagOnFailure)));
 			} else {
