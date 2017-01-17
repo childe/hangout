@@ -12,88 +12,92 @@ import org.apache.log4j.Logger;
 
 public class BaseFilter {
 
-	private static final Logger logger = Logger.getLogger(BaseFilter.class
-			.getName());
+    private static final Logger logger = Logger.getLogger(BaseFilter.class
+            .getName());
 
-	protected Map config;
-	protected List<TemplateRender> IF;
-	protected TemplateRender render;
-	protected String tagOnFailure;
-	protected ArrayList<String> removeFields;
+    protected Map config;
+    protected List<TemplateRender> IF;
+    protected TemplateRender render;
+    protected String tagOnFailure;
+    protected ArrayList<String> removeFields;
 
-	public BaseFilter(Map config) {
-		this.config = config;
+    public BaseFilter(Map config) {
+        this.config = config;
 
-		if (this.config.containsKey("if")) {
-			IF = new ArrayList<TemplateRender>();
-			for (String c : (List<String>) this.config.get("if")) {
-				try {
-					IF.add(new FreeMarkerRender(c, c));
-				} catch (IOException e) {
-					logger.fatal(e.getMessage());
-					System.exit(1);
-				}
-			}
-		} else {
-			IF = null;
-		}
+        if (this.config.containsKey("if")) {
+            IF = new ArrayList<TemplateRender>();
+            for (String c : (List<String>) this.config.get("if")) {
+                try {
+                    IF.add(new FreeMarkerRender(c, c));
+                } catch (IOException e) {
+                    logger.fatal(e.getMessage());
+                    System.exit(1);
+                }
+            }
+        } else {
+            IF = null;
+        }
 
-		if (config.containsKey("tag_on_failure")) {
-			this.tagOnFailure = (String) config.get("tag_on_failure");
-		} else {
-			this.tagOnFailure = null;
-		}
+        if (config.containsKey("tag_on_failure")) {
+            this.tagOnFailure = (String) config.get("tag_on_failure");
+        } else {
+            this.tagOnFailure = null;
+        }
 
-		this.removeFields = (ArrayList<String>) this.config
-				.get("remove_fields");
+        this.removeFields = (ArrayList<String>) this.config
+                .get("remove_fields");
 
-		this.prepare();
-	}
+        this.prepare();
+    }
 
-	protected void prepare() {
-	};
+    protected void prepare() {
+    }
 
-	public Map process(Map event) {
-		boolean succuess = true;
-		if (this.IF != null) {
-			for (TemplateRender render : this.IF) {
-				if (!render.render(event).equals("true")) {
-					succuess = false;
-					break;
-				}
-			}
-		}
-		if (succuess == true) {
-			event = this.filter(event);
-		}
+    ;
 
-		return event;
-	};
+    public Map process(Map event) {
+        boolean succuess = true;
+        if (this.IF != null) {
+            for (TemplateRender render : this.IF) {
+                if (!render.render(event).equals("true")) {
+                    succuess = false;
+                    break;
+                }
+            }
+        }
+        if (succuess == true) {
+            event = this.filter(event);
+        }
 
-	protected Map filter(Map event) {
-		return null;
-	}
+        return event;
+    }
 
-	public void postProcess(Map event, boolean ifsuccess) {
-		if (ifsuccess == false) {
-			if (this.tagOnFailure == null || this.tagOnFailure.length() <=0) {
-				return;
-			}
-			if (!event.containsKey("tags")) {
+    ;
 
-				event.put("tags",
-						new ArrayList<String>(Arrays.asList(this.tagOnFailure)));
-			} else {
-				Object tags = event.get("tags");
-				if (tags.getClass() == ArrayList.class
-						&& ((ArrayList) tags).indexOf(this.tagOnFailure) == -1) {
-					((ArrayList) tags).add(this.tagOnFailure);
-				}
-			}
-		} else if (this.removeFields != null) {
-			for (String f : this.removeFields) {
-				event.remove(f);
-			}
-		}
-	}
+    protected Map filter(Map event) {
+        return null;
+    }
+
+    public void postProcess(Map event, boolean ifsuccess) {
+        if (ifsuccess == false) {
+            if (this.tagOnFailure == null || this.tagOnFailure.length() <= 0) {
+                return;
+            }
+            if (!event.containsKey("tags")) {
+
+                event.put("tags",
+                        new ArrayList<String>(Arrays.asList(this.tagOnFailure)));
+            } else {
+                Object tags = event.get("tags");
+                if (tags.getClass() == ArrayList.class
+                        && ((ArrayList) tags).indexOf(this.tagOnFailure) == -1) {
+                    ((ArrayList) tags).add(this.tagOnFailure);
+                }
+            }
+        } else if (this.removeFields != null) {
+            for (String f : this.removeFields) {
+                event.remove(f);
+            }
+        }
+    }
 }
