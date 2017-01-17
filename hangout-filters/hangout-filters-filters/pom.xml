@@ -27,6 +27,24 @@
             <artifactId>testng</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>ctrip</groupId>
+            <artifactId>hangout-filters-grok</artifactId>
+            <version>0.1.9</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ctrip</groupId>
+            <artifactId>hangout-filters-add</artifactId>
+            <version>0.1.9</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ctrip</groupId>
+            <artifactId>hangout-filters-date</artifactId>
+            <version>0.1.9</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 
