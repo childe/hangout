@@ -1,5 +1,7 @@
 模仿[logstash](https://www.elastic.co/products/logstash)做的一个应用.
+
 最近在将部分内容进行代码上的优化。
+
 This product includes GeoLite2 data created by MaxMind, available from
 [http://www.maxmind.com](http://www.maxmind.com)
 
@@ -265,9 +267,7 @@ sniff设置为true的话, 会把hosts当做一个入口, 然后去寻找真正�
     - Stdout: {}
 
 # 开发:
-如果需要新的插件, 可以从源码编译重新打包.  
-或者编译成jar包, 加入到class path(尚未开发完成).
-
+如果需要新的插件, 请参考项目结构中baseplugin和input、output插件。
 
 # LICENSE
 The MIT License (MIT)
