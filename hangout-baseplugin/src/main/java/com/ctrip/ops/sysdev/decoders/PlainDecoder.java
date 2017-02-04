@@ -5,7 +5,7 @@ import org.joda.time.DateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PlainDecoder implements IDecode {
+public class PlainDecoder implements Decode {
 
 	public Map<String, Object> decode(final String message) {
 		return new HashMap<String, Object>() {

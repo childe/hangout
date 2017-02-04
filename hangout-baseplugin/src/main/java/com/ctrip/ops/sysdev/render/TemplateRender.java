@@ -2,9 +2,11 @@ package com.ctrip.ops.sysdev.render;
 
 import java.util.Map;
 
-public abstract class TemplateRender {
+public interface TemplateRender{
 
-	public abstract String render(Map event);
+	public String render(Map event);
 
-	public abstract String render(String template, Map event);
+	public default String render(String template, Map event){
+	    return render(event);
+	};
 }
