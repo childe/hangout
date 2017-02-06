@@ -5,15 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j;
 import com.ctrip.ops.sysdev.render.FreeMarkerRender;
 import com.ctrip.ops.sysdev.render.TemplateRender;
 
-@SuppressWarnings("ALL")
+@Log4j
 public abstract class BaseOutput {
-	private static final Logger logger = Logger.getLogger(BaseOutput.class
-			.getName());
-
 	protected Map config;
 	protected List<TemplateRender> IF;
 
@@ -26,7 +23,7 @@ public abstract class BaseOutput {
 				try {
 					IF.add(new FreeMarkerRender(c, c));
 				} catch (IOException e) {
-					logger.fatal(e.getMessage());
+					log.fatal(e.getMessage());
 					System.exit(1);
 				}
 			}
@@ -42,20 +39,20 @@ public abstract class BaseOutput {
 	protected abstract void emit(Map event);
 
     public void shutdown() {
-        logger.info("shutdown" + this.getClass().getName());
+        log.info("shutdown" + this.getClass().getName());
 	}
 
 	public void process(Map event) {
-		boolean succuess = true;
+		boolean ifSuccess = true;
 		if (this.IF != null) {
 			for (TemplateRender render : this.IF) {
 				if (!render.render(event).equals("true")) {
-					succuess = false;
+					ifSuccess = false;
 					break;
 				}
 			}
 		}
-		if (succuess) {
+		if (ifSuccess) {
 			this.emit(event);
 		}
 	}

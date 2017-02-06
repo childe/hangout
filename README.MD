@@ -224,7 +224,7 @@ trimkey和trim类似, 处理的是字段名称.
     可以在一个If条件下,顺序的执行多个filters, 而不用每次都执行If判断.
 
 ### 其它filter
-配置都比较简单, 可以参考[配置文件示例](https://github.com/childe/hangout/blob/master/example.yml)
+配置都比较简单, 可以参考[配置文件示例](https://github.com/childe/hangout/blob/master/conf/example.yml)
 
 ### freemarker
 If 条件和addfileds等插件使用[freemarker](http://freemarker.org/)模板引擎, 速度快, 功能强大.

@@ -12,7 +12,7 @@ import java.util.concurrent.Executors;
 import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
 import com.ctrip.ops.sysdev.baseplugin.BaseInput;
 import com.ctrip.ops.sysdev.baseplugin.BaseOutput;
-import com.ctrip.ops.sysdev.decoders.IDecode;
+import com.ctrip.ops.sysdev.decoders.Decode;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -32,9 +32,9 @@ public class NewKafka extends BaseInput {
 
     private class Consumer implements Runnable {
         private NewKafka kafkaInput;
-        private IDecode decoder;
+        private Decode decoder;
         private KafkaConsumer<String, String> consumer;
-        private BaseFilter[] filterProcessors;
+        private List<BaseFilter> filterProcessors;
         private List<BaseOutput> outputProcessors;
 
         public Consumer(String topicName, NewKafka kafkaInput) {
