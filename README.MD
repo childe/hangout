@@ -53,7 +53,7 @@ This product includes GeoLite2 data created by MaxMind, available from
 # 配置
 配置在一定程度上也是模仿logstash, 但用的是通用的yaml格式.
 因为能力有限, 不能实现logstash的那套语法, if是用了另外的格式.
-[可以参考一个配置的示例](https://github.com/childe/hangout/blob/master/example.yml)
+[可以参考一个配置的示例](https://github.com/childe/hangout/blob/master/conf/example.yml)
 
 ## Input
 ### Stdin
