@@ -1,7 +1,7 @@
 package com.ctrip.ops.sysdev.outputs;
 
 import com.ctrip.ops.sysdev.baseplugin.BaseOutput;
-import com.ctrip.ops.sysdev.render.Formatter;
+import com.ctrip.ops.sysdev.formatter.DateFormatter;
 import com.ctrip.ops.sysdev.render.FreeMarkerRender;
 import com.ctrip.ops.sysdev.render.TemplateRender;
 import org.apache.http.HttpHost;
@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.Map;
 
-@SuppressWarnings("ALL")
 public class ElasticsearchHTTP extends BaseOutput {
     private static final Logger logger = Logger.getLogger(ElasticsearchHTTP.class
             .getName());
@@ -84,7 +83,7 @@ public class ElasticsearchHTTP extends BaseOutput {
     }
 
     protected void emit(final Map event) {
-        String _index = Formatter.format(event, index, indexTimezone);
+        String _index = DateFormatter.format(event, index, indexTimezone);
         String _indexType = indexTypeRender.render(event);
         IndexRequest indexRequest;
     }

@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import com.ctrip.ops.sysdev.render.Formatter;
+import com.ctrip.ops.sysdev.formatter.DateFormatter;
 import com.ctrip.ops.sysdev.render.FreeMarkerRender;
 import com.ctrip.ops.sysdev.render.TemplateRender;
 import org.elasticsearch.action.ActionRequest;
@@ -234,7 +234,7 @@ public class Elasticsearch extends BaseOutput {
     }
 
     protected void emit(final Map event) {
-        String _index = Formatter.format(event, index, indexTimezone);
+        String _index = DateFormatter.format(event, index, indexTimezone);
         String _indexType = indexTypeRender.render(event);
         IndexRequest indexRequest;
         if (this.idRender == null) {

@@ -1,5 +1,6 @@
-package com.ctrip.ops.sysdev.baseplugin;
+package com.ctrip.ops.sysdev.filters;
 
+import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
 import org.apache.log4j.Logger;
 
 import java.lang.reflect.Constructor;

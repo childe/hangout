@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
 import com.ctrip.ops.sysdev.baseplugin.BaseInput;
 import com.ctrip.ops.sysdev.baseplugin.BaseOutput;
-import com.ctrip.ops.sysdev.decoders.IDecode;
+import com.ctrip.ops.sysdev.decoders.Decode;
 import org.apache.log4j.Logger;
 
 import kafka.consumer.ConsumerConfig;
@@ -35,9 +35,9 @@ public class Kafka extends BaseInput {
     private class Consumer implements Runnable {
         private KafkaStream<byte[], byte[]> m_stream;
         private Kafka kafkaInput;
-        private IDecode decoder;
+        private Decode decoder;
         private String encoding;
-        private BaseFilter[] filterProcessors;
+        private List<BaseFilter> filterProcessors;
         private List<BaseOutput> outputProcessors;
 
         public Consumer(KafkaStream<byte[], byte[]> a_stream, Kafka kafkaInput) {

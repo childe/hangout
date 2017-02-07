@@ -1,5 +1,7 @@
 模仿[logstash](https://www.elastic.co/products/logstash)做的一个应用.
+
 最近在将部分内容进行代码上的优化。
+
 This product includes GeoLite2 data created by MaxMind, available from
 [http://www.maxmind.com](http://www.maxmind.com)
 
@@ -222,7 +224,7 @@ trimkey和trim类似, 处理的是字段名称.
     可以在一个If条件下,顺序的执行多个filters, 而不用每次都执行If判断.
 
 ### 其它filter
-配置都比较简单, 可以参考[配置文件示例](https://github.com/childe/hangout/blob/master/example.yml)
+配置都比较简单, 可以参考[配置文件示例](https://github.com/childe/hangout/blob/master/conf/example.yml)
 
 ### freemarker
 If 条件和addfileds等插件使用[freemarker](http://freemarker.org/)模板引擎, 速度快, 功能强大.
@@ -265,9 +267,7 @@ sniff设置为true的话, 会把hosts当做一个入口, 然后去寻找真正�
     - Stdout: {}
 
 # 开发:
-如果需要新的插件, 可以从源码编译重新打包.  
-或者编译成jar包, 加入到class path(尚未开发完成).
-
+如果需要新的插件, 请参考项目结构中baseplugin和input、output插件。
 
 # LICENSE
 The MIT License (MIT)

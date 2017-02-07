@@ -1,19 +1,15 @@
 package com.ctrip.ops.sysdev.render;
 
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import lombok.extern.log4j.Log4j;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Map;
 
-import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
-import org.apache.log4j.Logger;
-
-import freemarker.template.Configuration;
-import freemarker.template.Template;
-
-public class FreeMarkerRender extends TemplateRender {
-	private static final Logger logger = Logger.getLogger(BaseFilter.class
-			.getName());
-
+@Log4j
+public class FreeMarkerRender implements TemplateRender {
 	private Template t;
 
 	public FreeMarkerRender(String template, String templateName)
@@ -22,31 +18,20 @@ public class FreeMarkerRender extends TemplateRender {
 		this.t = new Template(templateName, template, cfg);
 	}
 
-	public FreeMarkerRender(String template) throws IOException {
-		Configuration cfg = new Configuration(Configuration.VERSION_2_3_22);
-		this.t = new Template("", template, cfg);
-	}
-
 	public String render(Map event) {
 		StringWriter sw = new StringWriter();
 		try {
 			t.process(event, sw);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
-			logger.debug(event);
+			log.error(e.getMessage());
+			log.debug(event);
 			return "";
 		}
 		try {
 			sw.close();
 		} catch (IOException e) {
-			logger.error(e.getMessage());
+			log.error(e.getMessage());
 		}
 		return sw.toString();
-	}
-
-	@Override
-	public String render(String template, Map event) {
-		// actually it is just used to be compatible with jinjava
-		return this.render(event);
 	}
 }
