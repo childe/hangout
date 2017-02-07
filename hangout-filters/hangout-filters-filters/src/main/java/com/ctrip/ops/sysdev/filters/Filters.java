@@ -1,7 +1,6 @@
 package com.ctrip.ops.sysdev.filters;
 
 import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
-import com.ctrip.ops.sysdev.baseplugin.Utils;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;

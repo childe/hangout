@@ -1,26 +1,24 @@
 package com.ctrip.ops.sysdev.baseplugin;
 
+import com.ctrip.ops.sysdev.render.FreeMarkerRender;
+import com.ctrip.ops.sysdev.render.TemplateRender;
+import lombok.extern.log4j.Log4j;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import com.ctrip.ops.sysdev.render.FreeMarkerRender;
-import com.ctrip.ops.sysdev.render.TemplateRender;
-import org.apache.log4j.Logger;
 
-@SuppressWarnings("ALL")
+@Log4j
 public class BaseFilter {
 
-    private static final Logger logger = Logger.getLogger(BaseFilter.class
-            .getName());
-
     protected Map config;
-    protected List<TemplateRender> IF;
     protected TemplateRender render;
     protected String tagOnFailure;
-    protected ArrayList<String> removeFields;
+    protected List<String> removeFields;
+    private List<TemplateRender> IF;
 
     public BaseFilter(Map config) {
         this.config = config;
@@ -31,7 +29,7 @@ public class BaseFilter {
                 try {
                     IF.add(new FreeMarkerRender(c, c));
                 } catch (IOException e) {
-                    logger.fatal(e.getMessage());
+                    log.fatal(e.getMessage());
                     System.exit(1);
                 }
             }
@@ -45,8 +43,7 @@ public class BaseFilter {
             this.tagOnFailure = null;
         }
 
-        this.removeFields = (ArrayList<String>) this.config
-                .get("remove_fields");
+        this.removeFields = (ArrayList<String>) this.config.get("remove_fields");
 
         this.prepare();
     }
@@ -54,19 +51,17 @@ public class BaseFilter {
     protected void prepare() {
     }
 
-    ;
-
     public Map process(Map event) {
-        boolean succuess = true;
+        boolean isSuccess = true;
         if (this.IF != null) {
             for (TemplateRender render : this.IF) {
                 if (!render.render(event).equals("true")) {
-                    succuess = false;
+                    isSuccess = false;
                     break;
                 }
             }
         }
-        if (succuess == true) {
+        if (isSuccess == true) {
             event = this.filter(event);
         }
 
@@ -79,15 +74,13 @@ public class BaseFilter {
         return null;
     }
 
-    public void postProcess(Map event, boolean ifsuccess) {
-        if (ifsuccess == false) {
+    public void postProcess(Map event, boolean ifSuccess) {
+        if (ifSuccess == false) {
             if (this.tagOnFailure == null || this.tagOnFailure.length() <= 0) {
                 return;
             }
             if (!event.containsKey("tags")) {
-
-                event.put("tags",
-                        new ArrayList<String>(Arrays.asList(this.tagOnFailure)));
+                event.put("tags", new ArrayList<String>(Arrays.asList(this.tagOnFailure)));
             } else {
                 Object tags = event.get("tags");
                 if (tags.getClass() == ArrayList.class

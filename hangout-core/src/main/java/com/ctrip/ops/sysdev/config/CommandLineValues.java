@@ -6,6 +6,10 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
 /**
  * Created by gnuhpc on 2016/12/11.
  */
@@ -20,7 +24,7 @@ public class CommandLineValues {
     private boolean isHelp = false;
 
     @Option(name = "-ll", aliases = {"--loglevel"}, usage = "Set log level: INFO (default), DEBUG, TRACE",
-            handler = LogLevelOptionhandler.class,forbids = {"-v","-vv","-vvvv"})
+            handler = LogLevelOptionhandler.class, forbids = {"-v", "-vv", "-vvvv"})
     private Level logLevel = Level.WARN;
 
     @Option(name = "-f", aliases = {"--configfile"}, usage = " Specify a config file", required = true)
@@ -68,9 +72,18 @@ public class CommandLineValues {
         System.out.println("Hangout  Version:" + getVersion() + "  Copyright @Ctrip   Author : childe@github, guuhpc@github");
     }
 
-    //TODO not implementaion yet, reading from pom.xml is the goal
     private String getVersion() {
-        return "0.19";
+        InputStream resourceAsStream =
+                this.getClass().getResourceAsStream(
+                        "/META-INF/maven/ctrip/hangout-core/pom.properties"
+                );
+        Properties prop = new Properties();
+        try {
+            prop.load(resourceAsStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return prop.getProperty("version");
     }
 
     private void printUsage() {
