@@ -37,10 +37,15 @@ public abstract class BaseInput {
 
     public abstract void emit();
 
+    protected Map<String, Object> preprocess(Map<String, Object> event) {
+        return event;
+    }
+
+
     public List<BaseFilter> createFilterProcessors() {
         if (filters != null) {
             filterProcessors = filters.stream().collect(HashMap::new, Map::putAll, Map::putAll).entrySet().stream().map((Entry<Object, Object> filter) -> {
-                BaseFilter bf=null;
+                BaseFilter bf = null;
                 String filterType = (String) filter.getKey();
                 Map filterConfig = (Map) filter.getValue();
                 Class<?> filterClass;
@@ -49,7 +54,7 @@ public abstract class BaseInput {
                 try {
                     filterClass = Class.forName("com.ctrip.ops.sysdev.filters." + filterType);
                     ctor = filterClass.getConstructor(Map.class);
-                    log.info("build filter" + filterType+ " done");
+                    log.info("build filter" + filterType + " done");
                     bf = (BaseFilter) ctor.newInstance(filterConfig);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -65,7 +70,7 @@ public abstract class BaseInput {
 
     public List<BaseOutput> createOutputProcessors() {
         outputProcessors = outputs.stream().collect(HashMap::new, Map::putAll, Map::putAll).entrySet().stream().map((Entry<Object, Object> output) -> {
-            BaseOutput bo=null;
+            BaseOutput bo = null;
             String outputType = (String) output.getKey();
             Map outputConfig = (Map) output.getValue();
             Class<?> outputClass;
@@ -86,6 +91,34 @@ public abstract class BaseInput {
         this.registerShutdownHook(outputProcessors);
         return outputProcessors;
     }
+
+    public void process(String message) {
+        try {
+            Map<String, Object> event = this.decoder
+                    .decode(message);
+
+            event = this.preprocess(event);
+
+            if (this.filterProcessors != null) {
+                for (BaseFilter bf : filterProcessors) {
+                    if (event == null) {
+                        break;
+                    }
+                    event = bf.process(event);
+                }
+            }
+            if (event != null) {
+                for (BaseOutput bo : outputProcessors) {
+                    bo.process(event);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("process event failed:" + input);
+            e.printStackTrace();
+            logger.error(e);
+        }
+    }
+
 
     public Decode createDecoder() {
         String codec = (String) this.config.get("codec");

@@ -56,32 +56,7 @@ public class Stdin extends BaseInput {
             String input;
 
             while ((input = br.readLine()) != null) {
-                try {
-                    Map<String, Object> event = this.decoder
-                            .decode(input);
-
-                    if (this.hostname) {
-                        event.put("hostname", this.hostnameValue);
-                    }
-
-                    if (this.filterProcessors != null) {
-                        for (BaseFilter bf : filterProcessors) {
-                            if (event == null) {
-                                break;
-                            }
-                            event = bf.process(event);
-                        }
-                    }
-                    if (event != null) {
-                        for (BaseOutput bo : outputProcessors) {
-                            bo.process(event);
-                        }
-                    }
-                } catch (Exception e) {
-                    logger.error("process event failed:" + input);
-                    e.printStackTrace();
-                    logger.error(e);
-                }
+                this.process(input);
             }
 
         } catch (IOException io) {
