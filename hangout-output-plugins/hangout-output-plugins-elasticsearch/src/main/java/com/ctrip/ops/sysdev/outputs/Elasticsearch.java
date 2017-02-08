@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import com.ctrip.ops.sysdev.baseplugin.BaseOutput;
+import lombok.extern.log4j.Log4j;
 import org.apache.log4j.Logger;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
@@ -27,10 +28,8 @@ import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
-@SuppressWarnings("ALL")
+@Log4j
 public class Elasticsearch extends BaseOutput {
-    private static final Logger logger = Logger.getLogger(Elasticsearch.class
-            .getName());
 
     private String index;
     private String indexTimezone;
@@ -59,7 +58,7 @@ public class Elasticsearch extends BaseOutput {
                         (String) config.get("document_id"),
                         (String) config.get("document_id"));
             } catch (IOException e) {
-                logger.fatal(e.getMessage());
+                log.fatal(e.getMessage());
                 System.exit(1);
             }
         } else {
@@ -72,7 +71,7 @@ public class Elasticsearch extends BaseOutput {
                         (String) config.get("document_parent"),
                         (String) config.get("document_parent"));
             } catch (IOException e) {
-                logger.fatal(e.getMessage());
+                log.fatal(e.getMessage());
                 System.exit(1);
             }
         } else {
@@ -85,21 +84,21 @@ public class Elasticsearch extends BaseOutput {
                         (String) config.get("index_type"),
                         (String) config.get("index_type"));
             } catch (IOException e) {
-                logger.fatal(e.getMessage());
+                log.fatal(e.getMessage());
                 System.exit(1);
             }
         } else {
             try {
                 this.indexTypeRender = new FreeMarkerRender("logs", "logs");
             } catch (IOException e) {
-                logger.fatal(e.getMessage());
+                log.fatal(e.getMessage());
                 System.exit(1);
             }
         }
         try {
             this.initESClient();
         } catch (Exception e) {
-            logger.error(e);
+            log.error(e);
             System.exit(1);
         }
     }
@@ -162,7 +161,7 @@ public class Elasticsearch extends BaseOutput {
                     @Override
                     public void afterBulk(long arg0, BulkRequest arg1,
                                           BulkResponse arg2) {
-                        logger.info("bulk done with executionId: " + arg0);
+                        log.info("bulk done with executionId: " + arg0);
                         List<ActionRequest<?>> requests = arg1.requests();
                         int toberetry = 0;
                         int totalFailed = 0;
@@ -172,8 +171,8 @@ public class Elasticsearch extends BaseOutput {
                                     case TOO_MANY_REQUESTS:
                                     case SERVICE_UNAVAILABLE:
                                         if (toberetry == 0) {
-                                            logger.error("bulk has failed item which NEED to retry");
-                                            logger.error(item.getFailureMessage());
+                                            log.error("bulk has failed item which NEED to retry");
+                                            log.error(item.getFailureMessage());
                                         }
                                         toberetry++;
                                         bulkProcessor.add(requests.get(item
@@ -181,8 +180,8 @@ public class Elasticsearch extends BaseOutput {
                                         break;
                                     default:
                                         if (totalFailed == 0) {
-                                            logger.error("bulk has failed item which do NOT need to retry");
-                                            logger.error(item.getFailureMessage());
+                                            log.error("bulk has failed item which do NOT need to retry");
+                                            log.error(item.getFailureMessage());
                                         }
                                         break;
                                 }
@@ -192,15 +191,15 @@ public class Elasticsearch extends BaseOutput {
                         }
 
                         if (totalFailed > 0) {
-                            logger.info(totalFailed + " doc failed, "
+                            log.info(totalFailed + " doc failed, "
                                     + toberetry + " need to retry");
                         } else {
-                            logger.debug("no failed docs");
+                            log.debug("no failed docs");
                         }
 
                         if (toberetry > 0) {
                             try {
-                                logger.info("sleep " + toberetry / 2
+                                log.info("sleep " + toberetry / 2
                                         + "millseconds after bulk failure");
                                 Thread.sleep(toberetry / 2);
                             } catch (InterruptedException e) {
@@ -208,7 +207,7 @@ public class Elasticsearch extends BaseOutput {
                                 e.printStackTrace();
                             }
                         } else {
-                            logger.debug("no docs need to retry");
+                            log.debug("no docs need to retry");
                         }
 
                     }
@@ -216,14 +215,14 @@ public class Elasticsearch extends BaseOutput {
                     @Override
                     public void afterBulk(long arg0, BulkRequest arg1,
                                           Throwable arg2) {
-                        logger.error("bulk got exception");
-                        logger.error(arg2.getMessage());
+                        log.error("bulk got exception");
+                        log.error(arg2.getMessage());
                     }
 
                     @Override
                     public void beforeBulk(long arg0, BulkRequest arg1) {
-                        logger.info("executionId: " + arg0);
-                        logger.info("numberOfActions: "
+                        log.info("executionId: " + arg0);
+                        log.info("numberOfActions: "
                                 + arg1.numberOfActions());
                     }
 
@@ -251,7 +250,7 @@ public class Elasticsearch extends BaseOutput {
     }
 
     public void shutdown() {
-        logger.info("flush docs and then shutdown");
+        log.info("flush docs and then shutdown");
 
         //flush immediately
         this.bulkProcessor.flush();
@@ -264,8 +263,8 @@ public class Elasticsearch extends BaseOutput {
         try {
             this.bulkProcessor.awaitClose(flushInterval, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            logger.error("failed to bulk docs before shutdown");
-            logger.error(e);
+            log.error("failed to bulk docs before shutdown");
+            log.error(e);
         }
     }
 }

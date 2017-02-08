@@ -47,21 +47,27 @@ public class Main {
                     input.forEach((inputType, inputConfig) -> {
                         Class<?> inputClass = null;
                         try {
+                            log.info("begin to build input " + inputType);
                             inputClass = Class.forName("com.ctrip.ops.sysdev.inputs." + inputType);
                             //Get Constructor for each input
                             Constructor<?> ctor = inputClass.getConstructor(
                                     Map.class,
                                     ArrayList.class,
                                     ArrayList.class);
-                            //instantiate the input
+                            //instantiate the input,prepare() and registerShutdownHookForSelf() are called here.
                             BaseInput inputInstance = (BaseInput) ctor.newInstance(
                                     inputConfig,
                                     filterConfigs,
                                     outputConfigs);
+
+                            log.info("build input " + inputType + " done");
                             //Start working,guy.
                             inputInstance.emit();
+                            log.info("input" + inputType + " started");
                         } catch (Exception e) {
+                            log.error(e);
                             e.printStackTrace();
+                            System.exit(-1);
                         }
                     });
                 });

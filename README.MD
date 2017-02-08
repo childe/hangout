@@ -79,6 +79,11 @@ This product includes GeoLite2 data created by MaxMind, available from
           num.consumer.fetchers: "4"
         codec: plain
 
+支持白名单匹配，使用topic_pattern指定正则表达式来匹配topic名称，如果指定此参数，topic参数会被忽略。
+
+    - topic_pattern: #pattern has high priority,if specified, topic will be ignored
+        test.*: 3
+        
 ### newKafka
 新的kafka api.[http://kafka.apache.org/documentation.html#newconsumerapi](http://kafka.apache.org/documentation.html#newconsumerapi)
 
