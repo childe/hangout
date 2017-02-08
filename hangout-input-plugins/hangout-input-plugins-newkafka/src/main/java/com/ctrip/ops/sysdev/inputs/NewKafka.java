@@ -2,115 +2,81 @@ package com.ctrip.ops.sysdev.inputs;
 
 /**
  * Created by liujia on 16/4/1.
+ * Modifiled by gnuhpc on 17/2/8
  */
+
+import com.ctrip.ops.sysdev.baseplugin.BaseInput;
+import lombok.extern.log4j.Log4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-
-import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
-import com.ctrip.ops.sysdev.baseplugin.BaseInput;
-import com.ctrip.ops.sysdev.baseplugin.BaseOutput;
-import com.ctrip.ops.sysdev.decoders.Decode;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.log4j.Logger;
-
-@SuppressWarnings("ALL")
+@Log4j
 public class NewKafka extends BaseInput {
-    private static final Logger logger = Logger
-            .getLogger(NewKafka.class.getName());
 
     private ExecutorService executor;
+    private Map<String, Integer> topics;
+    private Properties props;
 
     public NewKafka(Map<String, Object> config, ArrayList<Map> filter,
                  ArrayList<Map> outputs) throws Exception {
         super(config, filter, outputs);
     }
 
-    private class Consumer implements Runnable {
-        private NewKafka kafkaInput;
-        private Decode decoder;
-        private KafkaConsumer<String, String> consumer;
-        private List<BaseFilter> filterProcessors;
-        private List<BaseOutput> outputProcessors;
 
-        public Consumer(String topicName, NewKafka kafkaInput) {
-            this.kafkaInput = kafkaInput;
-            this.decoder = kafkaInput.createDecoder();
+    protected void prepare() {
+        topics = (Map<String, Integer>) this.config.get("topic");
+        HashMap<String, String> consumerSettings = (HashMap<String, String>) this.config.get("consumer_settings");
+        props = new Properties();
 
-            Properties props = new Properties();
+        consumerSettings.entrySet().stream().forEach(entry->{
+            String k = entry.getKey();
+            String v = entry.getValue();
+            props.put(k, v);
+        });
 
-            HashMap<String, String> consumerSettings = (HashMap<String, String>) this.kafkaInput.config
-                    .get("consumer_settings");
-            Iterator<Map.Entry<String, String>> consumerSetting = consumerSettings
-                    .entrySet().iterator();
+        createProcessors();
+    }
 
-            while (consumerSetting.hasNext()) {
-                Map.Entry<String, String> entry = consumerSetting.next();
-                String k = entry.getKey();
-                String v = entry.getValue();
-                props.put(k, v);
+    public void emit() {
+        topics.entrySet().stream().forEach(entry->{
+            String topic = entry.getKey();
+            KafkaConsumer consumer = new KafkaConsumer<>(props);
+            int partitionSize = consumer.partitionsFor(topic).size();
+            int threadSize = entry.getValue();
+
+            //If threadSize > partitionSize, use paritionSize in order to avoid the waste of threads
+            if (partitionSize<threadSize){
+                executor = Executors.newFixedThreadPool(partitionSize);
             }
-            this.consumer = new KafkaConsumer<>(props);
-            consumer.subscribe(Arrays.asList(topicName));
+            else{
+                executor = Executors.newFixedThreadPool(threadSize);
+            }
 
-            this.filterProcessors = kafkaInput.createFilterProcessors();
-            this.outputProcessors = kafkaInput.createOutputProcessors();
+            for (int i = 0; i < partitionSize; i++) {
+                executor.submit(new ConsumerThread(topic,consumer));
+            }
+        });
+    }
+
+    private class ConsumerThread implements Runnable {
+
+        private final KafkaConsumer<String,String> consumer;
+
+        public ConsumerThread(String topicName, KafkaConsumer consumer) {
+            this.consumer = consumer;
+            this.consumer.subscribe(Arrays.asList(topicName));
         }
 
         public void run() {
             while (true) {
-                ConsumerRecords<String, String> records = consumer.poll(100);
+                ConsumerRecords<String, String> records = consumer.poll(10000);
                 for (ConsumerRecord<String, String> record : records)
-                    try {
-                        Map<String, Object> event = this.decoder
-                                .decode(record.value());
-
-                        if (this.filterProcessors != null) {
-                            for (BaseFilter bf : filterProcessors) {
-                                if (event == null) {
-                                    break;
-                                }
-                                event = bf.process(event);
-                            }
-                        }
-                        if (event != null) {
-                            for (BaseOutput bo : outputProcessors) {
-                                bo.process(event);
-                            }
-                        }
-                    } catch (Exception e) {
-                        logger.error("process event failed:" + record.value());
-                        e.printStackTrace();
-                        logger.error(e);
-                    }
-            }
-        }
-    }
-
-
-    protected void prepare() {
-    }
-
-    public void emit() {
-        Map<String, Integer> topics = (Map<String, Integer>) this.config
-                .get("topic");
-
-        Iterator<Map.Entry<String, Integer>> topicIT = topics.entrySet().iterator();
-
-        while (topicIT.hasNext()) {
-            Map.Entry<String, Integer> entry = topicIT.next();
-
-            String topic = entry.getKey();
-            Integer threads = entry.getValue();
-
-            executor = Executors.newFixedThreadPool(threads);
-
-            for (int i = 0; i < threads; i++) {
-                executor.submit(new Consumer(topic, this));
+                        applyProcessor(record.value());
             }
         }
     }

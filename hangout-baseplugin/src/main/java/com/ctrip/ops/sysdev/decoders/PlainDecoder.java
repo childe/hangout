@@ -8,11 +8,6 @@ import java.util.Map;
 public class PlainDecoder implements Decode {
 
 	public Map<String, Object> decode(final String message) {
-		return new HashMap<String, Object>() {
-			{
-				put("message", message);
-				put("@timestamp", DateTime.now());
-			}
-		};
+		return createDefaultEvent(message);
 	}
 }

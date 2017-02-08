@@ -37,6 +37,57 @@ public abstract class BaseInput {
 
     public abstract void emit();
 
+    //Apply decoder, filters, output in sequences
+    public void applyProcessor(String message){
+        Map event = applyDecoder(message);
+        processAfterDecode(event);
+        event = applyFilters(event);
+        if (event!=null)
+            applyOutputs(event);
+    }
+
+    public void processAfterDecode(Map event) {
+        return;
+    }
+
+    //Apply decoder
+    public Map<String,Object> applyDecoder(String message){
+        return this.decoder.decode(message);
+    }
+
+    //Apply Filters
+    public Map<String,Object> applyFilters(Map<String,Object> event){
+        if (this.filterProcessors != null) {
+            for (BaseFilter bf : filterProcessors) {
+                if (event == null) {
+                    break;
+                }
+                event = bf.process(event);
+            }
+        }
+        return event;
+    }
+
+    //Apply Outputs
+    public void applyOutputs(Map<String,Object> event){
+        outputProcessors.stream().forEach(outputProcessor->outputProcessor.process(event));
+    }
+
+    public void createProcessors(){
+        createDecoder();
+        createFilterProcessors();
+        createOutputProcessors();
+    }
+
+    public void createDecoder() {
+        String codec = (String) this.config.get("codec");
+        if (codec != null && codec.equalsIgnoreCase("plain")) {
+            decoder = new PlainDecoder();
+        } else {
+            decoder = new JsonDecoder();
+        }
+    }
+
     public List<BaseFilter> createFilterProcessors() {
         if (filters != null) {
             filterProcessors = filters.stream().collect(HashMap::new, Map::putAll, Map::putAll).entrySet().stream().map((Entry<Object, Object> filter) -> {
@@ -87,14 +138,7 @@ public abstract class BaseInput {
         return outputProcessors;
     }
 
-    public Decode createDecoder() {
-        String codec = (String) this.config.get("codec");
-        if (codec != null && codec.equalsIgnoreCase("plain")) {
-            return new PlainDecoder();
-        } else {
-            return new JsonDecoder();
-        }
-    }
+
 
     public void shutdown() {
     }
