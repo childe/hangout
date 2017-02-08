@@ -48,6 +48,14 @@ public class Stdin extends BaseInput {
         }
     }
 
+    @Override
+    protected Map<String, Object> preprocess(Map<String, Object> event) {
+        if (this.hostname) {
+            event.put("hostname", this.hostnameValue);
+        }
+        return event;
+    }
+
     public void emit() {
         try {
             BufferedReader br =

@@ -5,11 +5,9 @@ import com.ctrip.ops.sysdev.decoders.JsonDecoder;
 import com.ctrip.ops.sysdev.decoders.PlainDecoder;
 import lombok.extern.log4j.Log4j;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
@@ -38,6 +36,10 @@ public abstract class BaseInput {
     public abstract void emit();
 
     protected Map<String, Object> preprocess(Map<String, Object> event) {
+        return event;
+    }
+
+    protected Map<String, Object> postprocess(Map<String, Object> event) {
         return event;
     }
 
@@ -96,27 +98,46 @@ public abstract class BaseInput {
         try {
             Map<String, Object> event = this.decoder
                     .decode(message);
+            this.preprocess(event);
 
-            event = this.preprocess(event);
+            ArrayList<Map<String, Object>> events = new ArrayList<Map<String, Object>>();
+            events.add(event);
 
             if (this.filterProcessors != null) {
                 for (BaseFilter bf : filterProcessors) {
-                    if (event == null) {
+                    if (events == null) {
                         break;
                     }
-                    event = bf.process(event);
+                    for (int i = 0; i < events.size(); i++) {
+                        events.set(i, bf.process(events.get(i)));
+                    }
+                    if (bf.processToListFunc == true) {
+                        ArrayList<Map<String, Object>> newevents = new ArrayList<Map<String, Object>>();
+                        for (Map<String, Object> _ : events) {
+                            newevents.addAll(bf.processToList(_));
+                        }
+                    }
                 }
             }
-            if (event != null) {
+
+            for (int i = 0; i < events.size(); i++) {
+                events.set(i, this.postprocess(events.get(i)));
+            }
+
+            if (events != null) {
                 for (BaseOutput bo : outputProcessors) {
-                    bo.process(event);
+                    for (Map<String, Object> _ : events
+                            ) {
+                        bo.process(event);
+                    }
                 }
             }
         } catch (Exception e) {
-            logger.error("process event failed:" + input);
+            log.error("process event failed:" + message);
             e.printStackTrace();
-            logger.error(e);
+            log.error(e);
         }
+
     }
 
 

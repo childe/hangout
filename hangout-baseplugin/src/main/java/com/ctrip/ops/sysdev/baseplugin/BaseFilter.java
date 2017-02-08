@@ -5,10 +5,7 @@ import com.ctrip.ops.sysdev.render.TemplateRender;
 import lombok.extern.log4j.Log4j;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Log4j
@@ -19,6 +16,7 @@ public class BaseFilter {
     protected String tagOnFailure;
     protected List<String> removeFields;
     private List<TemplateRender> IF;
+    protected boolean processToListFunc;
 
     public BaseFilter(Map config) {
         this.config = config;
@@ -44,6 +42,7 @@ public class BaseFilter {
         }
 
         this.removeFields = (ArrayList<String>) this.config.get("remove_fields");
+        this.processToListFunc = false;
 
         this.prepare();
     }
@@ -51,27 +50,37 @@ public class BaseFilter {
     protected void prepare() {
     }
 
-    public Map process(Map event) {
-        boolean isSuccess = true;
+    public boolean needProcess(Map event) {
         if (this.IF != null) {
             for (TemplateRender render : this.IF) {
                 if (!render.render(event).equals("true")) {
-                    isSuccess = false;
-                    break;
+                    return false;
                 }
             }
         }
-        if (isSuccess == true) {
+        return true;
+    }
+
+    public Map process(Map event) {
+        if (event == null) {
+            return null;
+        }
+
+        if (this.needProcess(event) == true) {
             event = this.filter(event);
         }
 
         return event;
     }
 
-    ;
+    protected List<Map<String, Object>> processToList(Map event) {
+        ArrayList<Map<String, Object>> rst = new ArrayList<Map<String, Object>>();
+        rst.add(event);
+        return rst;
+    }
 
     protected Map filter(Map event) {
-        return null;
+        return event;
     }
 
     public void postProcess(Map event, boolean ifSuccess) {
