@@ -98,24 +98,38 @@ public abstract class BaseInput {
 
     public List<BaseFilter> createFilterProcessors() {
         if (filters != null) {
-            filterProcessors = filters.stream().collect(HashMap::new, Map::putAll, Map::putAll).entrySet().stream().map((Entry<Object, Object> filter) -> {
-                BaseFilter bf = null;
-                String filterType = (String) filter.getKey();
-                Map filterConfig = (Map) filter.getValue();
-                Class<?> filterClass;
-                Constructor<?> ctor = null;
-                log.info("begin to build filter " + filterType);
-                try {
-                    filterClass = Class.forName("com.ctrip.ops.sysdev.filters." + filterType);
-                    ctor = filterClass.getConstructor(Map.class);
-                    log.info("build filter " + filterType + " done");
-                    bf = (BaseFilter) ctor.newInstance(filterConfig);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    System.exit(-1);
+            filterProcessors = new ArrayList<>();
+
+            int idx = 0;
+            for (Map filter : filters) {
+                Iterator<Map.Entry<String, Map>> filterIT = filter.entrySet()
+                        .iterator();
+
+                while (filterIT.hasNext()) {
+                    Map.Entry<String, Map> filterEntry = filterIT.next();
+                    String filterType = filterEntry.getKey();
+                    Map filterConfig = filterEntry.getValue();
+                    System.out.println(filterConfig);
+
+                    try {
+                        log.info("begin to build filter " + filterType);
+                        Class<?> filterClass = Class
+                                .forName("com.ctrip.ops.sysdev.filters."
+                                        + filterType);
+                        Constructor<?> ctor = filterClass
+                                .getConstructor(Map.class);
+
+                        BaseFilter filterInstance = (BaseFilter) ctor
+                                .newInstance(filterConfig);
+                        filterProcessors.add(filterInstance);
+                        log.info("build filter " + filterType + " done");
+                    } catch (Exception e) {
+                        log.error(e);
+                        System.exit(1);
+                    }
+                    idx++;
                 }
-                return bf;
-            }).collect(Collectors.toList());
+            }
         } else {
             filterProcessors = null;
         }
@@ -166,7 +180,7 @@ public abstract class BaseInput {
                     }
                     if (bf.processExtraEventsFunc == true) {
                         int originEventSize = events.size();
-                        for(int i=0;i < events.size(); i++){
+                        for (int i = 0; i < events.size(); i++) {
                             List rst = bf.processExtraEvents(events.get(i));
                             if (rst != null) {
                                 events.addAll(rst);
