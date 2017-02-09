@@ -16,7 +16,7 @@ public class BaseFilter {
     protected String tagOnFailure;
     protected List<String> removeFields;
     private List<TemplateRender> IF;
-    protected boolean processToListFunc;
+    protected boolean processExtraEventsFunc = false;
 
     public BaseFilter(Map config) {
         this.config = config;
@@ -42,7 +42,6 @@ public class BaseFilter {
         }
 
         this.removeFields = (ArrayList<String>) this.config.get("remove_fields");
-        this.processToListFunc = false;
 
         this.prepare();
     }
@@ -73,14 +72,20 @@ public class BaseFilter {
         return event;
     }
 
-    protected List<Map<String, Object>> processToList(Map event) {
-        ArrayList<Map<String, Object>> rst = new ArrayList<Map<String, Object>>();
-        rst.add(event);
-        return rst;
+    protected List<Map<String, Object>> processExtraEvents(Map event) {
+        if (this.processExtraEventsFunc == false || event == null || this.needProcess(event) == false) {
+            return null;
+        }
+
+        return this.filterExtraEvents(event);
     }
 
     protected Map filter(Map event) {
         return event;
+    }
+
+    protected List<Map<String, Object>> filterExtraEvents(Map event) {
+        return null;
     }
 
     public void postProcess(Map event, boolean ifSuccess) {
