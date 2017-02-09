@@ -58,10 +58,26 @@ public class FlatMetric extends BaseFilter {
             return null;
         }
         List<Map<String, Object>> events = new ArrayList<Map<String, Object>>();
-        this.metric.put("@timestamp", this.lastEmitTime);
-        this.postProcess(this.metric, true);
-        events.add(this.metric);
+        Iterator<Map.Entry<String, Object>> it = this.metric.entrySet().iterator();
         this.lastEmitTime = System.currentTimeMillis();
+        while (it.hasNext()) {
+            Map.Entry<String, Object> o = it.next();
+            final String keyValue = o.getKey();
+            final Map ValueValue = (Map) o.getValue();
+            Iterator<Map.Entry<Object, Integer>> vvit = ValueValue.entrySet().iterator();
+            while (vvit.hasNext()) {
+                Map.Entry<Object, Integer> vvitentry = vvit.next();
+                events.add(new HashMap<String, Object>() {{
+                    this.put(key, keyValue);
+                    this.put(value, vvitentry.getKey());
+                    this.put("count", vvitentry.getValue());
+                    this.put("@timestamp", lastEmitTime);
+                }});
+            }
+
+        }
+        this.metric = new HashMap<String, Object>();
+
         return events;
     }
 }
