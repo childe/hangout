@@ -109,7 +109,6 @@ public abstract class BaseInput {
                     Map.Entry<String, Map> filterEntry = filterIT.next();
                     String filterType = filterEntry.getKey();
                     Map filterConfig = filterEntry.getValue();
-                    System.out.println(filterConfig);
 
                     try {
                         log.info("begin to build filter " + filterType);
