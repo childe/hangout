@@ -113,7 +113,7 @@ public class NewKafka extends BaseInput {
             while (true) {
                 ConsumerRecords<String, String> records = consumer.poll(10000);
                 for (ConsumerRecord<String, String> record : records)
-                        applyProcessor(record.value());
+                        process(record.value());
             }
         }
     }

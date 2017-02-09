@@ -105,7 +105,7 @@ public class Kafka extends BaseInput {
         public void run() {
             ConsumerIterator<String, String> it = kafkaStream.iterator();
             while (it.hasNext()) {
-                applyProcessor(it.next().message());
+                process(it.next().message());
             }
         }
     }

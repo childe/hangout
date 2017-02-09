@@ -43,10 +43,11 @@ public class Stdin extends BaseInput {
     }
 
     @Override
-    public void processAfterDecode(Map event) {
+    protected Map<String, Object> preprocess(Map<String, Object> event) {
         if (this.hostname) {
             event.put("hostname", this.hostnameValue);
         }
+        return event;
     }
 
     public void emit() {
@@ -56,12 +57,7 @@ public class Stdin extends BaseInput {
             String input;
 
             while ((input = br.readLine()) != null) {
-                try {
-                    applyProcessor(input);
-                } catch (Exception e) {
-                    log.error("process event failed:" + input);
-                    log.error(e);
-                }
+                this.process(input);
             }
 
         } catch (IOException io) {
