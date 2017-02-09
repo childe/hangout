@@ -3,20 +3,22 @@ inputs:
         codec: plain
         encoding: UTF8 # defaut UTF8
         topic:
-          test1: 1
-          test2: 4
-          test3: 8
-        #topic_pattern: #pattern has high priority,if specified, topic will be ignored
-        #  test.*: 3
+            gnuhpc1: 1
+            gnuhpc2: 4
+            gnuhpc3: 8
+        topic_pattern: #pattern has high priority,if specified, topic will be ignored
+            test.*: 3
         consumer_settings:
-          group.id: hangout
-          zookeeper.connect: 192.168.145.128:2181
-          auto.commit.interval.ms: "1000"
+            group.id: hangout
+            zookeeper.connect: 192.168.145.128:2181
+            auto.commit.interval.ms: "1000"
     - NewKafka:
         topic:
             gnuhpc1: 1
             gnuhpc2: 4
             gnuhpc3: 8
+        topic_pattern:
+            test.*: 16
         codec: plain
         consumer_settings:
             bootstrap.servers: 192.168.145.128:9092
