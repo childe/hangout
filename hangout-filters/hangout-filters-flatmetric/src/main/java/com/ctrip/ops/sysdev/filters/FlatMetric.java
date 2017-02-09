@@ -12,7 +12,7 @@ public class FlatMetric extends BaseFilter {
     private int windowSize;
     private String key;
     private String value;
-    private Map<String, Object> metric;
+    private Map<Object, Map<Object, Integer>> metric;
     private long lastEmitTime;
 
     public FlatMetric(Map config) {
@@ -24,8 +24,7 @@ public class FlatMetric extends BaseFilter {
         this.value = (String) config.get("value");
         this.windowSize = (int) config.get("windowSize") * 1000;
         this.processExtraEventsFunc = true;
-        this.metric = new HashMap<String, Object>();
-
+        this.metric = new HashMap();
         this.lastEmitTime = System.currentTimeMillis();
     }
 
@@ -58,11 +57,11 @@ public class FlatMetric extends BaseFilter {
             return null;
         }
         List<Map<String, Object>> events = new ArrayList<Map<String, Object>>();
-        Iterator<Map.Entry<String, Object>> it = this.metric.entrySet().iterator();
+        Iterator<Map.Entry<Object, Map<Object, Integer>>> it = this.metric.entrySet().iterator();
         this.lastEmitTime = System.currentTimeMillis();
         while (it.hasNext()) {
-            Map.Entry<String, Object> o = it.next();
-            final String keyValue = o.getKey();
+            Map.Entry<Object, Map<Object, Integer>> o = it.next();
+            final Object keyValue = o.getKey();
             final Map ValueValue = (Map) o.getValue();
             Iterator<Map.Entry<Object, Integer>> vvit = ValueValue.entrySet().iterator();
             while (vvit.hasNext()) {
@@ -76,7 +75,7 @@ public class FlatMetric extends BaseFilter {
             }
 
         }
-        this.metric = new HashMap<String, Object>();
+        this.metric = new HashMap();
 
         return events;
     }
