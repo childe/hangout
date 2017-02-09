@@ -17,7 +17,7 @@ public class BaseFilter {
     protected List<String> removeFields;
     protected Map<String, Object> addFields;
     private List<TemplateRender> IF;
-    protected boolean processExtraEventsFunc = false;
+    public boolean processExtraEventsFunc;
 
 
     public BaseFilter(Map config) {
@@ -75,7 +75,7 @@ public class BaseFilter {
         return event;
     }
 
-    protected List<Map<String, Object>> processExtraEvents(Map event) {
+    public List<Map<String, Object>> processExtraEvents(Map event) {
         if (this.processExtraEventsFunc == false || event == null || this.needProcess(event) == false) {
             return null;
         }
