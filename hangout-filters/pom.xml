@@ -31,6 +31,7 @@
         <module>hangout-filters-trim</module>
         <module>hangout-filters-ua</module>
         <module>hangout-filters-urldecode</module>
+        <module>hangout-filters-metric</module>
     </modules>
 
 
