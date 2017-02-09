@@ -12,6 +12,17 @@ filters:
             - Add:
                 fields:
                     test: 'abcd'
+    - Add:
+          fields:
+              addfield1: 'field1content'
+    - Add:
+          fields:
+              addfield2: 'field2content'
+    - Grok:
+          match:
+            - '^(?<logtime>\S+) (?<user>.+) (-|(?<level>\w+)) %{DATA:msg}$'
+          remove_fields: ['message']
+          tag_on_failure: '' # do not add tags; deafult "grokfail"     addfield2: 'field2content'
 
 outputs:
     - Stdout: {}
