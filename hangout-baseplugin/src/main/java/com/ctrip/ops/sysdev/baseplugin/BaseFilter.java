@@ -15,8 +15,9 @@ public class BaseFilter {
     protected TemplateRender render;
     protected String tagOnFailure;
     protected List<String> removeFields;
+    protected Map<String, Object> addFields;
     private List<TemplateRender> IF;
-    protected boolean processExtraEventsFunc=false;
+    protected boolean processExtraEventsFunc = false;
 
 
     public BaseFilter(Map config) {
@@ -43,6 +44,7 @@ public class BaseFilter {
         }
 
         this.removeFields = (ArrayList<String>) this.config.get("remove_fields");
+        this.addFields = (Map<String, Object>) this.config.get("add_fields");
 
         this.prepare();
     }
@@ -103,9 +105,21 @@ public class BaseFilter {
                     ((ArrayList) tags).add(this.tagOnFailure);
                 }
             }
-        } else if (this.removeFields != null) {
-            for (String f : this.removeFields) {
-                event.remove(f);
+        } else {
+            if (this.removeFields != null) {
+                for (String f : this.removeFields) {
+                    event.remove(f);
+                }
+            }
+
+            if (this.addFields != null) {
+                Iterator<Map.Entry<String, Object>> it = this.addFields.entrySet().iterator();
+                while (it.hasNext()) {
+                    Map.Entry<String, Object> entry = it.next();
+                    String field = entry.getKey();
+                    Object value = entry.getValue();
+                    event.put(field, value);
+                }
             }
         }
     }

@@ -59,6 +59,7 @@ public class Metric extends BaseFilter {
         }
         List<Map<String, Object>> events = new ArrayList<Map<String, Object>>();
         this.metric.put("@timestamp", this.lastEmitTime);
+        this.postProcess(this.metric, true);
         events.add(this.metric);
         this.lastEmitTime = System.currentTimeMillis();
         return events;
