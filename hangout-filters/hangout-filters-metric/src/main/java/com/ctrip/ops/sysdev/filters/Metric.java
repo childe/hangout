@@ -13,6 +13,7 @@ public class Metric extends BaseFilter {
     private String key;
     private String value;
     private Map<String, Object> metric;
+    private long lastEmitTime;
 
     public Metric(Map config) {
         super(config);
@@ -21,9 +22,11 @@ public class Metric extends BaseFilter {
     protected void prepare() {
         this.key = (String) config.get("key");
         this.value = (String) config.get("value");
-        this.windowSize = (int) config.get("windowSize");
+        this.windowSize = (int) config.get("windowSize") * 1000;
         this.processExtraEventsFunc = true;
         this.metric = new HashMap<String, Object>();
+
+        this.lastEmitTime = System.currentTimeMillis();
     }
 
     @Override
@@ -51,8 +54,13 @@ public class Metric extends BaseFilter {
 
     @Override
     public List<Map<String, Object>> filterExtraEvents(Map event) {
+        if (System.currentTimeMillis() < this.windowSize + this.lastEmitTime) {
+            return null;
+        }
         List<Map<String, Object>> events = new ArrayList<Map<String, Object>>();
+        this.metric.put("@timestamp", this.lastEmitTime);
         events.add(this.metric);
+        this.lastEmitTime = System.currentTimeMillis();
         return events;
     }
 }
