@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>hangout-input-plugin-kafka</artifactId>
+    <artifactId>hangout-input-plugins-kafka</artifactId>
     <dependencies>
         <dependency>
             <groupId>ctrip</groupId>
