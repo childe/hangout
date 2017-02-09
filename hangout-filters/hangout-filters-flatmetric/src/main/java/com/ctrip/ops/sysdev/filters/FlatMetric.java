@@ -66,12 +66,14 @@ public class FlatMetric extends BaseFilter {
             Iterator<Map.Entry<Object, Integer>> vvit = ValueValue.entrySet().iterator();
             while (vvit.hasNext()) {
                 Map.Entry<Object, Integer> vvitentry = vvit.next();
-                events.add(new HashMap<String, Object>() {{
+                HashMap e = new HashMap<String, Object>() {{
                     this.put(key, keyValue);
                     this.put(value, vvitentry.getKey());
                     this.put("count", vvitentry.getValue());
                     this.put("@timestamp", lastEmitTime);
-                }});
+                }};
+                this.postProcess(e, true);
+                events.add(e);
             }
 
         }
