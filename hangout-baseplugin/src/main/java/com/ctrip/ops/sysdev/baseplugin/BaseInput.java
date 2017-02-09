@@ -104,11 +104,11 @@ public abstract class BaseInput {
                 Map filterConfig = (Map) filter.getValue();
                 Class<?> filterClass;
                 Constructor<?> ctor = null;
-                log.info("begin to build filter" + filterType);
+                log.info("begin to build filter " + filterType);
                 try {
                     filterClass = Class.forName("com.ctrip.ops.sysdev.filters." + filterType);
                     ctor = filterClass.getConstructor(Map.class);
-                    log.info("build filter" + filterType + " done");
+                    log.info("build filter " + filterType + " done");
                     bf = (BaseFilter) ctor.newInstance(filterConfig);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -164,10 +164,13 @@ public abstract class BaseInput {
                     for (int i = 0; i < events.size(); i++) {
                         events.set(i, bf.process(events.get(i)));
                     }
-                    if (bf.processToListFunc == true) {
-                        ArrayList<Map<String, Object>> newevents = new ArrayList<Map<String, Object>>();
-                        for (Map<String, Object> _ : events) {
-                            newevents.addAll(bf.processToList(_));
+                    if (bf.processExtraEventsFunc == true) {
+                        int originEventSize = events.size();
+                        for(int i=0;i < events.size(); i++){
+                            List rst = bf.processExtraEvents(events.get(i));
+                            if (rst != null) {
+                                events.addAll(rst);
+                            }
                         }
                     }
                 }
