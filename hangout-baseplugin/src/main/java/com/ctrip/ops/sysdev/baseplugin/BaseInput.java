@@ -5,11 +5,13 @@ import com.ctrip.ops.sysdev.decoders.JsonDecoder;
 import com.ctrip.ops.sysdev.decoders.PlainDecoder;
 import lombok.extern.log4j.Log4j;
 
-import java.lang.reflect.Array;
+
 import java.lang.reflect.Constructor;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 @Log4j
 public abstract class BaseInput {
@@ -100,60 +102,58 @@ public abstract class BaseInput {
         if (filters != null) {
             filterProcessors = new ArrayList<>();
 
-            int idx = 0;
-            for (Map filter : filters) {
-                Iterator<Map.Entry<String, Map>> filterIT = filter.entrySet()
-                        .iterator();
-
-                while (filterIT.hasNext()) {
-                    Map.Entry<String, Map> filterEntry = filterIT.next();
-                    String filterType = filterEntry.getKey();
-                    Map filterConfig = filterEntry.getValue();
-
+            filters.stream().forEach((Map filterMap) -> {
+                filterMap.entrySet().stream().forEach(entry -> {
+                    Entry<String, Map> filter = (Entry<String, Map>) entry;
+                    String filterType = filter.getKey();
+                    Map filterConfig = filter.getValue();
+                    Class<?> filterClass;
+                    Constructor<?> ctor = null;
+                    log.info("begin to build filter " + filterType);
                     try {
-                        log.info("begin to build filter " + filterType);
-                        Class<?> filterClass = Class
-                                .forName("com.ctrip.ops.sysdev.filters."
-                                        + filterType);
-                        Constructor<?> ctor = filterClass
-                                .getConstructor(Map.class);
-
-                        BaseFilter filterInstance = (BaseFilter) ctor
-                                .newInstance(filterConfig);
-                        filterProcessors.add(filterInstance);
+                        filterClass = Class.forName("com.ctrip.ops.sysdev.filters." + filterType);
+                        ctor = filterClass.getConstructor(Map.class);
                         log.info("build filter " + filterType + " done");
+                        this.filterProcessors.add((BaseFilter) ctor.newInstance(filterConfig));
                     } catch (Exception e) {
-                        log.error(e);
-                        System.exit(1);
+                        e.printStackTrace();
+                        System.exit(-1);
                     }
-                    idx++;
-                }
-            }
-        } else {
-            filterProcessors = null;
+                });
+            });
         }
+
         return filterProcessors;
     }
 
     public List<BaseOutput> createOutputProcessors() {
-        outputProcessors = outputs.stream().collect(HashMap::new, Map::putAll, Map::putAll).entrySet().stream().map((Entry<Object, Object> output) -> {
-            BaseOutput bo = null;
-            String outputType = (String) output.getKey();
-            Map outputConfig = (Map) output.getValue();
-            Class<?> outputClass;
-            Constructor<?> ctor = null;
-            log.info("begin to build output " + outputType);
-            try {
-                outputClass = Class.forName("com.ctrip.ops.sysdev.outputs." + outputType);
-                ctor = outputClass.getConstructor(Map.class);
-                log.info("build output " + outputType + " done");
-                bo = (BaseOutput) ctor.newInstance(outputConfig);
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.exit(-1);
-            }
-            return bo;
-        }).collect(Collectors.toList());
+
+        if (outputs != null) {
+            outputProcessors = new ArrayList<>();
+            outputs.stream().forEach((Map outputMap) -> {
+                outputMap.entrySet().stream().forEach(entry -> {
+                    Entry<String, Map> output = (Entry<String, Map>) entry;
+                    String outputType = output.getKey();
+                    Map outputConfig = output.getValue();
+                    Class<?> outputClass;
+                    Constructor<?> ctor = null;
+                    log.info("begin to build output " + outputType);
+                    try {
+                        outputClass = Class.forName("com.ctrip.ops.sysdev.outputs." + outputType);
+                        ctor = outputClass.getConstructor(Map.class);
+                        log.info("build output " + outputType + " done");
+                        outputProcessors.add((BaseOutput) ctor.newInstance(outputConfig));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        System.exit(-1);
+                    }
+                });
+            });
+        } else {
+            log.error("Error: At least One output should be set.");
+            System.exit(-1);
+        }
+
 
         this.registerShutdownHook(outputProcessors);
         return outputProcessors;
@@ -210,6 +210,7 @@ public abstract class BaseInput {
     public void shutdown() {
     }
 
+
     private void registerShutdownHookForSelf() {
         final Object inputClass = this;
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -226,6 +227,4 @@ public abstract class BaseInput {
             }
         }));
     }
-
-
 }
