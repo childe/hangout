@@ -179,7 +179,7 @@ public abstract class BaseInput {
                     }
                     if (bf.processExtraEventsFunc == true) {
                         int originEventSize = events.size();
-                        for (int i = 0; i < events.size(); i++) {
+                        for (int i = 0; i < originEventSize; i++) {
                             List rst = bf.processExtraEvents(events.get(i));
                             if (rst != null) {
                                 events.addAll(rst);
@@ -189,14 +189,14 @@ public abstract class BaseInput {
                 }
             }
 
-            for (int i = 0; i < events.size(); i++) {
-                events.set(i, this.postprocess(events.get(i)));
-            }
+//            for (int i = 0; i < events.size(); i++) {
+//                events.set(i, this.postprocess(events.get(i)));
+//            }
 
             if (events != null) {
                 for (BaseOutput bo : outputProcessors) {
-                    for (Map<String, Object> _ : events) {
-                        bo.process(event);
+                    for (Map<String, Object> theevent : events) {
+                        bo.process(theevent);
                     }
                 }
             }

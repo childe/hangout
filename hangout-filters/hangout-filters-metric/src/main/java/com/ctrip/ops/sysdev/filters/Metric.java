@@ -13,7 +13,6 @@ public class Metric extends BaseFilter {
     private String key;
     private String value;
     private Map<String, Object> metric;
-    private boolean processExtraEventsFunc = true;
 
     public Metric(Map config) {
         super(config);
@@ -23,6 +22,8 @@ public class Metric extends BaseFilter {
         this.key = (String) config.get("key");
         this.value = (String) config.get("value");
         this.windowSize = (int) config.get("windowSize");
+        this.processExtraEventsFunc = true;
+        this.metric = new HashMap<String, Object>();
     }
 
     @Override
@@ -51,7 +52,6 @@ public class Metric extends BaseFilter {
     @Override
     public List<Map<String, Object>> filterExtraEvents(Map event) {
         List<Map<String, Object>> events = new ArrayList<Map<String, Object>>();
-        events.add(event);
         events.add(this.metric);
         return events;
     }

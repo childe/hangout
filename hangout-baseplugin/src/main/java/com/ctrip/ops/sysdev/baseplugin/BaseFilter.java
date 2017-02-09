@@ -16,7 +16,8 @@ public class BaseFilter {
     protected String tagOnFailure;
     protected List<String> removeFields;
     private List<TemplateRender> IF;
-    protected boolean processExtraEventsFunc = false;
+    protected boolean processExtraEventsFunc=false;
+
 
     public BaseFilter(Map config) {
         this.config = config;
