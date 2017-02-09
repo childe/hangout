@@ -31,7 +31,7 @@ public class FlatMetric extends BaseFilter {
     @Override
     protected Map filter(final Map event) {
         if (event.containsKey(this.key) && event.containsKey(this.value)) {
-            String keyValue = (String) event.get(this.key);
+            Object keyValue = event.get(this.key);
             Object valueValue = event.get(this.value);
             HashMap set = (HashMap) this.metric.get(keyValue);
             if (set == null) {
