@@ -79,12 +79,12 @@ public class ElasticsearchHTTP extends BaseOutput {
             UnknownHostException {
         restClient = RestClient.builder(
                 new HttpHost("localhost", 9200, "http"), new HttpHost("localhost", 9201, "http")).build();
-        
+
     }
 
     protected void emit(final Map event) {
         String _index = DateFormatter.format(event, index, indexTimezone);
-        String _indexType = indexTypeRender.render(event);
+        String _indexType = indexTypeRender.render(event).toString();
         IndexRequest indexRequest;
     }
 

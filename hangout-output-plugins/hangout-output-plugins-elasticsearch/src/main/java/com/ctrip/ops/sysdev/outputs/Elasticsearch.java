@@ -234,17 +234,17 @@ public class Elasticsearch extends BaseOutput {
 
     protected void emit(final Map event) {
         String _index = DateFormatter.format(event, index, indexTimezone);
-        String _indexType = indexTypeRender.render(event);
+        String _indexType = indexTypeRender.render(event).toString();
         IndexRequest indexRequest;
         if (this.idRender == null) {
             indexRequest = new IndexRequest(_index, _indexType).source(event);
         } else {
-            String _id = idRender.render(event);
+            String _id = idRender.render(event).toString();
             indexRequest = new IndexRequest(_index, _indexType, _id)
                     .source(event);
         }
         if (this.parentRender != null) {
-            indexRequest.parent(parentRender.render(event));
+            indexRequest.parent(parentRender.render(event).toString());
         }
         this.bulkProcessor.add(indexRequest);
     }
