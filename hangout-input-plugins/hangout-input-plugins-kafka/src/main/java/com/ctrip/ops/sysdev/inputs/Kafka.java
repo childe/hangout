@@ -35,6 +35,9 @@ public class Kafka extends BaseInput {
     protected void prepare() {
         //if null, utf-8 encoding will be used
         this.encoding = (String) this.config.get("encoding");
+        if (this.encoding == null) {
+            this.encoding = "UTF-8";
+        }
         topics = (Map<String, Integer>) this.config.get("topic");
         topicPatterns = (Map<String, Integer>) this.config.get("topic_pattern");
 
