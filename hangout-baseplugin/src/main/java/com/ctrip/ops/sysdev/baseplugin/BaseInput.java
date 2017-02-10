@@ -159,8 +159,7 @@ public abstract class BaseInput {
         return outputProcessors;
     }
 
-
-    public void process(String message) {
+    public void process(String message, List<BaseFilter> filterProcessors, List<BaseOutput> outputProcessors) {
         try {
             Map<String, Object> event = this.decoder
                     .decode(message);
@@ -169,7 +168,7 @@ public abstract class BaseInput {
             ArrayList<Map<String, Object>> events = new ArrayList<Map<String, Object>>();
             events.add(event);
 
-            if (this.filterProcessors != null) {
+            if (filterProcessors != null) {
                 for (BaseFilter bf : filterProcessors) {
                     for (int i = 0; i < events.size(); i++) {
                         Map rst = bf.process(events.get(i));
@@ -207,6 +206,14 @@ public abstract class BaseInput {
             e.printStackTrace();
             log.error(e);
         }
+    }
+
+    public void process(String message, List<BaseFilter> filterProcessors) {
+        this.process(message, filterProcessors, this.outputProcessors);
+    }
+
+    public void process(String message) {
+        this.process(message, this.filterProcessors, this.outputProcessors);
     }
 
     public void shutdown() {
