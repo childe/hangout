@@ -171,11 +171,11 @@ public abstract class BaseInput {
 
             if (this.filterProcessors != null) {
                 for (BaseFilter bf : filterProcessors) {
-                    if (events == null) {
-                        break;
-                    }
                     for (int i = 0; i < events.size(); i++) {
-                        events.set(i, bf.process(events.get(i)));
+                        Map rst = bf.process(events.get(i));
+                        if (rst != null) {
+                            events.set(i, rst);
+                        }
                     }
                     if (bf.processExtraEventsFunc == true) {
                         int originEventSize = events.size();
@@ -196,7 +196,9 @@ public abstract class BaseInput {
             if (events != null) {
                 for (BaseOutput bo : outputProcessors) {
                     for (Map<String, Object> theevent : events) {
-                        bo.process(theevent);
+                        if (theevent != null) {
+                            bo.process(theevent);
+                        }
                     }
                 }
             }
