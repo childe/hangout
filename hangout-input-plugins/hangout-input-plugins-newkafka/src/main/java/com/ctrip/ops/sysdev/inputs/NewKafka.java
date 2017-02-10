@@ -5,7 +5,9 @@ package com.ctrip.ops.sysdev.inputs;
  * Modifiled by gnuhpc on 17/2/8
  */
 
+import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
 import com.ctrip.ops.sysdev.baseplugin.BaseInput;
+import com.ctrip.ops.sysdev.baseplugin.BaseOutput;
 import lombok.extern.log4j.Log4j;
 import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -27,18 +29,18 @@ public class NewKafka extends BaseInput {
     private Map<String, Integer> topicPatterns;
 
     public NewKafka(Map<String, Object> config, ArrayList<Map> filter,
-                 ArrayList<Map> outputs) throws Exception {
+                    ArrayList<Map> outputs) throws Exception {
         super(config, filter, outputs);
     }
 
 
     protected void prepare() {
         topics = (Map<String, Integer>) this.config.get("topic");
-        topicPatterns = (Map<String,Integer>) this.config.get("topic_pattern");
+        topicPatterns = (Map<String, Integer>) this.config.get("topic_pattern");
         HashMap<String, String> consumerSettings = (HashMap<String, String>) this.config.get("consumer_settings");
         props = new Properties();
 
-        consumerSettings.entrySet().stream().forEach(entry->{
+        consumerSettings.entrySet().stream().forEach(entry -> {
             String k = entry.getKey();
             String v = entry.getValue();
             props.put(k, v);
@@ -48,20 +50,20 @@ public class NewKafka extends BaseInput {
     }
 
     public void emit() {
-        if(topicPatterns!=null){
-            topicPatterns.entrySet().stream().forEach(entry->{
+        if (topicPatterns != null) {
+            topicPatterns.entrySet().stream().forEach(entry -> {
                 Pattern topicPattern = Pattern.compile(entry.getKey());
                 int threadSize = entry.getValue();
                 executor = Executors.newFixedThreadPool(threadSize);
                 for (int i = 0; i < threadSize; i++) {
                     KafkaConsumer consumer = new KafkaConsumer<>(props);
-                    executor.submit(new ConsumerThread(topicPattern,consumer));
+                    executor.submit(new ConsumerThread(topicPattern, consumer, this));
                 }
             });
 
-        }else {
+        } else {
             //Create Consumer Streams Map
-            topics.entrySet().stream().forEach(entry-> {
+            topics.entrySet().stream().forEach(entry -> {
                 String topic = entry.getKey();
                 int threadSettingSize = entry.getValue();
                 KafkaConsumer consumer = new KafkaConsumer<>(props);
@@ -77,7 +79,7 @@ public class NewKafka extends BaseInput {
                 executor = Executors.newFixedThreadPool(threadSize);
                 for (int i = 0; i < threadSize; i++) {
                     //One KafkaConsumer instance per thread
-                    executor.submit(new ConsumerThread(topic, new KafkaConsumer<>(props)));
+                    executor.submit(new ConsumerThread(topic, new KafkaConsumer<>(props), this));
                 }
             });
         }
@@ -85,16 +87,22 @@ public class NewKafka extends BaseInput {
 
     private class ConsumerThread implements Runnable {
 
-        private final KafkaConsumer<String,String> consumer;
+        private final KafkaConsumer<String, String> consumer;
+        private List<BaseFilter> filterProcessors;
+        private List<BaseOutput> outputProcessors;
 
-        public ConsumerThread(String topicName, KafkaConsumer consumer) {
+        public ConsumerThread(String topicName, KafkaConsumer consumer, NewKafka kafka) {
             this.consumer = consumer;
+            this.filterProcessors = kafka.createFilterProcessors();
+            this.outputProcessors = kafka.createOutputProcessors();
             this.consumer.subscribe(Arrays.asList(topicName));
         }
 
-        public ConsumerThread(Pattern topicPattern, KafkaConsumer consumer) {
+        public ConsumerThread(Pattern topicPattern, KafkaConsumer consumer, NewKafka kafka) {
 
             this.consumer = consumer;
+            this.filterProcessors = kafka.createFilterProcessors();
+            this.outputProcessors = kafka.createOutputProcessors();
             this.consumer.subscribe(topicPattern, new ConsumerRebalanceListener() {
                 @Override
                 public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
@@ -102,8 +110,8 @@ public class NewKafka extends BaseInput {
 
                 @Override
                 public void onPartitionsAssigned(Collection<TopicPartition> partitions) {
-                    partitions.forEach(partition->{
-                        log.info("Rebalance happened"+partition.topic()+":"+partition.partition());
+                    partitions.forEach(partition -> {
+                        log.info("Rebalance happened" + partition.topic() + ":" + partition.partition());
                     });
                 }
             });
@@ -113,7 +121,7 @@ public class NewKafka extends BaseInput {
             while (true) {
                 ConsumerRecords<String, String> records = consumer.poll(10000);
                 for (ConsumerRecord<String, String> record : records)
-                        process(record.value());
+                    process(record.value(), this.filterProcessors, this.outputProcessors);
             }
         }
     }

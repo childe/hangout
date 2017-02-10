@@ -1,6 +1,8 @@
 package com.ctrip.ops.sysdev.inputs;
 
+import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
 import com.ctrip.ops.sysdev.baseplugin.BaseInput;
+import com.ctrip.ops.sysdev.baseplugin.BaseOutput;
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.ConsumerIterator;
 import kafka.consumer.KafkaStream;
@@ -34,7 +36,7 @@ public class Kafka extends BaseInput {
         //if null, utf-8 encoding will be used
         this.encoding = (String) this.config.get("encoding");
         topics = (Map<String, Integer>) this.config.get("topic");
-        topicPatterns = (Map<String,Integer>) this.config.get("topic_pattern");
+        topicPatterns = (Map<String, Integer>) this.config.get("topic_pattern");
 
         Properties props = new Properties();
         HashMap<String, String> consumerSettings = (HashMap<String, String>) this.config.get("consumer_settings");
@@ -70,8 +72,8 @@ public class Kafka extends BaseInput {
         StringDecoder decoder = new StringDecoder(vp);
 
 
-        if(topicPatterns!=null){
-            topicPatterns.entrySet().stream().forEach(entry->{
+        if (topicPatterns != null) {
+            topicPatterns.entrySet().stream().forEach(entry -> {
                 String topicPattern = entry.getKey();
                 Integer threadCounts = entry.getValue();
                 List<KafkaStream<String, String>> consumerStreams =
@@ -79,17 +81,17 @@ public class Kafka extends BaseInput {
                                 new Whitelist(topicPattern), threadCounts,
                                 decoder, decoder);
                 executor = Executors.newFixedThreadPool(consumerStreams.size());
-                consumerStreams.forEach(stream-> executor.submit(new Consumer(stream)));
+                consumerStreams.forEach(stream -> executor.submit(new Consumer(stream, this)));
 
             });
 
-        }else{
+        } else {
             //Create Consumer Streams Map
             Map<String, List<KafkaStream<String, String>>> consumerMap = consumer.createMessageStreams(topics, decoder, decoder);
-            consumerMap.entrySet().forEach(entry->{
+            consumerMap.entrySet().forEach(entry -> {
                 List<KafkaStream<String, String>> streams = entry.getValue();
                 executor = Executors.newFixedThreadPool(streams.size());
-                streams.forEach(stream -> executor.submit(new Consumer(stream)));
+                streams.forEach(stream -> executor.submit(new Consumer(stream, this)));
             });
         }
         //Kick off each stream as the number of threads specified
@@ -97,15 +99,19 @@ public class Kafka extends BaseInput {
 
     private class Consumer implements Runnable {
         private KafkaStream<String, String> kafkaStream;
+        private List<BaseFilter> filterProcessors;
+        private List<BaseOutput> outputProcessors;
 
-        public Consumer(KafkaStream<String, String> kafkaStream) {
+        public Consumer(KafkaStream<String, String> kafkaStream, Kafka kafka) {
             this.kafkaStream = kafkaStream;
+            this.filterProcessors = kafka.createFilterProcessors();
+            this.outputProcessors = kafka.createOutputProcessors();
         }
 
         public void run() {
             ConsumerIterator<String, String> it = kafkaStream.iterator();
             while (it.hasNext()) {
-                process(it.next().message());
+                process(it.next().message(), this.filterProcessors, this.outputProcessors);
             }
         }
     }
