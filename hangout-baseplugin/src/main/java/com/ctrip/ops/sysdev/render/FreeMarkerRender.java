@@ -10,28 +10,28 @@ import java.util.Map;
 
 @Log4j
 public class FreeMarkerRender implements TemplateRender {
-	private Template t;
+    private Template t;
 
-	public FreeMarkerRender(String template, String templateName)
-			throws IOException {
-		Configuration cfg = new Configuration(Configuration.VERSION_2_3_22);
-		this.t = new Template(templateName, template, cfg);
-	}
+    public FreeMarkerRender(String template, String templateName)
+            throws IOException {
+        Configuration cfg = new Configuration(Configuration.VERSION_2_3_22);
+        this.t = new Template(templateName, template, cfg);
+    }
 
-	public String render(Map event) {
-		StringWriter sw = new StringWriter();
-		try {
-			t.process(event, sw);
-		} catch (Exception e) {
-			log.error(e.getMessage());
-			log.debug(event);
-			return "";
-		}
-		try {
-			sw.close();
-		} catch (IOException e) {
-			log.error(e.getMessage());
-		}
-		return sw.toString();
-	}
+    public Object render(Map event) {
+        StringWriter sw = new StringWriter();
+        try {
+            t.process(event, sw);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            log.debug(event);
+            return null;
+        }
+        try {
+            sw.close();
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+        return sw.toString();
+    }
 }
