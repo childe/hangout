@@ -45,8 +45,6 @@ public class NewKafka extends BaseInput {
             String v = entry.getValue();
             props.put(k, v);
         });
-
-        createProcessors();
     }
 
     public void emit() {

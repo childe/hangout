@@ -45,7 +45,6 @@ public class Kafka extends BaseInput {
         HashMap<String, String> consumerSettings = (HashMap<String, String>) this.config.get("consumer_settings");
         consumerSettings.entrySet().stream().forEach(entry -> props.put(entry.getKey(), entry.getValue()));
         consumer = kafka.consumer.Consumer.createJavaConsumerConnector(new ConsumerConfig(props));
-        createProcessors();
     }
 
     public void shutdown() {

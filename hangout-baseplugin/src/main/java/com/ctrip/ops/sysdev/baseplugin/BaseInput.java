@@ -27,6 +27,7 @@ public abstract class BaseInput {
         this.config = config;
         this.filters = filters;
         this.outputs = outputs;
+        this.createDecoder();
 
         this.prepare();
 
@@ -46,49 +47,7 @@ public abstract class BaseInput {
         return event;
     }
 
-
-    //Apply decoder, filters, output in sequences
-    public void applyProcessor(String message) {
-        Map event = applyDecoder(message);
-        processAfterDecode(event);
-        event = applyFilters(event);
-        if (event != null)
-            applyOutputs(event);
-    }
-
-    public void processAfterDecode(Map event) {
-        return;
-    }
-
-    //Apply decoder
-    public Map<String, Object> applyDecoder(String message) {
-        return this.decoder.decode(message);
-    }
-
-    //Apply Filters
-    public Map<String, Object> applyFilters(Map<String, Object> event) {
-        if (this.filterProcessors != null) {
-            for (BaseFilter bf : filterProcessors) {
-                if (event == null) {
-                    break;
-                }
-                event = bf.process(event);
-            }
-        }
-        return event;
-    }
-
-    //Apply Outputs
-    public void applyOutputs(Map<String, Object> event) {
-        outputProcessors.stream().forEach(outputProcessor -> outputProcessor.process(event));
-    }
-
-    public void createProcessors() {
-        createDecoder();
-        createFilterProcessors();
-        createOutputProcessors();
-    }
-
+    // any input plugin should create decoder when init
     public void createDecoder() {
         String codec = (String) this.config.get("codec");
         if (codec != null && codec.equalsIgnoreCase("plain")) {
@@ -98,6 +57,8 @@ public abstract class BaseInput {
         }
     }
 
+    // some input plugin like kafka has more than one thread, and each thread must own their filter/output instance.
+    // so we should call createFilterProcessors and return filters in each thread.
     public List<BaseFilter> createFilterProcessors() {
         if (filters != null) {
             filterProcessors = new ArrayList<>();
@@ -126,6 +87,8 @@ public abstract class BaseInput {
         return filterProcessors;
     }
 
+    // some input plugin like kafka has more than one thread, and each thread must own their filter/output instance.
+    // so we should call createFilterProcessors and return filters in each thread.
     public List<BaseOutput> createOutputProcessors() {
 
         if (outputs != null) {
