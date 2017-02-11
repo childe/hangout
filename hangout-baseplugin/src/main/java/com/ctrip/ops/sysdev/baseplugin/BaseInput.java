@@ -179,8 +179,7 @@ public abstract class BaseInput {
         this.process(message, this.filterProcessors, this.outputProcessors);
     }
 
-    public void shutdown() {
-    }
+    public abstract void shutdown();
 
 
     private void registerShutdownHookForSelf() {
