@@ -128,7 +128,7 @@ public abstract class BaseInput {
                     .decode(message);
             this.preprocess(event);
 
-            ArrayList<Map<String, Object>> events = new ArrayList<Map<String, Object>>();
+            ArrayList<Map<String, Object>> events = new ArrayList();
             events.add(event);
 
             if (filterProcessors != null) {
