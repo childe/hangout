@@ -25,6 +25,8 @@ public class ElasticsearchHTTP extends BaseOutput {
 
     public ElasticsearchHTTP(Map config) {
         super(config);
+        logger.error("this is not implemented");
+        System.exit(1);
     }
 
     protected void prepare() {
