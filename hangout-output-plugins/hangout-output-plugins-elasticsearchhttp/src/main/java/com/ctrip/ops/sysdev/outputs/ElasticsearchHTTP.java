@@ -1,7 +1,7 @@
 package com.ctrip.ops.sysdev.outputs;
 
 import com.ctrip.ops.sysdev.baseplugin.BaseOutput;
-import com.ctrip.ops.sysdev.formatter.DateFormatter;
+import com.ctrip.ops.sysdev.render.DateFormatter;
 import com.ctrip.ops.sysdev.render.FreeMarkerRender;
 import com.ctrip.ops.sysdev.render.RenderUtils;
 import com.ctrip.ops.sysdev.render.TemplateRender;
@@ -40,13 +40,9 @@ public class ElasticsearchHTTP extends BaseOutput {
     }
 
     protected void prepare() {
-        this.index = (String) config.get("index");
-        this.bulkActions = config.containsKey("bulk_actions") ? (int) config.get("bulk_actions") : BULKACTION;
-        if (config.containsKey("timezone")) {
-            this.indexTimezone = (String) config.get("timezone");
-        } else {
-            this.indexTimezone = "UTC";
-        }
+        this.index = getConfig(config,"index",null,true);
+        this.bulkActions = getConfig(config,"bulk_actions", BULKACTION,false);
+        this.indexTimezone = getConfig(config,"timezone", "UTC",false);
 
         try {
             this.idRender = RenderUtils.esConfigRender(config, "document_id", null);
@@ -60,7 +56,7 @@ public class ElasticsearchHTTP extends BaseOutput {
 
     private void initESClient() throws NumberFormatException,
             UnknownHostException {
-        ArrayList<String> hosts = (ArrayList<String>) config.get("hosts");
+        ArrayList<String> hosts = getConfig(config,"hosts",null,true);
         List<HttpHost> httpHostList = hosts.stream().map(hostString -> {
             String[] parsedHost = hostString.split(":");
             String host = parsedHost[0];

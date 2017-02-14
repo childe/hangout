@@ -10,7 +10,7 @@ import com.ctrip.ops.sysdev.render.FreeMarkerRender;
 import com.ctrip.ops.sysdev.render.TemplateRender;
 
 @Log4j
-public abstract class BaseOutput {
+public abstract class BaseOutput extends Base {
 	protected Map config;
 	protected List<TemplateRender> IF;
 

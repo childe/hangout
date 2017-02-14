@@ -1,7 +1,7 @@
 package com.ctrip.ops.sysdev.outputs;
 
 import com.ctrip.ops.sysdev.baseplugin.BaseOutput;
-import com.ctrip.ops.sysdev.formatter.DateFormatter;
+import com.ctrip.ops.sysdev.render.DateFormatter;
 import com.ctrip.ops.sysdev.render.FreeMarkerRender;
 import com.ctrip.ops.sysdev.render.RenderUtils;
 import com.ctrip.ops.sysdev.render.TemplateRender;
