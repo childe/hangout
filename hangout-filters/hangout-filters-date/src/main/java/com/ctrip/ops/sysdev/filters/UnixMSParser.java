@@ -1,6 +1,5 @@
 package com.ctrip.ops.sysdev.filters;
 
-import com.ctrip.ops.sysdev.dataparser.DateParser;
 import org.joda.time.DateTime;
 
 public class UnixMSParser implements DateParser {
