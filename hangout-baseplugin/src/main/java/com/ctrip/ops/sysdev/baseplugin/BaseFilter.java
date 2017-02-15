@@ -9,7 +9,7 @@ import java.util.*;
 
 
 @Log4j
-public class BaseFilter {
+public class BaseFilter extends Base {
 
     protected Map config;
     protected TemplateRender render;

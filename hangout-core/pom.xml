@@ -17,21 +17,7 @@
             <artifactId>hangout-baseplugin</artifactId>
             <version>0.1.9</version>
         </dependency>
-        <dependency>
-            <groupId>ctrip</groupId>
-            <artifactId>hangout-input-plugins-stdin</artifactId>
-            <version>0.1.9</version>
-        </dependency>
-        <dependency>
-            <groupId>ctrip</groupId>
-            <artifactId>hangout-output-plugins-stdout</artifactId>
-            <version>0.1.9</version>
-        </dependency>
-        <dependency>
-            <groupId>ctrip</groupId>
-            <artifactId>hangout-filters-filters</artifactId>
-            <version>0.1.9</version>
-        </dependency>
+
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>

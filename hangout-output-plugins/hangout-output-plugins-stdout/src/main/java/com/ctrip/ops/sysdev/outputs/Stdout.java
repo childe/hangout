@@ -3,12 +3,12 @@ package com.ctrip.ops.sysdev.outputs;
 import java.util.Map;
 
 import com.ctrip.ops.sysdev.baseplugin.BaseOutput;
+import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
 import org.apache.log4j.Logger;
 
-@SuppressWarnings("ALL")
+@Log4j
 public class Stdout extends BaseOutput {
-	private static final Logger logger = Logger.getLogger(Stdout.class
-			.getName());
 
 	public Stdout(Map config) {
 		super(config);

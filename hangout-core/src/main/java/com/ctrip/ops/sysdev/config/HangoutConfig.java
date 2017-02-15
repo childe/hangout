@@ -3,17 +3,17 @@ package com.ctrip.ops.sysdev.config;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Map;
 
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.error.YAMLException;
 
 
 @SuppressWarnings("rawtypes")
-public class HangoutConfig {
+public class HangoutConfig<T> {
     private static final String HTTP = "http://";
     private static final String HTTPS = "https://";
 //    private static final Logger logger = Logger.getLogger(HangoutConfig.class.getName());
@@ -42,4 +42,15 @@ public class HangoutConfig {
 
         return configs;
     }
+
+
+    /**
+     * Get specified config from configurations, default config can also be set, isMust indicates whether this config is a must or not.
+     * @param config
+     * @param key
+     * @param defaultConfig
+     * @param isMust
+     * @param <T>
+     * @return
+     */
 }
