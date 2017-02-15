@@ -261,6 +261,19 @@ sniff设置为true的话, 会把hosts当做一个入口, 然后去寻找真正�
 	concurrent_requests: 0	#default 0
     sniff: false #default true
 
+### ElasticsearchHTTP
+使用[rest api](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html) 批量将数据写入ES.
+目前在es2.4.0 和es 5.2.0 上进行过初步测试
+
+       - ElasticsearchHTTP:
+            cluster: elasticsearch
+            hosts:
+              - 192.168.145.128
+            index: 'myindex'
+            index_type: "mytype" # default logs
+            bulk_actions: 5 #default 20000
+            sniff: false #default true
+
 ### Kafka
 	#bootstrap_servers format is host1:port1,host2:port2, and the list can be a subset of brokers or a VIP pointing to a subset of brokers.
 	bootstrap_servers: 192.168.1.100:9092 # required
