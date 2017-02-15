@@ -27,11 +27,6 @@
             <artifactId>testng</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>ctrip</groupId>
-            <artifactId>hangout-utils</artifactId>
-            <version>0.1.9</version>
-        </dependency>
     </dependencies>
 
 

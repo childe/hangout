@@ -83,28 +83,28 @@ public class Kafka extends BaseInput {
                                 new Whitelist(topicPattern), threadCounts,
                                 decoder, decoder);
                 executor = Executors.newFixedThreadPool(consumerStreams.size());
-                consumerStreams.forEach(stream -> executor.submit(new Consumer(stream, this)));
+                consumerStreams.forEach(stream -> executor.submit(new ConsumerThread(stream, this)));
 
             });
 
         } else {
-            //Create Consumer Streams Map
+            //Create ConsumerThread Streams Map
             Map<String, List<KafkaStream<String, String>>> consumerMap = consumer.createMessageStreams(topics, decoder, decoder);
             consumerMap.entrySet().forEach(entry -> {
-                List<KafkaStream<String, String>> streams = entry.getValue();
-                executor = Executors.newFixedThreadPool(streams.size());
-                streams.forEach(stream -> executor.submit(new Consumer(stream, this)));
+                List<KafkaStream<String, String>> consumerStreams = entry.getValue();
+                executor = Executors.newFixedThreadPool(consumerStreams.size());
+                consumerStreams.forEach(stream -> executor.submit(new ConsumerThread(stream, this)));
             });
         }
         //Kick off each stream as the number of threads specified
     }
 
-    private class Consumer implements Runnable {
+    private class ConsumerThread implements Runnable {
         private KafkaStream<String, String> kafkaStream;
         private List<BaseFilter> filterProcessors;
         private List<BaseOutput> outputProcessors;
 
-        public Consumer(KafkaStream<String, String> kafkaStream, Kafka kafka) {
+        public ConsumerThread(KafkaStream<String, String> kafkaStream, Kafka kafka) {
             this.kafkaStream = kafkaStream;
             this.filterProcessors = kafka.createFilterProcessors();
             this.outputProcessors = kafka.createOutputProcessors();

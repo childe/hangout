@@ -2,7 +2,7 @@ package com.ctrip.ops.sysdev.inputs;
 
 /**
  * Created by liujia on 16/4/1.
- * Modifiled by gnuhpc on 17/2/8
+ * Modifiled by gnuhpc on 17/2/11
  */
 
 import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
@@ -18,6 +18,7 @@ import org.apache.kafka.common.TopicPartition;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 @Log4j
@@ -27,6 +28,7 @@ public class NewKafka extends BaseInput {
     private Map<String, Integer> topics;
     private Properties props;
     private Map<String, Integer> topicPatterns;
+    private ArrayList<ConsumerThread> consumerThreadsList = new ArrayList<>();
 
     public NewKafka(Map<String, Object> config, ArrayList<Map> filter,
                     ArrayList<Map> outputs) throws Exception {
@@ -54,8 +56,9 @@ public class NewKafka extends BaseInput {
                 int threadSize = entry.getValue();
                 executor = Executors.newFixedThreadPool(threadSize);
                 for (int i = 0; i < threadSize; i++) {
-                    KafkaConsumer consumer = new KafkaConsumer<>(props);
-                    executor.submit(new ConsumerThread(topicPattern, consumer, this));
+                    ConsumerThread consumerThread = new ConsumerThread(topicPattern,props,this);
+                    consumerThreadsList.add(consumerThread);
+                    executor.submit(consumerThread);
                 }
             });
 
@@ -77,30 +80,37 @@ public class NewKafka extends BaseInput {
                 executor = Executors.newFixedThreadPool(threadSize);
                 for (int i = 0; i < threadSize; i++) {
                     //One KafkaConsumer instance per thread
-                    executor.submit(new ConsumerThread(topic, new KafkaConsumer<>(props), this));
+                    executor.submit(new ConsumerThread(topic, props, this));
                 }
             });
         }
     }
 
+    @Override
+    public void shutdown() {
+        consumerThreadsList.forEach(consumerThread -> consumerThread.shutdown());
+        executor.shutdown();
+        try {
+            executor.awaitTermination(5000, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            log.error(e);
+        }
+    }
+
     private class ConsumerThread implements Runnable {
 
-        private final KafkaConsumer<String, String> consumer;
+        private KafkaConsumer<String, String> consumer;
         private List<BaseFilter> filterProcessors;
         private List<BaseOutput> outputProcessors;
 
-        public ConsumerThread(String topicName, KafkaConsumer consumer, NewKafka kafka) {
-            this.consumer = consumer;
-            this.filterProcessors = kafka.createFilterProcessors();
-            this.outputProcessors = kafka.createOutputProcessors();
+        public ConsumerThread(String topicName, Properties props, NewKafka kafka) {
+            consumer = new KafkaConsumer<>(props);
+            initConsumerThread(props,kafka);
             this.consumer.subscribe(Arrays.asList(topicName));
         }
 
-        public ConsumerThread(Pattern topicPattern, KafkaConsumer consumer, NewKafka kafka) {
-
-            this.consumer = consumer;
-            this.filterProcessors = kafka.createFilterProcessors();
-            this.outputProcessors = kafka.createOutputProcessors();
+        public ConsumerThread(Pattern topicPattern, Properties props, NewKafka kafka) {
+            initConsumerThread(props,kafka);
             this.consumer.subscribe(topicPattern, new ConsumerRebalanceListener() {
                 @Override
                 public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
@@ -109,10 +119,16 @@ public class NewKafka extends BaseInput {
                 @Override
                 public void onPartitionsAssigned(Collection<TopicPartition> partitions) {
                     partitions.forEach(partition -> {
-                        log.info("Rebalance happened" + partition.topic() + ":" + partition.partition());
+                        log.info("Rebalance happened " + partition.topic() + ":" + partition.partition());
                     });
                 }
             });
+        }
+
+        public void initConsumerThread(Properties prop, NewKafka kafka){
+            this.consumer = new KafkaConsumer<>(props);
+            this.filterProcessors = kafka.createFilterProcessors();
+            this.outputProcessors = kafka.createOutputProcessors();
         }
 
         public void run() {
@@ -121,6 +137,11 @@ public class NewKafka extends BaseInput {
                 for (ConsumerRecord<String, String> record : records)
                     process(record.value(), this.filterProcessors, this.outputProcessors);
             }
+        }
+
+        public void shutdown() {
+            consumer.wakeup();
+            consumer.close();
         }
     }
 }

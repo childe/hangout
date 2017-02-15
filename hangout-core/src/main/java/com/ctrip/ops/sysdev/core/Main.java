@@ -6,7 +6,6 @@ import com.ctrip.ops.sysdev.config.HangoutConfig;
 import com.ctrip.ops.sysdev.log.LogSetter;
 import lombok.extern.log4j.Log4j;
 
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,4 +1,6 @@
-package com.ctrip.ops.sysdev.converter;
+package com.ctrip.ops.sysdev.filters;
+
+import com.ctrip.ops.sysdev.converter.Converter;
 
 public class StringConverter implements Converter {
 

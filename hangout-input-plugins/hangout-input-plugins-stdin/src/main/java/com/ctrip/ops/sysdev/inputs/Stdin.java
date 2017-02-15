@@ -51,6 +51,11 @@ public class Stdin extends BaseInput {
         return event;
     }
 
+    @Override
+    public void shutdown() {
+        System.out.println("Stdin Input shutdown... ");
+    }
+
     public void emit() {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));

@@ -1,16 +1,10 @@
 package ua_parser;
 
+import org.apache.commons.collections.map.LRUMap;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
-
-import org.apache.commons.collections.map.LRUMap;
-
-import ua_parser.Client;
-import ua_parser.Device;
-import ua_parser.OS;
-import ua_parser.Parser;
-import ua_parser.UserAgent;
 
 /**
  * When doing webanalytics (with for example PIG) the main pattern is to process

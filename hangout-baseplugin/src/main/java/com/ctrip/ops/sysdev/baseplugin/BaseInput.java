@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 @Log4j
-public abstract class BaseInput {
+public abstract class BaseInput extends Base{
     protected Map<String, Object> config;
     protected Decode decoder;
     protected List<BaseFilter> filterProcessors;
@@ -179,8 +179,7 @@ public abstract class BaseInput {
         this.process(message, this.filterProcessors, this.outputProcessors);
     }
 
-    public void shutdown() {
-    }
+    public abstract void shutdown();
 
 
     private void registerShutdownHookForSelf() {
