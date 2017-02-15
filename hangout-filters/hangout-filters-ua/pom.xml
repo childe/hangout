@@ -26,6 +26,11 @@
             <artifactId>commons-collections</artifactId>
             <version>3.2.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.13</version>
+        </dependency>
 
         <!-- https://mvnrepository.com/artifact/ua_parser/ua-parser -->
     </dependencies>

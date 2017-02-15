@@ -1,6 +1,6 @@
 package com.ctrip.ops.sysdev.baseplugin;
 
-import org.yaml.snakeyaml.error.YAMLException;
+import com.ctrip.ops.sysdev.exception.YamlConfigException;
 
 import java.util.Map;
 
@@ -18,7 +18,7 @@ public class Base {
      * @param <T>
      * @return
      */
-    public <T> T getConfig(Map config, String key, T defaultConfig, boolean isMust){
+    public <T> T getConfig(Map config, String key, T defaultConfig, boolean isMust) throws YamlConfigException {
         if(config.containsKey(key)){
             return (T)config.get(key);
         }
@@ -27,7 +27,7 @@ public class Base {
                 return defaultConfig;
             }
             else{
-                throw new YAMLException(key+" must be specified");
+                throw new YamlConfigException(key+" must be specified");
             }
         }
     }

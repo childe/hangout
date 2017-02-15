@@ -1,6 +1,7 @@
 package com.ctrip.ops.sysdev.outputs;
 
 import com.ctrip.ops.sysdev.baseplugin.BaseOutput;
+import com.ctrip.ops.sysdev.exception.YamlConfigException;
 import com.ctrip.ops.sysdev.render.DateFormatter;
 import com.ctrip.ops.sysdev.render.FreeMarkerRender;
 import com.ctrip.ops.sysdev.render.RenderUtils;
@@ -34,15 +35,17 @@ public class ElasticsearchHTTP extends BaseOutput {
     private TemplateRender idRender;
     private int bulkActions;
     private List eventList = new ArrayList();
+    private List<String> hosts;
 
     public ElasticsearchHTTP(Map config) {
         super(config);
     }
 
-    protected void prepare() {
+    protected void prepare() throws YamlConfigException {
         this.index = getConfig(config,"index",null,true);
         this.bulkActions = getConfig(config,"bulk_actions", BULKACTION,false);
         this.indexTimezone = getConfig(config,"timezone", "UTC",false);
+        this.hosts = (ArrayList<String>)getConfig(config,"hosts",null,true);
 
         try {
             this.idRender = RenderUtils.esConfigRender(config, "document_id", null);
@@ -56,7 +59,6 @@ public class ElasticsearchHTTP extends BaseOutput {
 
     private void initESClient() throws NumberFormatException,
             UnknownHostException {
-        ArrayList<String> hosts = getConfig(config,"hosts",null,true);
         List<HttpHost> httpHostList = hosts.stream().map(hostString -> {
             String[] parsedHost = hostString.split(":");
             String host = parsedHost[0];
@@ -76,7 +78,7 @@ public class ElasticsearchHTTP extends BaseOutput {
         addEventList(event);
         if(this.eventList.size()/2>=this.bulkActions) {
             try {
-                log.info(String.join("\n", eventList));
+                log.info(String.join("", eventList));
                 Response reponse = restClient.performRequest(
                         "POST",
                         bulkPath,
