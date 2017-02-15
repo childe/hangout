@@ -11,4 +11,4 @@ outputs:
         index: 'myindex'
         index_type: "mytype" # default logs
         bulk_actions: 5 #default 20000
-        sniff: false #default true
+        sniff: true #default true

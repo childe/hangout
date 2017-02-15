@@ -12,14 +12,13 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.nio.entity.NStringEntity;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.sniff.Sniffer;
 import org.json.simple.JSONValue;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
@@ -34,31 +33,38 @@ public class ElasticsearchHTTP extends BaseOutput {
     private TemplateRender indexTypeRender;
     private TemplateRender idRender;
     private int bulkActions;
-    private List eventList = new ArrayList();
     private List<String> hosts;
+    private List<Map> actionList = new ArrayList<>();
+    private final static Map indexAction = new HashMap(){
+        {
+            put("index", new HashMap<>());
+        }
+    };
+    private Boolean isSniff;
+    private Sniffer sniffer;
 
     public ElasticsearchHTTP(Map config) {
         super(config);
     }
 
-    protected void prepare() throws YamlConfigException {
-        this.index = getConfig(config,"index",null,true);
-        this.bulkActions = getConfig(config,"bulk_actions", BULKACTION,false);
-        this.indexTimezone = getConfig(config,"timezone", "UTC",false);
-        this.hosts = (ArrayList<String>)getConfig(config,"hosts",null,true);
-
+    protected void prepare() {
         try {
+            this.index = getConfig(config,"index",null,true);
+            this.bulkActions = getConfig(config,"bulk_actions", BULKACTION,false);
+            this.indexTimezone = getConfig(config,"timezone", "UTC",false);
+            this.hosts = (ArrayList<String>)getConfig(config,"hosts",null,true);
             this.idRender = RenderUtils.esConfigRender(config, "document_id", null);
             this.indexTypeRender = RenderUtils.esConfigRender(config, "index_type", new FreeMarkerRender("logs", "logs"));
+            this.isSniff = getConfig(config,"sniff",true,false);
             this.initESClient();
         } catch (Exception e) {
             log.error(e);
-            System.exit(1);
         }
     }
 
     private void initESClient() throws NumberFormatException,
             UnknownHostException {
+
         List<HttpHost> httpHostList = hosts.stream().map(hostString -> {
             String[] parsedHost = hostString.split(":");
             String host = parsedHost[0];
@@ -66,7 +72,11 @@ public class ElasticsearchHTTP extends BaseOutput {
             return new HttpHost(host, port);
         }).collect(toList());
         List<HttpHost> clusterHosts = unmodifiableList(httpHostList);
+
         restClient = RestClient.builder(clusterHosts.toArray(new HttpHost[clusterHosts.size()])).build();
+        if(this.isSniff){
+            sniffer = Sniffer.builder(restClient).build();
+        }
 
     }
 
@@ -74,25 +84,31 @@ public class ElasticsearchHTTP extends BaseOutput {
         String _index = DateFormatter.format(event, index, indexTimezone);
         String _indexType = (String) indexTypeRender.render(event);
         String bulkPath = bulkPathBuilder(_index,_indexType);
+        String requestBody;
+        Response response = null;
 
-        addEventList(event);
-        if(this.eventList.size()/2>=this.bulkActions) {
+        addActionList(event);
+        if(this.actionList.size()/2>=this.bulkActions) {
             try {
-                log.info(String.join("", eventList));
-                Response reponse = restClient.performRequest(
+
+                requestBody = actionList.stream().map(JSONValue::toJSONString).collect(Collectors.joining("\n"))+"\n";
+                log.info(requestBody);
+                response = restClient.performRequest(
                         "POST",
                         bulkPath,
                         Collections.<String, String>emptyMap(),
                         new NStringEntity(
-                                String.join("", eventList),
+                                requestBody,
                                 ContentType.APPLICATION_JSON
                         )
                 );
-                log.info(reponse.toString());
+                log.info(response.toString());
             } catch (IOException e) {
-                log.error(e);
+                log.error("Bulk index es Error:",e);
+                if(response!=null)
+                    log.error("Response Code is " + response.getStatusLine().toString());
             } finally {
-                eventList.clear();
+                actionList.clear();
             }
         }
     }
@@ -107,16 +123,16 @@ public class ElasticsearchHTTP extends BaseOutput {
         return sb.toString();
     }
 
-    private void addEventList(Map event) {
+    private void addActionList(Map event) {
         event.put("@timestamp",event.get("@timestamp").toString());
-        String jsonEventStr = JSONValue.toJSONString(event);
-        eventList.add("{\"index\":{}}\n");
-        eventList.add(jsonEventStr+"\n");
+        actionList.add(indexAction);
+        actionList.add(event);
     }
 
     public void shutdown() {
         log.info("close restClient");
         try {
+            sniffer.close();
             restClient.close();
         } catch (IOException e) {
             e.printStackTrace();
