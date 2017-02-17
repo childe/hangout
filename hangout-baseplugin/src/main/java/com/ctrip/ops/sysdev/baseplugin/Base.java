@@ -1,6 +1,7 @@
 package com.ctrip.ops.sysdev.baseplugin;
 
 import com.ctrip.ops.sysdev.exception.YamlConfigException;
+import com.ctrip.ops.sysdev.watcher.Watcher;
 
 import java.util.Map;
 
@@ -9,6 +10,7 @@ import java.util.Map;
  */
 public class Base {
 
+    public static final Watcher watcher = Watcher.getWatcher();
  /**
      * Get specified config from configurations, default config can also be set, isMust indicates whether this config is a must or not.
      * @param config

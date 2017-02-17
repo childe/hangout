@@ -1,6 +1,7 @@
 package com.ctrip.ops.sysdev.config;
 
 
+import com.ctrip.ops.sysdev.exception.YamlConfigException;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
@@ -35,21 +36,9 @@ public class HangoutConfig<T> {
         Map configs = (Map) yaml.load(is);
 
         if (configs.get("inputs")==null||configs.get("outputs")==null){
-            System.err.println("Error: No inputs or outputs!");
-            throw new Exception();
+            throw new YamlConfigException("Error: No inputs or outputs");
         }
 
         return configs;
     }
-
-
-    /**
-     * Get specified config from configurations, default config can also be set, isMust indicates whether this config is a must or not.
-     * @param config
-     * @param key
-     * @param defaultConfig
-     * @param isMust
-     * @param <T>
-     * @return
-     */
 }
