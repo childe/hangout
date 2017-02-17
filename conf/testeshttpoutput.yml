@@ -8,7 +8,7 @@ outputs:
         cluster: elasticsearch
         hosts:
           - 192.168.145.128
-        index: 'myindex'
-        index_type: "mytype" # default logs
+        index: 'hangout-%{message}-%{+YYYY.MM.dd}'
+        index_type: 'hangout-${message}'
         bulk_actions: 5 #default 20000
         sniff: true #default true
