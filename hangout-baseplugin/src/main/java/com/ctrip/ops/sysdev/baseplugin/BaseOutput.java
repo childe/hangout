@@ -32,15 +32,10 @@ public abstract class BaseOutput extends Base {
 			IF = null;
 		}
 
-		try {
-			this.prepare();
-		} catch (Exception e) {
-		    log.error(e);
-		    System.exit(-1);
-		}
+        this.prepare();
 	}
 
-	protected abstract void prepare() throws YamlConfigException;
+	protected abstract void prepare();
 
 	protected abstract void emit(Map event);
 
