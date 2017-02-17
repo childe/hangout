@@ -1,15 +1,14 @@
 package com.ctrip.ops.sysdev.config;
 
 
+import org.yaml.snakeyaml.Yaml;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Map;
-
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.error.YAMLException;
 
 
 @SuppressWarnings("rawtypes")

@@ -132,3 +132,4 @@ public class ElasticsearchHTTP extends BaseOutput {
         }
     }
 }
+
