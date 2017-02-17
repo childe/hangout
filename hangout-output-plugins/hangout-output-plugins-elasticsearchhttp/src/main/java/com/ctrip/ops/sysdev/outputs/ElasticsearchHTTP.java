@@ -35,11 +35,7 @@ public class ElasticsearchHTTP extends BaseOutput {
     private int bulkActions;
     private List<String> hosts;
     private List<Map> actionList = new ArrayList<>();
-    private final static Map indexAction = new HashMap(){
-        {
-            put("index", new HashMap<>());
-        }
-    };
+    private static final String BULKPATH= "_bulk";
     private Boolean isSniff;
     private Sniffer sniffer;
 
@@ -83,11 +79,10 @@ public class ElasticsearchHTTP extends BaseOutput {
     protected void emit(final Map event) {
         String _index = DateFormatter.format(event, index, indexTimezone);
         String _indexType = (String) indexTypeRender.render(event);
-        String bulkPath = bulkPathBuilder(_index,_indexType);
         String requestBody;
         Response response = null;
 
-        addActionList(event);
+        addActionList(event,_index,_indexType);
         if(this.actionList.size()/2>=this.bulkActions) {
             try {
 
@@ -95,7 +90,7 @@ public class ElasticsearchHTTP extends BaseOutput {
                 log.info(requestBody);
                 response = restClient.performRequest(
                         "POST",
-                        bulkPath,
+                        BULKPATH,
                         Collections.<String, String>emptyMap(),
                         new NStringEntity(
                                 requestBody,
@@ -113,18 +108,16 @@ public class ElasticsearchHTTP extends BaseOutput {
         }
     }
 
-    private String bulkPathBuilder(String index, String indexType) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("/");
-        sb.append(index);
-        sb.append("/");
-        sb.append(indexType);
-        sb.append("/_bulk");
-        return sb.toString();
-    }
-
-    private void addActionList(Map event) {
+    private void addActionList(Map event, String _index, String _indexType) {
+        Map indexAction = new HashMap(){};
         event.put("@timestamp",event.get("@timestamp").toString());
+        Map indexMap = new HashMap() {
+            {
+                put("_index",_index);
+                put("_type",_indexType);
+            }
+        };
+        indexAction.put("index",indexMap);
         actionList.add(indexAction);
         actionList.add(event);
     }
@@ -139,3 +132,4 @@ public class ElasticsearchHTTP extends BaseOutput {
         }
     }
 }
+
