@@ -18,8 +18,6 @@ import lombok.extern.log4j.Log4j;
 
 import javax.servlet.ServletException;
 import java.lang.reflect.Constructor;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -98,14 +96,10 @@ public class Main {
         if (isAdminListen) {
             Runnable task = () -> {
                 int adminPort;
-                String adminHost = null;
-
+                String address=null,adminHost = null;
                 adminPort = configs.containsKey("admin_port") ? (int) configs.get("admin_port") : 8080;
-                try {
-                    adminHost = configs.containsKey("admin_ip") ? (String) configs.get("admin_ip") : InetAddress.getLocalHost().getHostAddress();
-                } catch (UnknownHostException e) {
-                    log.error("Get Host for admin server Error: ", e);
-                }
+                adminHost = configs.containsKey("admin_ip") ? (String) configs.get("admin_ip") : "0.0.0.0";
+
                 DeploymentInfo servletBuilder = Servlets.deployment()
                         .setClassLoader(Main.class.getClassLoader())
                         .setContextPath("/")
@@ -122,14 +116,19 @@ public class Main {
                 try {
                     path = Handlers.path().addPrefixPath("/", manager.start());
                 } catch (ServletException e) {
-                    log.error("Admin thread error: ", e);
+                    log.error("Admin Servlet error: ", e);
                 }
 
                 Undertow server = Undertow.builder()
                         .addHttpListener(adminPort, adminHost)
                         .setHandler(path)
                         .build();
-                server.start();
+                try{
+                    server.start();
+                } catch (RuntimeException e){
+                    log.error("Admin server start error: ",e);
+                }
+
             };
             task.run();
         }

@@ -41,15 +41,4 @@ public class HangoutConfig<T> {
 
         return configs;
     }
-
-
-    /**
-     * Get specified config from configurations, default config can also be set, isMust indicates whether this config is a must or not.
-     * @param config
-     * @param key
-     * @param defaultConfig
-     * @param isMust
-     * @param <T>
-     * @return
-     */
 }
