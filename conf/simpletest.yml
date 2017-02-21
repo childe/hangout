@@ -29,5 +29,5 @@ outputs:
 
 commons:
       admin_listen: true
-      admin_ip: 199.22.22.11
+  #    admin_ip: 199.22.22.11
       admin_port: 8080
