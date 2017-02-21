@@ -1,6 +1,8 @@
 package com.ctrip.ops.sysdev.inputs;
 
+import com.codahale.metrics.Meter;
 import com.ctrip.ops.sysdev.baseplugin.BaseInput;
+import com.ctrip.ops.sysdev.watcher.Watcher;
 import lombok.extern.log4j.Log4j;
 
 import java.io.BufferedReader;
@@ -16,6 +18,7 @@ public class Stdin extends BaseInput {
 
     private boolean hostname;
     private String hostnameValue;
+    private Meter meter;
 
     public Stdin(Map<String, Object> config, ArrayList<Map> filter,
                  ArrayList<Map> outputs) throws Exception {
@@ -41,6 +44,8 @@ public class Stdin extends BaseInput {
                 this.hostname = false;
             }
         }
+
+        this.meter = watcher.setMetric(this.getClass().getSimpleName());
     }
 
     @Override
@@ -64,11 +69,12 @@ public class Stdin extends BaseInput {
 
             while ((input = br.readLine()) != null) {
                 this.process(input);
+                this.meter.mark();
             }
 
         } catch (IOException io) {
             log.error("Stdin loop got exception", io);
-//            System.exit(1);
         }
     }
 }
+
