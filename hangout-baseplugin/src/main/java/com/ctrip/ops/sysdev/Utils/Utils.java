@@ -1,4 +1,4 @@
-package com.ctrip.ops.sysdev.Utils;
+package com.ctrip.ops.sysdev.utils;
 
 import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
 import org.apache.log4j.Logger;
@@ -41,5 +41,5 @@ public class Utils {
 
         return filterProcessors;
     }
-
+    
 }
