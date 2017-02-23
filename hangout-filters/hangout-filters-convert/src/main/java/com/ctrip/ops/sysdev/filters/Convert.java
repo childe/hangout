@@ -1,7 +1,6 @@
 package com.ctrip.ops.sysdev.filters;
 
 import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
-import com.ctrip.ops.sysdev.converter.*;
 import org.apache.log4j.Logger;
 import scala.Tuple3;
 
@@ -36,7 +35,7 @@ public class Convert extends BaseFilter {
 			Map.Entry<String, Map> entry = it.next();
 			String field = entry.getKey();
 			Map value = entry.getValue();
-			Converter converter = null;
+			ConverterI converter = null;
 			Boolean remove_if_fail = false;
 			Object setto_if_fail = null;
 			if (((String) value.get("to")).equalsIgnoreCase("long")) {
@@ -76,7 +75,7 @@ public class Convert extends BaseFilter {
 			Tuple3 t3 = entry.getValue();
 			try {
 				event.put(field,
-						((Converter) t3._1()).convert(event.get(field)));
+						((ConverterI) t3._1()).convert(event.get(field)));
 			} catch (Exception e) {
 				success = false;
 				if ((Boolean) t3._2()) {

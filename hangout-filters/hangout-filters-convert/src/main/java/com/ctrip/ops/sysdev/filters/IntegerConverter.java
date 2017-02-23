@@ -1,8 +1,6 @@
 package com.ctrip.ops.sysdev.filters;
 
-import com.ctrip.ops.sysdev.converter.Converter;
-
-public class IntegerConverter implements Converter {
+public class IntegerConverter implements ConverterI {
 
 	public Object convert(Object from) {
 		if (from instanceof Number) {
