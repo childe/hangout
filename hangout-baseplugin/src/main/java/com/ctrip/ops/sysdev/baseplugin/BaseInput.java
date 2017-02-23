@@ -1,5 +1,6 @@
 package com.ctrip.ops.sysdev.baseplugin;
 
+import com.ctrip.ops.sysdev.Utils.Utils;
 import com.ctrip.ops.sysdev.decoders.Decode;
 import com.ctrip.ops.sysdev.decoders.JsonDecoder;
 import com.ctrip.ops.sysdev.decoders.PlainDecoder;
@@ -14,7 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 @Log4j
-public abstract class BaseInput extends Base{
+public abstract class BaseInput extends Base {
     protected Map<String, Object> config;
     protected Decode decoder;
     protected List<BaseFilter> filterProcessors;
@@ -60,31 +61,8 @@ public abstract class BaseInput extends Base{
     // some input plugin like kafka has more than one thread, and each thread must own their filter/output instance.
     // so we should call createFilterProcessors and return filters in each thread.
     public List<BaseFilter> createFilterProcessors() {
-        if (filters != null) {
-            filterProcessors = new ArrayList<>();
-
-            filters.stream().forEach((Map filterMap) -> {
-                filterMap.entrySet().stream().forEach(entry -> {
-                    Entry<String, Map> filter = (Entry<String, Map>) entry;
-                    String filterType = filter.getKey();
-                    Map filterConfig = filter.getValue();
-                    Class<?> filterClass;
-                    Constructor<?> ctor = null;
-                    log.info("begin to build filter " + filterType);
-                    try {
-                        filterClass = Class.forName("com.ctrip.ops.sysdev.filters." + filterType);
-                        ctor = filterClass.getConstructor(Map.class);
-                        log.info("build filter " + filterType + " done");
-                        this.filterProcessors.add((BaseFilter) ctor.newInstance(filterConfig));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        System.exit(-1);
-                    }
-                });
-            });
-        }
-
-        return filterProcessors;
+        this.filterProcessors = Utils.createFilterProcessors(this.filters);
+        return this.filterProcessors;
     }
 
     // some input plugin like kafka has more than one thread, and each thread must own their filter/output instance.

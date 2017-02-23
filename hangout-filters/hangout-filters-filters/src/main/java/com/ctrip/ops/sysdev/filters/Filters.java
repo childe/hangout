@@ -1,5 +1,6 @@
 package com.ctrip.ops.sysdev.filters;
 
+import com.ctrip.ops.sysdev.Utils.Utils;
 import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
 import org.apache.log4j.Logger;
 
@@ -15,7 +16,7 @@ public class Filters extends BaseFilter {
         super(config);
     }
 
-    protected BaseFilter[] filterProcessors;
+    protected List<BaseFilter> filterProcessors;
 
     protected void prepare() {
         ArrayList<Map> filters = (ArrayList<Map>) config.get("filters");
