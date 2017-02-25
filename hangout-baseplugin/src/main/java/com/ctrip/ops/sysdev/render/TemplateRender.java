@@ -13,6 +13,9 @@ public interface TemplateRender {
         if (p.matcher(template).matches()) {
             return new FieldRender(template);
         }
-        return new FreeMarkerRender(template, template);
+        if (template.contains("$")) {
+            return new FreeMarkerRender(template, template);
+        }
+        return new OneLevelRender(template);
     }
 }
