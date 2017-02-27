@@ -113,9 +113,7 @@ public abstract class BaseInput extends Base {
                 for (BaseFilter bf : filterProcessors) {
                     for (int i = 0; i < events.size(); i++) {
                         Map rst = bf.process(events.get(i));
-                        if (rst != null) {
-                            events.set(i, rst);
-                        }
+                        events.set(i, rst);
                     }
                     if (bf.processExtraEventsFunc == true) {
                         int originEventSize = events.size();
