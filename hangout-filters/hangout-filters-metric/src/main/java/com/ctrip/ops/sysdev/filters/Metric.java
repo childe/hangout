@@ -13,7 +13,7 @@ public class Metric extends BaseFilter {
     String key;
     String value;
     Map<String, Object> metric;
-     Map<String, Object> metricToEmit;
+    Map<String, Object> metricToEmit;
     long lastEmitTime;
 
     public Metric(Map config) {
@@ -38,7 +38,7 @@ public class Metric extends BaseFilter {
             this.metric = new HashMap();
         }
         if (event.containsKey(this.key) && event.containsKey(this.value)) {
-            String keyValue = (String) event.get(this.key);
+            String keyValue = event.get(this.key).toString();
             Object valueValue = event.get(this.value);
             HashMap set = (HashMap) this.metric.get(keyValue);
             if (set == null) {
