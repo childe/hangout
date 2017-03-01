@@ -107,7 +107,7 @@ public class Elasticsearch extends BaseOutput {
                     public void beforeBulk(long executionId, BulkRequest request) {
                         log.info("executionId: " + executionId);
                         log.info("numberOfActions: " + request.numberOfActions());
-                        log.info("Hosts:" + esclient.transportAddresses().toString());
+                        log.debug("Hosts:" + esclient.transportAddresses().toString());
                     }
 
                     @Override
@@ -162,7 +162,7 @@ public class Elasticsearch extends BaseOutput {
                     }
 
                     @Override
-                    public void afterBulk(long executionId, BulkRequest request,Throwable failure) {
+                    public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
                         log.error("bulk got exception: " + failure.getMessage());
                     }
                 }).setBulkActions(bulkActions)
