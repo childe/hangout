@@ -2,7 +2,6 @@ package com.ctrip.ops.sysdev.filters;
 
 import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
 import com.ctrip.ops.sysdev.fieldSetter.FieldSetter;
-import com.ctrip.ops.sysdev.render.FieldRender;
 import com.ctrip.ops.sysdev.render.TemplateRender;
 import org.apache.log4j.Logger;
 import scala.Tuple4;
