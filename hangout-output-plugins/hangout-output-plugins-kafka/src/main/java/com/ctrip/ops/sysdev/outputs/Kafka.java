@@ -32,19 +32,22 @@ public class Kafka extends BaseOutput {
 
         props = new Properties();
 
-        if (!this.config.containsKey("bootstrap_servers")) {
-            log.error("bootstrap_servers must be included in producer_settings");
-            System.exit(1);
-        }
-        props.put("bootstrap.servers", (String) this.config.get("bootstrap_servers"));
-
         HashMap<String, String> producerSettings = (HashMap<String, String>) this.config.get("producer_settings");
+
         if (producerSettings != null) {
             producerSettings.entrySet().stream().forEach(entry -> {
                 String k = entry.getKey();
                 String v = entry.getValue();
                 props.put(k, v);
             });
+        } else {
+            log.error("producer_settings must be included in config");
+            System.exit(1);
+        }
+
+        if (props.get("bootstrap.servers") == null) {
+            log.error("bootstrap.servers must be included in producer_settings");
+            System.exit(1);
         }
 
         if (props.get("key.serializer") == null) {
