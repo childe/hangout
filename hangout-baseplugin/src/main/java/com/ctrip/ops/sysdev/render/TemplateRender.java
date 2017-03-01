@@ -13,6 +13,20 @@ public interface TemplateRender {
         if (p.matcher(template).matches()) {
             return new FieldRender(template);
         }
+
+        return new FreeMarkerRender(template, template);
+
+    }
+
+
+    static public TemplateRender getRender(String template, boolean ignoreOneLevelRender) throws IOException {
+        if (ignoreOneLevelRender == true) {
+            return getRender(template);
+        }
+
+        if (p.matcher(template).matches()) {
+            return new FieldRender(template);
+        }
         if (template.contains("$")) {
             return new FreeMarkerRender(template, template);
         }
