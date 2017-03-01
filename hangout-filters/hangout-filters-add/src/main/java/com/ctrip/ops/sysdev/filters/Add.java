@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 
 import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
 
+import com.ctrip.ops.sysdev.fieldSetter.FieldSetter;
 import org.apache.log4j.Logger;
 import com.ctrip.ops.sysdev.render.FreeMarkerRender;
 import com.ctrip.ops.sysdev.render.TemplateRender;
@@ -20,10 +21,10 @@ public class Add extends BaseFilter {
         super(config);
     }
 
-    private Map<String, TemplateRender> f;
+    private Map<FieldSetter, TemplateRender> f;
 
     protected void prepare() {
-        f = new HashMap<String, TemplateRender>();
+        f = new HashMap();
 
         Map<String, String> fields = (Map<String, String>) config.get("fields");
         Iterator<Entry<String, String>> it = fields.entrySet().iterator();
@@ -34,7 +35,7 @@ public class Add extends BaseFilter {
             String value = entry.getValue();
 
             try {
-                this.f.put(field, TemplateRender.getRender(value));
+                this.f.put(FieldSetter.getFieldSetter(field), TemplateRender.getRender(value));
             } catch (IOException e) {
                 logger.fatal(e.getMessage());
                 System.exit(1);
@@ -44,13 +45,13 @@ public class Add extends BaseFilter {
 
     @Override
     protected Map filter(final Map event) {
-        Iterator<Entry<String, TemplateRender>> it = f.entrySet().iterator();
+        Iterator<Entry<FieldSetter, TemplateRender>> it = f.entrySet().iterator();
         while (it.hasNext()) {
-            Map.Entry<String, TemplateRender> entry = it.next();
+            Map.Entry<FieldSetter, TemplateRender> entry = it.next();
 
-            String field = entry.getKey();
+            FieldSetter fieldSetter = entry.getKey();
             TemplateRender render = entry.getValue();
-            event.put(field, render.render(event));
+            fieldSetter.setField(event, render.render(event));
         }
         return event;
     }
