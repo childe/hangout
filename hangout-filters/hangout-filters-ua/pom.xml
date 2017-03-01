@@ -22,10 +22,16 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>ctrip</groupId>
-            <artifactId>hangout-utils</artifactId>
-            <version>0.1.9</version>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.2.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.13</version>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/ua_parser/ua-parser -->
     </dependencies>
 

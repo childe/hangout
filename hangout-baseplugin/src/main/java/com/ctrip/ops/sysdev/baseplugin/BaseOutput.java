@@ -5,12 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.ctrip.ops.sysdev.exception.YamlConfigException;
 import lombok.extern.log4j.Log4j;
 import com.ctrip.ops.sysdev.render.FreeMarkerRender;
 import com.ctrip.ops.sysdev.render.TemplateRender;
 
 @Log4j
-public abstract class BaseOutput {
+public abstract class BaseOutput extends Base {
 	protected Map config;
 	protected List<TemplateRender> IF;
 
@@ -31,7 +32,7 @@ public abstract class BaseOutput {
 			IF = null;
 		}
 
-		this.prepare();
+        this.prepare();
 	}
 
 	protected abstract void prepare();

@@ -1,19 +1,18 @@
 package com.ctrip.ops.sysdev.config;
 
 
+import org.yaml.snakeyaml.Yaml;
+
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Map;
 
-import org.yaml.snakeyaml.Yaml;
-
 
 @SuppressWarnings("rawtypes")
-public class HangoutConfig {
+public class HangoutConfig<T> {
     private static final String HTTP = "http://";
     private static final String HTTPS = "https://";
 //    private static final Logger logger = Logger.getLogger(HangoutConfig.class.getName());

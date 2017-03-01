@@ -1,126 +1,50 @@
 package com.ctrip.ops.sysdev.inputs;
 
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Map.Entry;
+import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
+import com.ctrip.ops.sysdev.baseplugin.BaseInput;
+import com.ctrip.ops.sysdev.baseplugin.BaseOutput;
+import kafka.consumer.ConsumerConfig;
+import kafka.consumer.ConsumerIterator;
+import kafka.consumer.KafkaStream;
+import kafka.consumer.Whitelist;
+import kafka.javaapi.consumer.ConsumerConnector;
+import kafka.serializer.StringDecoder;
+import kafka.utils.VerifiableProperties;
+import lombok.extern.log4j.Log4j;
+
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
-import com.ctrip.ops.sysdev.baseplugin.BaseInput;
-import com.ctrip.ops.sysdev.baseplugin.BaseOutput;
-import com.ctrip.ops.sysdev.decoders.Decode;
-import org.apache.log4j.Logger;
-
-import kafka.consumer.ConsumerConfig;
-import kafka.consumer.ConsumerIterator;
-import kafka.consumer.KafkaStream;
-import kafka.javaapi.consumer.ConsumerConnector;
-
-@SuppressWarnings("ALL")
+@Log4j
 public class Kafka extends BaseInput {
-    private static final Logger logger = Logger
-            .getLogger(Kafka.class.getName());
 
     private ConsumerConnector consumer;
     private ExecutorService executor;
     private String encoding;
+    private Map<String, Integer> topics;
+    private Map<String, Integer> topicPatterns;
 
-    private class Consumer implements Runnable {
-        private KafkaStream<byte[], byte[]> m_stream;
-        private Kafka kafkaInput;
-        private Decode decoder;
-        private String encoding;
-        private List<BaseFilter> filterProcessors;
-        private List<BaseOutput> outputProcessors;
-
-        public Consumer(KafkaStream<byte[], byte[]> a_stream, Kafka kafkaInput) {
-            this.m_stream = a_stream;
-            this.kafkaInput = kafkaInput;
-            this.encoding = kafkaInput.encoding;
-            this.decoder = kafkaInput.createDecoder();
-            this.filterProcessors = kafkaInput.createFilterProcessors();
-            this.outputProcessors = kafkaInput.createOutputProcessors();
-        }
-
-        public void run() {
-            try {
-                ConsumerIterator<byte[], byte[]> it = m_stream.iterator();
-                while (it.hasNext()) {
-                    String m = null;
-                    try {
-                        m = new String(it.next().message(),
-                                this.kafkaInput.encoding);
-                    } catch (UnsupportedEncodingException e1) {
-                        e1.printStackTrace();
-                        logger.error(e1);
-                    }
-
-                    try {
-                        Map<String, Object> event = this.decoder
-                                .decode(m);
-
-                        if (this.filterProcessors != null) {
-                            for (BaseFilter bf : filterProcessors) {
-                                if (event == null) {
-                                    break;
-                                }
-                                event = bf.process(event);
-                            }
-                        }
-                        if (event != null) {
-                            for (BaseOutput bo : outputProcessors) {
-                                bo.process(event);
-                            }
-                        }
-                    } catch (Exception e) {
-                        logger.error("process event failed:" + m);
-                        e.printStackTrace();
-                        logger.error(e);
-                    }
-
-                }
-            } catch (Throwable t) {
-                logger.error(t);
-                System.exit(1);
-            }
-        }
-    }
 
     public Kafka(Map<String, Object> config, ArrayList<Map> filter,
                  ArrayList<Map> outputs) throws Exception {
         super(config, filter, outputs);
     }
 
-    @SuppressWarnings("unchecked")
     protected void prepare() {
+        //if null, utf-8 encoding will be used
+        this.encoding = (String) this.config.get("encoding");
+        if (this.encoding == null) {
+            this.encoding = "UTF-8";
+        }
+        topics = (Map<String, Integer>) this.config.get("topic");
+        topicPatterns = (Map<String, Integer>) this.config.get("topic_pattern");
+
         Properties props = new Properties();
-
-        HashMap<String, String> consumerSettings = (HashMap<String, String>) this.config
-                .get("consumer_settings");
-        Iterator<Entry<String, String>> consumerSetting = consumerSettings
-                .entrySet().iterator();
-
-        while (consumerSetting.hasNext()) {
-            Map.Entry<String, String> entry = consumerSetting.next();
-            String k = entry.getKey();
-            String v = entry.getValue();
-            props.put(k, v);
-        }
-        consumer = kafka.consumer.Consumer
-                .createJavaConsumerConnector(new ConsumerConfig(props));
-
-        if (this.config.containsKey("encoding")) {
-            this.encoding = (String) this.config.get("encoding");
-        } else {
-            this.encoding = "UTF8";
-        }
+        HashMap<String, String> consumerSettings = (HashMap<String, String>) this.config.get("consumer_settings");
+        consumerSettings.entrySet().stream().forEach(entry -> props.put(entry.getKey(), entry.getValue()));
+        consumer = kafka.consumer.Consumer.createJavaConsumerConnector(new ConsumerConfig(props));
     }
 
     public void shutdown() {
@@ -137,32 +61,59 @@ public class Kafka extends BaseInput {
             }
 
             if (!executor.awaitTermination(timeout, TimeUnit.MILLISECONDS)) {
-                logger.error("Timed out waiting for consumer threads to shut down, exiting uncleanly");
+                log.error("Timed out waiting for consumer threads to shut down, exiting uncleanly");
             }
         } catch (InterruptedException e) {
-            logger.error("Interrupted during shutdown, exiting uncleanly");
+            log.error("Interrupted during shutdown, exiting uncleanly", e);
         }
     }
 
     public void emit() {
-        Map<String, List<KafkaStream<byte[], byte[]>>> consumerMap = null;
+        VerifiableProperties vp = new VerifiableProperties();
+        vp.props().setProperty("serializer.encoding", this.encoding);
+        StringDecoder decoder = new StringDecoder(vp);
 
-        Map<String, Integer> topics = (Map<String, Integer>) this.config
-                .get("topic");
-        consumerMap = consumer.createMessageStreams(topics);
 
-        Iterator<Entry<String, Integer>> topicIT = topics.entrySet().iterator();
+        if (topicPatterns != null) {
+            topicPatterns.entrySet().stream().forEach(entry -> {
+                String topicPattern = entry.getKey();
+                Integer threadCounts = entry.getValue();
+                List<KafkaStream<String, String>> consumerStreams =
+                        consumer.createMessageStreamsByFilter(
+                                new Whitelist(topicPattern), threadCounts,
+                                decoder, decoder);
+                executor = Executors.newFixedThreadPool(consumerStreams.size());
+                consumerStreams.forEach(stream -> executor.submit(new ConsumerThread(stream, this)));
 
-        while (topicIT.hasNext()) {
-            Map.Entry<String, Integer> entry = topicIT.next();
-            String topic = entry.getKey();
-            Integer threads = entry.getValue();
-            List<KafkaStream<byte[], byte[]>> streams = consumerMap.get(topic);
+            });
 
-            executor = Executors.newFixedThreadPool(threads);
+        } else {
+            //Create ConsumerThread Streams Map
+            Map<String, List<KafkaStream<String, String>>> consumerMap = consumer.createMessageStreams(topics, decoder, decoder);
+            consumerMap.entrySet().forEach(entry -> {
+                List<KafkaStream<String, String>> consumerStreams = entry.getValue();
+                executor = Executors.newFixedThreadPool(consumerStreams.size());
+                consumerStreams.forEach(stream -> executor.submit(new ConsumerThread(stream, this)));
+            });
+        }
+        //Kick off each stream as the number of threads specified
+    }
 
-            for (final KafkaStream<byte[], byte[]> stream : streams) {
-                executor.submit(new Consumer(stream, this));
+    private class ConsumerThread implements Runnable {
+        private KafkaStream<String, String> kafkaStream;
+        private List<BaseFilter> filterProcessors;
+        private List<BaseOutput> outputProcessors;
+
+        public ConsumerThread(KafkaStream<String, String> kafkaStream, Kafka kafka) {
+            this.kafkaStream = kafkaStream;
+            this.filterProcessors = kafka.createFilterProcessors();
+            this.outputProcessors = kafka.createOutputProcessors();
+        }
+
+        public void run() {
+            ConsumerIterator<String, String> it = kafkaStream.iterator();
+            while (it.hasNext()) {
+                process(it.next().message(), this.filterProcessors, this.outputProcessors);
             }
         }
     }

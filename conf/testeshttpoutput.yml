@@ -1,0 +1,14 @@
+inputs:
+   - Stdin:
+        codec: plain
+        hostname: true # if add hostname to event; default false
+
+outputs:
+   - ElasticsearchHTTP:
+        cluster: elasticsearch
+        hosts:
+          - 192.168.145.128
+        index: 'hangout-%{message}-%{+YYYY.MM.dd}'
+        index_type: 'hangout-${message}'
+        bulk_actions: 5 #default 20000
+        sniff: true #default true

@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>hangout-filters-gusk</artifactId>
+    <artifactId>hangout-filters-gsub</artifactId>
     <dependencies>
         <dependency>
             <groupId>ctrip</groupId>
@@ -20,6 +20,11 @@
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>2.11.8</version>
         </dependency>
     </dependencies>
 

@@ -79,6 +79,11 @@ This product includes GeoLite2 data created by MaxMind, available from
           num.consumer.fetchers: "4"
         codec: plain
 
+支持白名单匹配，使用topic_pattern指定正则表达式来匹配topic名称，如果指定此参数，topic参数会被忽略。
+
+    - topic_pattern: #pattern has high priority,if specified, topic will be ignored
+        test.*: 3
+        
 ### newKafka
 新的kafka api.[http://kafka.apache.org/documentation.html#newconsumerapi](http://kafka.apache.org/documentation.html#newconsumerapi)
 
@@ -256,15 +261,42 @@ sniff设置为true的话, 会把hosts当做一个入口, 然后去寻找真正�
 	concurrent_requests: 0	#default 0
     sniff: false #default true
 
+### ElasticsearchHTTP
+使用[rest api](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html) 批量将数据写入ES.
+目前在es2.4.0 和es 5.2.0 上进行过初步测试
+
+       - ElasticsearchHTTP:
+            cluster: elasticsearch
+            hosts:
+              - 192.168.145.128
+            index: 'myindex'
+            index_type: "mytype" # default logs
+            bulk_actions: 5 #default 20000
+            sniff: false #default true
+
 ### Kafka
-	#broker_list format is host1:port1,host2:port2, and the list can be a subset of brokers or a VIP pointing to a subset of brokers.
-	broker_list: 192.168.1.100:9092 # required
+	#bootstrap_servers format is host1:port1,host2:port2, and the list can be a subset of brokers or a VIP pointing to a subset of brokers.
+	bootstrap_servers: 192.168.1.100:9092 # required
 	topic: test # required
 
 ### Stdout
 主要测试用吧. 因为配置是yml格式, 所以没有其它条件的话, 需要写成 
 
     - Stdout: {}
+    
+## Admin
+为了实现hangout分布式部署中对各个agent的统一性能和运行情况监控，实现了一个具备restful api的Admin server，具体配置为
+    
+    commons:
+          admin_listen: true
+          admin_ip: 192.168.145.128
+          admin_port: 8080
+
+admin_listen为是否开启admin server
+admin_ip为绑定IP,默认为0.0.0.0(绑定所有IP)
+admin_port为监听端口，默认8080
+
+提供功能为性能监控、探活。如果需要使用，可以参考stdin-input和stdout-output里面的计数方法。
 
 # 开发:
 如果需要新的插件, 请参考项目结构中baseplugin和input、output插件。

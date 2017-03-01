@@ -6,7 +6,6 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -69,7 +68,9 @@ public class CommandLineValues {
     }
 
     private void printVersion() {
-        System.out.println("Hangout  Version:" + getVersion() + "  Copyright @Ctrip   Author : childe@github, guuhpc@github");
+        if(getVersion()!=null){
+            System.out.println("Hangout  Version:" + getVersion() + "  Copyright @Ctrip   Author : childe@github, gnuhpc@github");
+        }
     }
 
     private String getVersion() {
@@ -80,8 +81,8 @@ public class CommandLineValues {
         Properties prop = new Properties();
         try {
             prop.load(resourceAsStream);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            return null;
         }
         return prop.getProperty("version");
     }

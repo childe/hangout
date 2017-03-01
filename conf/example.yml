@@ -11,7 +11,7 @@ inputs:
     - Kafka:
         codec: plain
         encoding: UTF8 # defaut UTF8
-        topic: 
+        topic:
           app: 2
         consumer_settings:
           group.id: hangout
@@ -19,7 +19,7 @@ inputs:
           auto.commit.interval.ms: "1000"
     - Kafka:
         codec: json
-        topic: 
+        topic:
           web: 1
         consumer_settings:
           group.id: hangout
@@ -99,10 +99,10 @@ filters:
     - Convert:
         tag_on_failure: '' # do not add tags; deafult "convertfail"
         fields:
-            cs_bytes: 
+            cs_bytes:
                 to: integer
                 remove_if_fail: true # default false
-            time_taken: 
+            time_taken:
                 to: float
                 setto_if_fail: 0.0 # default NOT set anything; should set remove_if_fail to false
     - URLDecode:
