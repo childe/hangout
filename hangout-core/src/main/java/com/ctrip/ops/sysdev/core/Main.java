@@ -83,12 +83,10 @@ public class Main {
                         }
                     });
                 });
-
-
     }
 
     private static void runAdminServer(HashMap<String, Object> configs) {
-        if (configs==null){
+        if (configs == null) {
             return;
         }
         Watcher watcher = Watcher.getWatcher();
@@ -96,7 +94,7 @@ public class Main {
         if (isAdminListen) {
             Runnable task = () -> {
                 int adminPort;
-                String address=null,adminHost = null;
+                String address = null, adminHost = null;
                 adminPort = configs.containsKey("admin_port") ? (int) configs.get("admin_port") : 8080;
                 adminHost = configs.containsKey("admin_ip") ? (String) configs.get("admin_ip") : "0.0.0.0";
 
@@ -123,10 +121,10 @@ public class Main {
                         .addHttpListener(adminPort, adminHost)
                         .setHandler(path)
                         .build();
-                try{
+                try {
                     server.start();
-                } catch (RuntimeException e){
-                    log.error("Admin server start error: ",e);
+                } catch (RuntimeException e) {
+                    log.error("Admin server start error: ", e);
                 }
 
             };
