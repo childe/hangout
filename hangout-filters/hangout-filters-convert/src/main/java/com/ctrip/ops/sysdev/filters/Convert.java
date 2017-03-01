@@ -64,7 +64,7 @@ public class Convert extends BaseFilter {
             }
 
             try {
-                f.put(FieldSetter.getFieldSetter(field), new Tuple4(converter, TemplateRender.getRender(field), remove_if_fail, setto_if_fail));
+                f.put(FieldSetter.getFieldSetter(field), new Tuple4(converter, TemplateRender.getRender(field, false), remove_if_fail, setto_if_fail));
             } catch (Exception e) {
                 logger.error("could not create filed render for '" + field + "'");
                 System.exit(1);
