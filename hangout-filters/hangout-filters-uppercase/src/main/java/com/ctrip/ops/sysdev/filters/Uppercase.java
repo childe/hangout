@@ -1,29 +1,46 @@
 package com.ctrip.ops.sysdev.filters;
 
 import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
+import com.ctrip.ops.sysdev.fieldSetter.FieldSetter;
+import com.ctrip.ops.sysdev.render.TemplateRender;
+import org.apache.log4j.Logger;
+import scala.Tuple2;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
 @SuppressWarnings("ALL")
 public class Uppercase extends BaseFilter {
-	public Uppercase(Map config) {
-		super(config);
-	}
+    private static final Logger logger = Logger.getLogger(Uppercase.class.getName());
 
-	private ArrayList<String> fields;
+    public Uppercase(Map config) {
+        super(config);
+    }
 
-	protected void prepare() {
-		this.fields = (ArrayList<String>) config.get("fields");
-	}
+    private ArrayList<Tuple2> fields;
+
+    protected void prepare() {
+        this.fields = new ArrayList();
+        for (String field : (ArrayList<String>) config.get("fields")) {
+            try {
+                this.fields.add(new Tuple2(FieldSetter.getFieldSetter(field), TemplateRender.getRender(field, false)));
+            } catch (IOException e) {
+                logger.error("could NOT build TemplateRender from " + field);
+                System.exit(1);
+            }
+        }
+    }
 
     @Override
-	protected Map filter(Map event) {
-		for (String field : fields) {
-			if (event.containsKey(field)) {
-				event.put(field, ((String) event.get(field)).toUpperCase());
-			}
-		}
-		return event;
-	}
+    protected Map filter(Map event) {
+        for (Tuple2 t2 : fields) {
+            Object input = ((TemplateRender) t2._2()).render(event);
+            if (input != null && String.class.isAssignableFrom(input.getClass())) {
+                ((FieldSetter) t2._1()).setField(event, ((String) input).toUpperCase());
+            }
+        }
+
+        return event;
+    }
 }
