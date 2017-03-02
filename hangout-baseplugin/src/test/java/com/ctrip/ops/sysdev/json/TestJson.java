@@ -27,6 +27,6 @@ public class TestJson {
         };
 
         String rst = JSONValue.toJSONString(event);
-        Assert.assertEquals("{\"@timestamp\":\"2017-03-02T11:15:54.000+08:00\", \"message\":\"hello json\"}", rst);
+        Assert.assertEquals(rst, "{\"@timestamp\":\"2017-03-02T11:15:54.000+08:00\",\"message\":\"hello json\"}");
     }
 }
