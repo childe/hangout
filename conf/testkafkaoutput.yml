@@ -1,16 +1,10 @@
 inputs:
-    - Kafka:
+    - Stdin:
         codec: plain
-        encoding: UTF8 # defaut UTF8
-        topic:
-            test1: 1
-        consumer_settings:
-            group.id: hangout
-            zookeeper.connect: 192.168.145.128:2181
-            auto.commit.interval.ms: "1000"
 outputs:
     - Kafka:
-        bootstrap_servers: 192.168.145.128:9092
-        topic: test2
+        producer_settings:
+            bootstrap.servers: 10.2.7.109:9092
+        topic: test
     - Stdout: {}
 
