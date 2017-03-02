@@ -21,6 +21,8 @@ public class BaseFilter extends Base {
 
 
     public BaseFilter(Map config) {
+        super(config);
+        
         this.config = config;
 
         if (this.config.containsKey("if")) {

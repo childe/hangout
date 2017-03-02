@@ -12,49 +12,54 @@ import com.ctrip.ops.sysdev.render.TemplateRender;
 
 @Log4j
 public abstract class BaseOutput extends Base {
-	protected Map config;
-	protected List<TemplateRender> IF;
+    protected Map config;
+    protected List<TemplateRender> IF;
 
-	public BaseOutput(Map config) {
-		this.config = config;
+    public BaseOutput(Map config) {
+        super(config);
 
-		if (this.config.containsKey("if")) {
-			IF = new ArrayList<TemplateRender>();
-			for (String c : (List<String>) this.config.get("if")) {
-				try {
-					IF.add(new FreeMarkerRender(c, c));
-				} catch (IOException e) {
-					log.fatal(e.getMessage());
-					System.exit(1);
-				}
-			}
-		} else {
-			IF = null;
-		}
+        this.config = config;
+
+        if (this.config.containsKey("if")) {
+            IF = new ArrayList<TemplateRender>();
+            for (String c : (List<String>) this.config.get("if")) {
+                try {
+                    IF.add(new FreeMarkerRender(c, c));
+                } catch (IOException e) {
+                    log.fatal(e.getMessage());
+                    System.exit(1);
+                }
+            }
+        } else {
+            IF = null;
+        }
 
         this.prepare();
-	}
+    }
 
-	protected abstract void prepare();
+    protected abstract void prepare();
 
-	protected abstract void emit(Map event);
+    protected abstract void emit(Map event);
 
     public void shutdown() {
         log.info("shutdown" + this.getClass().getName());
-	}
+    }
 
-	public void process(Map event) {
-		boolean ifSuccess = true;
-		if (this.IF != null) {
-			for (TemplateRender render : this.IF) {
-				if (!render.render(event).equals("true")) {
-					ifSuccess = false;
-					break;
-				}
-			}
-		}
-		if (ifSuccess) {
-			this.emit(event);
-		}
-	}
+    public void process(Map event) {
+        boolean ifSuccess = true;
+        if (this.IF != null) {
+            for (TemplateRender render : this.IF) {
+                if (!render.render(event).equals("true")) {
+                    ifSuccess = false;
+                    break;
+                }
+            }
+        }
+        if (ifSuccess) {
+            this.emit(event);
+            if (this.enableMeter == true) {
+                this.meter.mark();
+            }
+        }
+    }
 }
