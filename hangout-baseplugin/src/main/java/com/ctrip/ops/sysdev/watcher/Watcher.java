@@ -12,16 +12,19 @@ import lombok.extern.log4j.Log4j;
  * Created by gnuhpc on 2017/2/16.
  */
 @Log4j
-@Data public class Watcher {
+@Data
+public class Watcher {
     private static Watcher instance;
     private MetricRegistry metricRegistry = new MetricRegistry();
     private HealthCheckRegistry healthCheckRegistry = new HealthCheckRegistry();
-    private Watcher(){}
 
-    public static Watcher getWatcher(){
-        if(instance==null){
-            synchronized (Watcher.class){
-                if(instance==null){
+    private Watcher() {
+    }
+
+    public static Watcher getWatcher() {
+        if (instance == null) {
+            synchronized (Watcher.class) {
+                if (instance == null) {
                     instance = new Watcher();
                 }
             }
@@ -29,12 +32,8 @@ import lombok.extern.log4j.Log4j;
         return instance;
     }
 
-    public Meter setMetric(String metricName){
+    public Meter setMetric(String metricName) {
         return metricRegistry.meter(metricName);
     }
-
-
-
-
 
 }

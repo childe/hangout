@@ -25,6 +25,8 @@ public abstract class BaseInput extends Base {
 
     public BaseInput(Map config, ArrayList<Map> filters, ArrayList<Map> outputs)
             throws Exception {
+        super(config);
+
         this.config = config;
         this.filters = filters;
         this.outputs = outputs;
@@ -144,6 +146,10 @@ public abstract class BaseInput extends Base {
             log.error("process event failed:" + message);
             e.printStackTrace();
             log.error(e);
+        } finally {
+            if (this.enableMeter == true) {
+                this.meter.mark();
+            }
         }
     }
 
