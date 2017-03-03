@@ -12,7 +12,7 @@ import org.yaml.snakeyaml.Yaml;
 
 public class TestRemoveFilter {
     @Test
-    public void testAddFilter() {
+    public void testRemoveFilter() {
         String c = String.format("%s\n%s\n%s\n%s",
                 "fields:",
                 "  - gender",
