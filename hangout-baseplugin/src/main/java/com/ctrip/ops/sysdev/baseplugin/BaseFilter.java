@@ -12,7 +12,6 @@ import java.util.*;
 public class BaseFilter extends Base {
 
     protected Map config;
-    protected TemplateRender render;
     protected String tagOnFailure;
     protected List<String> removeFields;
     protected Map<String, Object> addFields;
