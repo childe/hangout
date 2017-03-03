@@ -9,12 +9,15 @@ public interface TemplateRender {
 
     public Object render(Map event);
 
-    static public TemplateRender getRender(String template) throws IOException {
-        if (p.matcher(template).matches()) {
-            return new FieldRender(template);
+    static public TemplateRender getRender(Object template) throws IOException {
+        if (!String.class.isAssignableFrom(template.getClass())) {
+            return new DirectRender(template);
+        }
+        if (p.matcher((String) template).matches()) {
+            return new FieldRender((String) template);
         }
 
-        return new FreeMarkerRender(template, template);
+        return new FreeMarkerRender((String) template, (String) template);
 
     }
 
@@ -24,6 +27,9 @@ public interface TemplateRender {
             return getRender(template);
         }
 
+        if (!String.class.isAssignableFrom(template.getClass())) {
+            return new DirectRender(template);
+        }
         if (p.matcher(template).matches()) {
             return new FieldRender(template);
         }

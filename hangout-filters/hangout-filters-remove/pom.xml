@@ -16,6 +16,12 @@
             <artifactId>hangout-baseplugin</artifactId>
             <version>0.1.9</version>
         </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>6.8.5</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 

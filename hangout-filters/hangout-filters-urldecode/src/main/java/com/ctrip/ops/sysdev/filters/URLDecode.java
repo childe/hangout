@@ -1,57 +1,74 @@
 package com.ctrip.ops.sysdev.filters;
 
+import java.io.IOException;
+import java.io.ObjectInput;
 import java.util.ArrayList;
 import java.util.Map;
 import java.net.URLDecoder;
+
+import com.ctrip.ops.sysdev.fieldSetter.FieldSetter;
+import com.ctrip.ops.sysdev.render.TemplateRender;
+import scala.Tuple2;
 
 import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
 import org.apache.log4j.Logger;
 
 public class URLDecode extends BaseFilter {
-	private static final Logger logger = Logger.getLogger(URLDecode.class.getName());
+    private static final Logger logger = Logger.getLogger(URLDecode.class.getName());
 
-	@SuppressWarnings("rawtypes")
-	public URLDecode(Map config) {
-		super(config);
-	}
+    @SuppressWarnings("rawtypes")
+    public URLDecode(Map config) {
+        super(config);
+    }
 
-	private ArrayList<String> fields;
-	private String enc;
+    private ArrayList<Tuple2> fields;
+    private String enc;
 
-	@SuppressWarnings("unchecked")
-	protected void prepare() {
-		this.fields = (ArrayList<String>) config.get("fields");
-		if (config.containsKey("enc")) {
-			this.enc = (String) config.get("enc");
-		} else {
-			this.enc = "UTF-8";
-		}
+    @SuppressWarnings("unchecked")
+    protected void prepare() {
+        this.fields = new ArrayList<>();
+        for (String field : (ArrayList<String>) config.get("fields")) {
+            TemplateRender templateRender = null;
+            try {
+                templateRender = TemplateRender.getRender(field, false);
+            } catch (IOException e) {
+                logger.fatal("could NOT build template render from " + field);
+                System.exit(1);
+            }
+            this.fields.add(new Tuple2(FieldSetter.getFieldSetter(field), templateRender));
+        }
 
-		if (this.config.containsKey("tag_on_failure")) {
-			this.tagOnFailure = (String) this.config.get("tag_on_failure");
-		} else {
-			this.tagOnFailure = "URLDecodefail";
-		}
-	}
+        if (config.containsKey("enc")) {
+            this.enc = (String) config.get("enc");
+        } else {
+            this.enc = "UTF-8";
+        }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-	@Override
-	protected Map filter(final Map event) {
-		boolean success = true;
-		for (String f : this.fields) {
-			if (event.containsKey(f)) {
-				try {
-					event.put(f,
-							URLDecoder.decode((String) event.get(f), this.enc));
-				} catch (Exception e) {
-					logger.error("URLDecode failed", e);
-					success = false;
-				}
-			}
-		}
+        if (this.config.containsKey("tag_on_failure")) {
+            this.tagOnFailure = (String) this.config.get("tag_on_failure");
+        } else {
+            this.tagOnFailure = "URLDecodefail";
+        }
+    }
 
-		this.postProcess(event, success);
+    @Override
+    protected Map filter(final Map event) {
+        boolean success = true;
+        for (Tuple2 f2 : this.fields) {
+            TemplateRender templateRender = (TemplateRender) f2._2();
+            Object value = templateRender.render(event);
+            if (value != null && String.class.isAssignableFrom(value.getClass())) {
+                try {
+                    ((FieldSetter) f2._1()).setField(event, URLDecoder.decode((String) value, this.enc));
+                } catch (Exception e) {
+                    logger.error("URLDecode failed", e);
+                    success = false;
+                }
+            }
+        }
 
-		return event;
-	}
+        this.postProcess(event, success);
+
+        return event;
+    }
 }
