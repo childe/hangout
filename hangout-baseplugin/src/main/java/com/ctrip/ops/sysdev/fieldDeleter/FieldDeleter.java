@@ -1,8 +1,5 @@
 package com.ctrip.ops.sysdev.fieldDeleter;
 
-import com.ctrip.ops.sysdev.fieldDeleter.MultiLevelDeleter;
-import com.ctrip.ops.sysdev.fieldDeleter.OneLevelDeleter;
-
 import java.util.Map;
 import java.util.regex.Pattern;
 
