@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+//TODO setfield and render
+
 @SuppressWarnings("ALL")
 public class Rename extends BaseFilter {
 	public Rename(Map config) {
