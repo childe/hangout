@@ -4,7 +4,6 @@ package com.ctrip.ops.sysdev.render;
  * Created by liujia on 17/2/10.
  */
 
-import com.ctrip.ops.sysdev.render.FieldRender;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
