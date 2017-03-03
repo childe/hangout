@@ -1,23 +1,25 @@
 package com.ctrip.ops.sysdev.baseplugin;
 
+import com.ctrip.ops.sysdev.fieldDeleter.FieldDeleter;
+import com.ctrip.ops.sysdev.fieldSetter.FieldSetter;
 import com.ctrip.ops.sysdev.render.FreeMarkerRender;
 import com.ctrip.ops.sysdev.render.TemplateRender;
-import lombok.extern.log4j.Log4j;
+import freemarker.ext.beans.HashAdapter;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.*;
 
-
-@Log4j
 public class BaseFilter extends Base {
+    private static final Logger logger = Logger.getLogger(BaseFilter.class
+            .getName());
 
     protected Map config;
     protected String tagOnFailure;
-    protected List<String> removeFields;
-    protected Map<String, Object> addFields;
+    protected List<FieldDeleter> removeFields;
+    protected Map<FieldSetter, TemplateRender> addFields;
     private List<TemplateRender> IF;
     public boolean processExtraEventsFunc;
-
 
     public BaseFilter(Map config) {
         this.config = config;
@@ -28,7 +30,7 @@ public class BaseFilter extends Base {
                 try {
                     IF.add(new FreeMarkerRender(c, c));
                 } catch (IOException e) {
-                    log.fatal(e.getMessage());
+                    logger.fatal(e.getMessage());
                     System.exit(1);
                 }
             }
@@ -42,8 +44,27 @@ public class BaseFilter extends Base {
             this.tagOnFailure = null;
         }
 
-        this.removeFields = (ArrayList<String>) this.config.get("remove_fields");
-        this.addFields = (Map<String, Object>) this.config.get("add_fields");
+        this.removeFields = new ArrayList<>();
+        for (String field : (ArrayList<String>) config.get("remove_fields")) {
+            this.removeFields.add(FieldDeleter.getFieldDeleter(field));
+        }
+
+        this.addFields = new HashMap<>();
+        Map<String, String> fields = (Map<String, String>) config.get("add_fields");
+        Iterator<Map.Entry<String, String>> it = fields.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, String> entry = it.next();
+
+            String field = entry.getKey();
+            String value = entry.getValue();
+
+            try {
+                this.addFields.put(FieldSetter.getFieldSetter(field), TemplateRender.getRender(value));
+            } catch (IOException e) {
+                logger.fatal(e.getMessage());
+                System.exit(1);
+            }
+        }
 
         this.prepare();
     }
@@ -106,18 +127,18 @@ public class BaseFilter extends Base {
             }
         } else {
             if (this.removeFields != null) {
-                for (String f : this.removeFields) {
-                    event.remove(f);
+                for (FieldDeleter f : this.removeFields) {
+                    f.delete(event);
                 }
             }
 
             if (this.addFields != null) {
-                Iterator<Map.Entry<String, Object>> it = this.addFields.entrySet().iterator();
+                Iterator<Map.Entry<FieldSetter, TemplateRender>> it = this.addFields.entrySet().iterator();
                 while (it.hasNext()) {
-                    Map.Entry<String, Object> entry = it.next();
-                    String field = entry.getKey();
-                    Object value = entry.getValue();
-                    event.put(field, value);
+                    Map.Entry<FieldSetter, TemplateRender> entry = it.next();
+                    FieldSetter fieldSetter = entry.getKey();
+                    TemplateRender templateRender = entry.getValue();
+                    fieldSetter.setField(event, templateRender.render(event));
                 }
             }
         }
