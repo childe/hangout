@@ -40,8 +40,8 @@
 
             <includes>
                 <!--<include>DEVNOTES</include>-->
-                <!--<include>README</include>-->
-                <!--<include>LICENSE</include>-->
+                <include>README.ME</include>
+                <include>LICENSE</include>
                 <!--<include>NOTICE</include>-->
                 <!--<include>CHANGELOG</include>-->
                 <!--<include>RELEASE-NOTES</include>-->

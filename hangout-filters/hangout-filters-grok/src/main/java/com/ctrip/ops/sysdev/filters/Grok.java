@@ -181,9 +181,6 @@ public class Grok extends BaseFilter {
             matches.add(regex);
         }
 
-        this.removeFields = (ArrayList<String>) this.config
-                .get("remove_fields");
-
         if (this.config.containsKey("encoding")) {
             this.encoding = (String) this.config.get("encoding");
         } else {
