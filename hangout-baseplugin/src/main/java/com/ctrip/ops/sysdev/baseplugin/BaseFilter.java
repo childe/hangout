@@ -44,26 +44,33 @@ public class BaseFilter extends Base {
             this.tagOnFailure = null;
         }
 
-        this.removeFields = new ArrayList<>();
-        for (String field : (ArrayList<String>) config.get("remove_fields")) {
-            this.removeFields.add(FieldDeleter.getFieldDeleter(field));
-        }
-
-        this.addFields = new HashMap<>();
-        Map<String, String> fields = (Map<String, String>) config.get("add_fields");
-        Iterator<Map.Entry<String, String>> it = fields.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<String, String> entry = it.next();
-
-            String field = entry.getKey();
-            String value = entry.getValue();
-
-            try {
-                this.addFields.put(FieldSetter.getFieldSetter(field), TemplateRender.getRender(value));
-            } catch (IOException e) {
-                logger.fatal(e.getMessage());
-                System.exit(1);
+        if (config.containsKey("remove_fields")) {
+            this.removeFields = new ArrayList<>();
+            for (String field : (ArrayList<String>) config.get("remove_fields")) {
+                this.removeFields.add(FieldDeleter.getFieldDeleter(field));
             }
+        } else {
+            this.removeFields = null;
+        }
+        if (config.containsKey("add_fields")) {
+            this.addFields = new HashMap<>();
+            Map<String, String> fields = (Map<String, String>) config.get("add_fields");
+            Iterator<Map.Entry<String, String>> it = fields.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry<String, String> entry = it.next();
+
+                String field = entry.getKey();
+                Object value = entry.getValue();
+
+                try {
+                    this.addFields.put(FieldSetter.getFieldSetter(field), TemplateRender.getRender(value));
+                } catch (IOException e) {
+                    logger.fatal(e.getMessage());
+                    System.exit(1);
+                }
+            }
+        } else {
+            this.addFields = null;
         }
 
         this.prepare();
