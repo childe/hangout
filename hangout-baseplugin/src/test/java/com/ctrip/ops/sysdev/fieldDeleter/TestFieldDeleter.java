@@ -1,10 +1,9 @@
-package com.ctrip.ops.sysdev.render;
+package com.ctrip.ops.sysdev.fieldDeleter;
 
 /**
  * Created by liujia on 17/2/10.
  */
 
-import com.ctrip.ops.sysdev.fieldDeleter.FieldDeleter;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
