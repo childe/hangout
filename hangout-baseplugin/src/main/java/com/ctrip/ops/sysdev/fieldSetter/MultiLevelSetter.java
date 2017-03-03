@@ -38,8 +38,9 @@ public class MultiLevelSetter implements FieldSetter {
             if (current.containsKey(field)) {
                 current = (Map) current.get(field);
             } else {
-                current = new HashMap<>();
-                event.put(field, current);
+                Map next = new HashMap<>();
+                current.put(field, next);
+                current = next;
             }
         }
         current.put(this.fields.get(this.fields.size() - 1), value);
