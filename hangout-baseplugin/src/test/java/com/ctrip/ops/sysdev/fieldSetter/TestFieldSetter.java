@@ -41,5 +41,17 @@ public class TestFieldSetter {
         fieldSetter.setField(event, 123);
         Assert.assertEquals(event.get("test1"), "ab");
         Assert.assertEquals(event.get("a"), 123);
+
+        //more than 2 level
+        fieldSetter = FieldSetter.getFieldSetter("[a][b][c]");
+        event = new HashMap() {{
+            this.put("test1", "ab");
+        }};
+
+        fieldSetter.setField(event, 123);
+        Assert.assertEquals(event.get("test1"), "ab");
+        Map a = (Map) event.get("a");
+        Map b = (Map) a.get("b");
+        Assert.assertEquals(b.get("c"), 123);
     }
 }

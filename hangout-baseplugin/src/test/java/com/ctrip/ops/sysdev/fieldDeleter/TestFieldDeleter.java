@@ -74,5 +74,22 @@ public class TestFieldDeleter {
         Assert.assertEquals(b.size(), 2);
         Assert.assertEquals(b.get(0), 1);
         Assert.assertEquals(b.get(1), 2);
+
+        // [a][b][c]
+        fieldDeleter = FieldDeleter.getFieldDeleter("[a][b][c]");
+        event = new HashMap() {{
+            this.put("test1", "ab");
+            this.put("a", new HashMap() {{
+                this.put("b", new HashMap() {{
+                    this.put("c", 100);
+                }});
+            }});
+        }};
+
+        fieldDeleter.delete(event);
+        Assert.assertEquals(event.get("test1"), "ab");
+        Assert.assertEquals(((Map) event.get("a")).size(), 1);
+        a = (Map) event.get("a");
+        Assert.assertEquals(((Map) a.get("b")).size(), 0);
     }
 }
