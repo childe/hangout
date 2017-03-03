@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
+import com.ctrip.ops.sysdev.fieldSetter.FieldSetter;
+import com.ctrip.ops.sysdev.render.TemplateRender;
 import org.apache.log4j.Logger;
 import org.yaml.snakeyaml.Yaml;
 
@@ -22,8 +24,8 @@ public class Translate extends BaseFilter {
         super(config);
     }
 
-    private String target;
-    private String source;
+    private FieldSetter target;
+    private TemplateRender source;
     private String dictionaryPath;
     private int refreshInterval;
     private long nextLoadTime;
@@ -32,11 +34,6 @@ public class Translate extends BaseFilter {
     private void loadDictionary() {
         logger.info("begin to loadDictionary: " + this.dictionaryPath);
 
-        if (dictionaryPath == null) {
-            dictionary = null;
-            logger.warn("dictionary_path is null");
-            return;
-        }
         Yaml yaml = new Yaml();
 
         if (dictionaryPath.startsWith("http://") || dictionaryPath.startsWith("https://")) {
@@ -68,10 +65,22 @@ public class Translate extends BaseFilter {
     }
 
     protected void prepare() {
-        target = (String) config.get("target");
-        source = (String) config.get("source");
+        String sourceField = (String) config.get("source");
+        String targetField = (String) config.get("target");
+        try {
+            this.source = TemplateRender.getRender(sourceField, false);
+        } catch (IOException e) {
+            logger.fatal("could NOT build template render from " + sourceField);
+            System.exit(1);
+        }
+        this.target = FieldSetter.getFieldSetter(targetField);
 
         dictionaryPath = (String) config.get("dictionary_path");
+
+        if (dictionaryPath == null) {
+            logger.fatal("dictionary_path must be inclued in config");
+            System.exit(1);
+        }
 
         loadDictionary();
 
@@ -85,16 +94,17 @@ public class Translate extends BaseFilter {
 
     @Override
     protected Map filter(final Map event) {
-        if (dictionary == null || !event.containsKey(this.source)) {
-            return event;
-        }
         if (System.currentTimeMillis() >= nextLoadTime) {
             loadDictionary();
             nextLoadTime += refreshInterval;
         }
-        Object t = dictionary.get(event.get(source));
+        if (this.dictionary == null) {
+            logger.debug("dictionary is null, return without any change");
+            return event;
+        }
+        Object t = dictionary.get(this.source.render(event));
         if (t != null) {
-            event.put(target, t);
+            this.target.setField(event, t);
         }
         return event;
     }
