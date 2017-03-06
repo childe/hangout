@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 import java.io.IOException;
 import java.util.*;
 
-public class BaseFilter extends Base {
+public class BaseFilter {
     private static final Logger logger = Logger.getLogger(BaseFilter.class
             .getName());
 
@@ -22,8 +22,6 @@ public class BaseFilter extends Base {
     public boolean processExtraEventsFunc;
 
     public BaseFilter(Map config) {
-        super(config);
-        
         this.config = config;
 
         if (this.config.containsKey("if")) {
