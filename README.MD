@@ -299,7 +299,14 @@ admin_port为监听端口，默认8080
 提供功能为性能监控、探活。如果需要使用，可以参考stdin-input和stdout-output里面的计数方法。
 
 # 开发:
-如果需要新的插件, 请参考项目结构中baseplugin和input、output插件。
+当然可以在hangout的结构上继续开发, 可以参考项目结构中baseplugin和input,output,filters等插件.  
+也可以开一个独立的项目. 我写了几个简单的例子做为教程, 供大家参考.
+
+1. 一个最简单的filter [https://github.com/childe/hangout-filter-reverse](https://github.com/childe/hangout-filter-reverse)
+2. 操作json结构中的深层数据. TODO
+3. 对消息做聚合, 生成聚合后的新消息. TODO
+4. input. TODO
+5. output. TODO
 
 # LICENSE
 The MIT License (MIT)
