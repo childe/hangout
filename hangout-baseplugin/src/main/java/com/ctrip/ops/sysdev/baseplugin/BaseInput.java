@@ -9,6 +9,7 @@ import lombok.extern.log4j.Log4j;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -78,17 +79,33 @@ public abstract class BaseInput extends Base {
                     Entry<String, Map> output = (Entry<String, Map>) entry;
                     String outputType = output.getKey();
                     Map outputConfig = output.getValue();
+
+                    log.info("begin to build output " + outputType);
+
                     Class<?> outputClass;
                     Constructor<?> ctor = null;
-                    log.info("begin to build output " + outputType);
-                    try {
-                        outputClass = Class.forName("com.ctrip.ops.sysdev.outputs." + outputType);
-                        ctor = outputClass.getConstructor(Map.class);
-                        log.info("build output " + outputType + " done");
-                        outputProcessors.add((BaseOutput) ctor.newInstance(outputConfig));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        System.exit(-1);
+                    List<String> classNames = Arrays.asList("com.ctrip.ops.sysdev.outputs." + outputType, outputType);
+                    boolean tryCtrip = true;
+
+                    for (String className : classNames) {
+                        try {
+                            outputClass = Class.forName(className);
+                            ctor = outputClass.getConstructor(Map.class);
+                            log.info("build output " + outputType + " done");
+                            outputProcessors.add((BaseOutput) ctor.newInstance(outputConfig));
+                        } catch (ClassNotFoundException e) {
+                            if (tryCtrip == true) {
+                                log.info("maybe a third party output plugin. try to build " + outputType);
+                                tryCtrip = false;
+                                continue;
+                            } else {
+                                log.error(e);
+                                System.exit(-1);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            System.exit(-1);
+                        }
                     }
                 });
             });

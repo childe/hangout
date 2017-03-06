@@ -17,11 +17,10 @@ import io.undertow.servlet.api.DeploymentManager;
 import lombok.extern.log4j.Log4j;
 
 import javax.servlet.ServletException;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
 
 @Log4j
 public class Main {
@@ -57,29 +56,43 @@ public class Main {
         inputConfigs.forEach(
                 input -> {
                     input.forEach((inputType, inputConfig) -> {
-                        Class<?> inputClass = null;
-                        try {
-                            log.info("begin to build input " + inputType);
-                            inputClass = Class.forName("com.ctrip.ops.sysdev.inputs." + inputType);
-                            //Get Constructor for each input
-                            Constructor<?> ctor = inputClass.getConstructor(
-                                    Map.class,
-                                    ArrayList.class,
-                                    ArrayList.class);
-                            //instantiate the input,prepare() and registerShutdownHookForSelf() are called here.
-                            BaseInput inputInstance = (BaseInput) ctor.newInstance(
-                                    inputConfig,
-                                    filterConfigs,
-                                    outputConfigs);
+                        log.info("begin to build input " + inputType);
 
-                            log.info("build input " + inputType + " done");
-                            //Start working,guy.
-                            inputInstance.emit();
-                            log.info("input" + inputType + " started");
-                        } catch (Exception e) {
-                            log.error(e);
-                            e.printStackTrace();
-                            System.exit(-1);
+                        Class<?> inputClass = null;
+
+                        List<String> classNames = Arrays.asList("com.ctrip.ops.sysdev.inputs." + inputType, inputType);
+                        boolean tryCtrip = true;
+                        for (String className : classNames) {
+                            try {
+                                inputClass = Class.forName(className);
+                                //Get Constructor for each input
+                                Constructor<?> ctor = inputClass.getConstructor(
+                                        Map.class,
+                                        ArrayList.class,
+                                        ArrayList.class);
+                                //instantiate the input,prepare() and registerShutdownHookForSelf() are called here.
+                                BaseInput inputInstance = (BaseInput) ctor.newInstance(
+                                        inputConfig,
+                                        filterConfigs,
+                                        outputConfigs);
+
+                                log.info("build input " + inputType + " done");
+                                //Start working,guy.
+                                inputInstance.emit();
+                                log.info("input" + inputType + " started");
+                            } catch (ClassNotFoundException e) {
+                                if (tryCtrip == true) {
+                                    log.info("maybe a third party input plugin. try to build " + inputType);
+                                    tryCtrip = false;
+                                    continue;
+                                } else {
+                                    log.error(e);
+                                    System.exit(-1);
+                                }
+                            } catch (Exception e) {
+                                log.error(e);
+                                System.exit(-1);
+                            }
                         }
                     });
                 });

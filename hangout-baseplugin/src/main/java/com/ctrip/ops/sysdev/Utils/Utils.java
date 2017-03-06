@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -23,17 +24,32 @@ public class Utils {
                     Map.Entry<String, Map> filter = (Map.Entry<String, Map>) entry;
                     String filterType = filter.getKey();
                     Map filterConfig = filter.getValue();
+
+                    logger.info("begin to build filter " + filterType);
+
                     Class<?> filterClass;
                     Constructor<?> ctor = null;
-                    logger.info("begin to build filter " + filterType);
-                    try {
-                        filterClass = Class.forName("com.ctrip.ops.sysdev.filters." + filterType);
-                        ctor = filterClass.getConstructor(Map.class);
-                        logger.info("build filter " + filterType + " done");
-                        filterProcessors.add((BaseFilter) ctor.newInstance(filterConfig));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        System.exit(-1);
+                    List<String> classNames = Arrays.asList("com.ctrip.ops.sysdev.filters." + filterType, filterType);
+                    boolean tryCtrip = true;
+                    for (String className : classNames) {
+                        try {
+                            filterClass = Class.forName(className);
+                            ctor = filterClass.getConstructor(Map.class);
+                            logger.info("build filter " + filterType + " done");
+                            filterProcessors.add((BaseFilter) ctor.newInstance(filterConfig));
+                        } catch (ClassNotFoundException e) {
+                            if (tryCtrip == true) {
+                                logger.info("maybe a third party output plugin. try to build " + filterType);
+                                tryCtrip = false;
+                                continue;
+                            } else {
+                                logger.error(e);
+                                System.exit(-1);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            System.exit(-1);
+                        }
                     }
                 });
             });
