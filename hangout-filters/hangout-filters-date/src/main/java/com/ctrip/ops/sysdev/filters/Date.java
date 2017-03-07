@@ -71,11 +71,12 @@ public class Date extends BaseFilter {
 
     @Override
     protected Map filter(Map event) {
-        String input = this.templateRender.render(event).toString();
-        if (input == null) {
+        Object inputObj = this.templateRender.render(event);
+        if (inputObj == null) {
             return event;
         }
 
+        String input = inputObj.toString();
         boolean success = false;
 
         if (addYear) {

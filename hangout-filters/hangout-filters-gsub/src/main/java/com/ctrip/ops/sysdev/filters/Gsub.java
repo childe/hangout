@@ -53,7 +53,11 @@ public class Gsub extends BaseFilter {
         for (Tuple4 t4 : f) {
             FieldSetter fs = (FieldSetter) t4._1();
             TemplateRender templateRender = (TemplateRender) t4._2();
-            fs.setField(event, templateRender.render(event).toString().replaceAll((String) t4._3(), (String) t4._4()));
+            Object o = templateRender.render(event);
+            if (o == null) {
+                continue;
+            }
+            fs.setField(event, o.toString().replaceAll((String) t4._3(), (String) t4._4()));
         }
         return event;
     }
