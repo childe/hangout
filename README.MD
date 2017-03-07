@@ -303,7 +303,7 @@ admin_port为监听端口，默认8080
 也可以开一个独立的项目. 我写了几个简单的例子做为教程, 供大家参考.
 
 1. 一个最简单的filter [https://github.com/childe/hangout-filter-reverse](https://github.com/childe/hangout-filter-reverse)
-2. 操作json结构中的深层数据. TODO
+2. 操作json结构中的深层数据. [https://github.com/childe/hangout-filter-reverse/tree/multilevel](https://github.com/childe/hangout-filter-reverse/tree/multilevel)
 3. 对消息做聚合, 生成聚合后的新消息. TODO
 4. input. TODO
 5. output. TODO
