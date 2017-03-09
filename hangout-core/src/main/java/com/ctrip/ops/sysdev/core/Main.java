@@ -80,6 +80,7 @@ public class Main {
                                 //Start working,guy.
                                 inputInstance.emit();
                                 log.info("input" + inputType + " started");
+                                break;
                             } catch (ClassNotFoundException e) {
                                 if (tryCtrip == true) {
                                     log.info("maybe a third party input plugin. try to build " + inputType);
