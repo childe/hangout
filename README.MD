@@ -167,7 +167,7 @@ maxmind也提供了数据的下载 [http://dev.maxmind.com/geoip/geoip2/geolite2
         location: false # default true
 
 ### Drop
-没有额外参数, 配置if使用.
+没有额外参数, 配合if使用.
 
 	if:
 		- '<#if user?matches("huhan3")>true</#if>'
