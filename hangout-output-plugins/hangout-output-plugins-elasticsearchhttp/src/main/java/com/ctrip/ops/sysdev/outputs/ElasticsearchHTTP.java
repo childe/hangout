@@ -138,7 +138,6 @@ public class ElasticsearchHTTP extends BaseOutput {
     private void addActionList(Map event, String _index, String _indexType) {
         Map indexAction = new HashMap() {
         };
-        event.put("@timestamp", event.get("@timestamp").toString());
         Map indexMap = new HashMap() {
             {
                 put("_index", _index);
