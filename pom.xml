@@ -13,6 +13,7 @@
         <module>hangout-input-plugins</module>
         <module>hangout-output-plugins</module>
         <module>hangout-filters</module>
+        <module>hangout-example</module>
         <module>hangout-dist</module>
     </modules>
 
