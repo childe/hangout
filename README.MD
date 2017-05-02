@@ -76,7 +76,6 @@ This product includes GeoLite2 data created by MaxMind, available from
           auto.commit.interval.ms: "1000"
           socket.receive.buffer.bytes: "1048576"
           fetch.message.max.bytes: "1048576"
-          num.consumer.fetchers: "4"
         codec: plain
 
 支持白名单匹配，使用topic_pattern指定正则表达式来匹配topic名称，如果指定此参数，topic参数会被忽略。
