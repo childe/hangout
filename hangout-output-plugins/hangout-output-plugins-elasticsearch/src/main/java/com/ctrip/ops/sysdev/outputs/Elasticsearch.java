@@ -124,7 +124,7 @@ public class Elasticsearch extends BaseOutput {
             }
         });
 
-        int bulkActions = config.containsKey("bulk_action") ? (int) config.get("bulk_action") : BULKACTION;
+        int bulkActions = config.containsKey("bulk_actions") ? (int) config.get("bulk_actions") : BULKACTION;
         int bulkSize = config.containsKey("bulk_size") ? (int) config.get("bulk_size") : BULKSIZE;
         int flushInterval = config.containsKey("flush_interval") ? (int) config.get("flush_interval") : FLUSHINTERVAL;
         int concurrentRequests = config.containsKey("concurrent_requests") ? (int) config.get("concurrent_requests") : CONCURRENTREQSIZE;
