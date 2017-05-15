@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -105,12 +106,17 @@ public class Elasticsearch extends BaseOutput {
         boolean sniff = config.containsKey("sniff") ? (boolean) config.get("sniff") : DEFAULTSNIFF;
         boolean compress = config.containsKey("compress") ? (boolean) config.get("compress") : DEFAULTCOMPRESS;
 
-        Settings settings = Settings.builder()
+        Settings.Builder settings = Settings.builder()
                 .put("client.transport.sniff", sniff)
                 .put("transport.tcp.compress", compress)
-                .put("cluster.name", clusterName).build();
+                .put("cluster.name", clusterName);
 
-        esclient = new PreBuiltTransportClient(settings);
+
+        if (config.containsKey("settings")) {
+            HashMap<String, Object> otherSettings = (HashMap<String, Object>) this.config.get("settings");
+            otherSettings.entrySet().stream().forEach(entry -> settings.put(entry.getKey(), entry.getValue()));
+        }
+        esclient = new PreBuiltTransportClient(settings.build());
 
         ArrayList<String> hosts = (ArrayList<String>) config.get("hosts");
         hosts.stream().map(host -> host.split(":")).forEach(parsedHost -> {
