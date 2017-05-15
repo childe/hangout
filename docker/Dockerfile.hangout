@@ -1,0 +1,20 @@
+
+FROM openjdk:8
+
+MAINTAINER hg
+
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+WORKDIR /opt/hangout/
+
+ADD hangout-tmp/ ./
+ADD log4j.properties ./bin/
+
+ENV HO_HEAP_SIZE 500m
+
+#ENTRYPOINT ["/bin/bash"]
+
+ENTRYPOINT ["./bin/hangout", "-f" ,"conf/kafka-es-docker.yml"  ]
+
+
