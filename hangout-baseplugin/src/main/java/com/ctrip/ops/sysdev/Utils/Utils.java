@@ -37,6 +37,7 @@ public class Utils {
                             ctor = filterClass.getConstructor(Map.class);
                             logger.info("build filter " + filterType + " done");
                             filterProcessors.add((BaseFilter) ctor.newInstance(filterConfig));
+                            break;
                         } catch (ClassNotFoundException e) {
                             if (tryCtrip == true) {
                                 logger.info("maybe a third party output plugin. try to build " + filterType);
