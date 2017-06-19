@@ -76,7 +76,6 @@ This product includes GeoLite2 data created by MaxMind, available from
           auto.commit.interval.ms: "1000"
           socket.receive.buffer.bytes: "1048576"
           fetch.message.max.bytes: "1048576"
-          num.consumer.fetchers: "4"
         codec: plain
 
 支持白名单匹配，使用topic_pattern指定正则表达式来匹配topic名称，如果指定此参数，topic参数会被忽略。
@@ -167,7 +166,7 @@ maxmind也提供了数据的下载 [http://dev.maxmind.com/geoip/geoip2/geolite2
         location: false # default true
 
 ### Drop
-没有额外参数, 配置if使用.
+没有额外参数, 配合if使用.
 
 	if:
 		- '<#if user?matches("huhan3")>true</#if>'
@@ -304,9 +303,9 @@ admin_port为监听端口，默认8080
 
 1. 一个最简单的filter [https://github.com/childe/hangout-filter-reverse](https://github.com/childe/hangout-filter-reverse)
 2. 操作json结构中的深层数据. [https://github.com/childe/hangout-filter-reverse/tree/multilevel](https://github.com/childe/hangout-filter-reverse/tree/multilevel)
-3. 对消息做聚合, 生成聚合后的新消息. TODO
-4. input. TODO
-5. output. TODO
+3. 对消息做聚合, 额外输出聚合后的新消息. 聚合访问日志,统计一定时间段内每个Url的响应时间(平均值,最小最大值,条数等信息), 然后输出给下游. [https://github.com/childe/hangout-filter-statmetric](https://github.com/childe/hangout-filter-statmetric)
+4. output.  示例3中的聚合数据如果需要告警, 比如Url的响应时间过高, 可以通过邮件发送出去. [https://github.com/childe/hangout-output-mail](https://github.com/childe/hangout-output-mail)
+5. input. TODO
 
 # LICENSE
 The MIT License (MIT)

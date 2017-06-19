@@ -93,6 +93,7 @@ public abstract class BaseInput extends Base {
                             ctor = outputClass.getConstructor(Map.class);
                             log.info("build output " + outputType + " done");
                             outputProcessors.add((BaseOutput) ctor.newInstance(outputConfig));
+                            break;
                         } catch (ClassNotFoundException e) {
                             if (tryCtrip == true) {
                                 log.info("maybe a third party output plugin. try to build " + outputType);
