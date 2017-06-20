@@ -252,7 +252,7 @@ sniff设置为true的话, 会把hosts当做一个入口, 然后去寻找真正�
 	hosts: # required
 		- 192.168.1.100
 		- 192.168.1.200:9301
-	index: 'hangout-${@timestamp.toString("YYYY.MM.dd")}'
+	index: 'hangout-%{+YYYY.MM.dd}'
 	index_type: logs # default logs
 	bulk_actions: 20000 # default 20000
 	bulk_size: 15	#default 15
