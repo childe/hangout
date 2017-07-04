@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import com.ctrip.ops.sysdev.metric.Metric;
+
 /**
  * Created by liujia on 17/7/4.
  */
@@ -40,6 +42,8 @@ public class Graphit extends BaseMetric {
     }
 
     public void register() {
+        this.metricRegistry.registerAll(Metric.getMetricRegistry());
+
         this.metrics.forEach((metricType, metricNames) -> {
             Class<?> metricClass = null;
             try {
@@ -96,7 +100,7 @@ public class Graphit extends BaseMetric {
         if ("".equals(this.prefix)) {
             this.prefix = localHostName;
         } else {
-            this.prefix = localHostName + "." + prefix;
+            this.prefix += "." + localHostName;
         }
 
         PickledGraphite pickledGraphite = new PickledGraphite(new InetSocketAddress(host, port));
