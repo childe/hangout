@@ -1,6 +1,6 @@
 package com.ctrip.ops.sysdev.metrics;
 
-import com.codahale.metrics.MetricRegistry;
+
 import com.codahale.metrics.health.HealthCheckRegistry;
 import com.codahale.metrics.servlets.AdminServlet;
 import com.codahale.metrics.servlets.HealthCheckServlet;
@@ -18,6 +18,8 @@ import org.apache.log4j.Logger;
 import javax.servlet.ServletException;
 import java.util.Map;
 
+import com.ctrip.ops.sysdev.metric.Metric;
+
 /**
  * Created by liujia on 17/7/4.
  */
@@ -26,7 +28,6 @@ public class Watcher extends BaseMetric {
 
     private final String host;
     private final int port;
-    private MetricRegistry metricRegistry = new MetricRegistry();
     private HealthCheckRegistry healthCheckRegistry = new HealthCheckRegistry();
 
     public Watcher(Map config) {
@@ -43,7 +44,7 @@ public class Watcher extends BaseMetric {
                     .setClassLoader(Watcher.class.getClassLoader())
                     .setContextPath("/")
                     .setDeploymentName("admin.war")
-                    .addServletContextAttribute(MetricsServlet.METRICS_REGISTRY, this.metricRegistry)
+                    .addServletContextAttribute(MetricsServlet.METRICS_REGISTRY, Metric.getMetricRegistry())
                     .addServletContextAttribute(HealthCheckServlet.HEALTH_CHECK_REGISTRY, this.healthCheckRegistry)
                     .addServlets(
                             Servlets.servlet("AdminServlet", AdminServlet.class).addMapping("/*")
