@@ -13,6 +13,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>hangout-metric-graphit</module>
+        <module>hangout-metric-watcher</module>
     </modules>
 
 </project>
