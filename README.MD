@@ -307,8 +307,10 @@ metric count, 可以记录流经每个plugin的数据多少, 开发新的plugin�
 
 在使用的时候需要注意, yml配置文件中需要指明meter_name才可以记录.
 
-   - Stdin:
-        meter_name: stdin1
+```
+- Stdin:
+  meter_name: stdin1
+```
 
 # 开发:
 当然可以在hangout的结构上继续开发, 可以参考项目结构中baseplugin和input,output,filters等插件.  
