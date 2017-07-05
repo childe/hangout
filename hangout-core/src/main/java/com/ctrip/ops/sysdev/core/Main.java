@@ -41,41 +41,43 @@ public class Main {
         final List<HashMap<String, Map>> outputConfigs = (ArrayList<HashMap<String, Map>>) configs.get("outputs");
         final List<HashMap<String, Map>> metricsConfigs = (ArrayList<HashMap<String, Map>>) configs.get("metrics");
 
-        metricsConfigs.forEach(metric -> {
-            metric.forEach((metricType, metricConfig) -> {
-                logger.info("begin to build metric " + metricType);
+        if (metricsConfigs != null) {
+            metricsConfigs.forEach(metric -> {
+                metric.forEach((metricType, metricConfig) -> {
+                    logger.info("begin to build metric " + metricType);
 
-                Class<?> metricClass = null;
+                    Class<?> metricClass = null;
 
-                List<String> classNames = Arrays.asList("com.ctrip.ops.sysdev.metrics." + metricType, metricType);
-                boolean tryCtrip = true;
-                for (String className : classNames) {
-                    try {
-                        metricClass = Class.forName(className);
-                        Constructor<?> ctor = metricClass.getConstructor(Map.class);
-                        BaseMetric metricInstance = (BaseMetric) ctor.newInstance(metricConfig);
-                        logger.info("build metric " + metricType + " done");
+                    List<String> classNames = Arrays.asList("com.ctrip.ops.sysdev.metrics." + metricType, metricType);
+                    boolean tryCtrip = true;
+                    for (String className : classNames) {
+                        try {
+                            metricClass = Class.forName(className);
+                            Constructor<?> ctor = metricClass.getConstructor(Map.class);
+                            BaseMetric metricInstance = (BaseMetric) ctor.newInstance(metricConfig);
+                            logger.info("build metric " + metricType + " done");
 
-                        metricInstance.register();
-                        logger.info("metric" + metricType + " started");
+                            metricInstance.register();
+                            logger.info("metric" + metricType + " started");
 
-                        break;
-                    } catch (ClassNotFoundException e) {
-                        if (tryCtrip == true) {
-                            logger.info("maybe a third party metric plugin. try to build " + metricType);
-                            tryCtrip = false;
-                            continue;
-                        } else {
+                            break;
+                        } catch (ClassNotFoundException e) {
+                            if (tryCtrip == true) {
+                                logger.info("maybe a third party metric plugin. try to build " + metricType);
+                                tryCtrip = false;
+                                continue;
+                            } else {
+                                logger.error(e);
+                                System.exit(-1);
+                            }
+                        } catch (Exception e) {
                             logger.error(e);
                             System.exit(-1);
                         }
-                    } catch (Exception e) {
-                        logger.error(e);
-                        System.exit(-1);
                     }
-                }
+                });
             });
-        });
+        }
 
         // for input in all_inputs, Go through every input and emit immediately
         inputConfigs.forEach(
