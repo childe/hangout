@@ -4,7 +4,7 @@
 
     <groupId>ctrip</groupId>
     <artifactId>hangout</artifactId>
-    <version>0.2.1</version>
+    <version>0.3.0</version>
     <packaging>pom</packaging>
     <name>hangout</name>
     <modules>
@@ -13,6 +13,7 @@
         <module>hangout-input-plugins</module>
         <module>hangout-output-plugins</module>
         <module>hangout-filters</module>
+        <module>hangout-metric-plugins</module>
         <module>hangout-dist</module>
     </modules>
 

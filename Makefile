@@ -1,4 +1,4 @@
-VERSION := 0.2.1
+VERSION := 0.3.0
 RELEASEPATH = release/$(FULLVERSION)
 
 UNAME := $(shell uname)
@@ -11,7 +11,7 @@ endif
 default:
 	mkdir -p release/hangout-$(VERSION)
 	mvn clean package -DskipTests
-	unzip hangout-dist/target/hangout-dist-0.2.1-release-bin.zip -d release/hangout-$(VERSION)
+	unzip hangout-dist/target/hangout-dist-0.3.0-release-bin.zip -d release/hangout-$(VERSION)
 	git rev-parse --short HEAD > release/hangout-$(VERSION)/VERSION
 	chmod +x release/hangout-$(VERSION)/bin/hangout
 

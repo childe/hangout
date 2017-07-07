@@ -2,9 +2,8 @@ package com.ctrip.ops.sysdev.baseplugin;
 
 import com.codahale.metrics.Meter;
 import com.ctrip.ops.sysdev.exception.YamlConfigException;
-import com.ctrip.ops.sysdev.watcher.Watcher;
+import com.ctrip.ops.sysdev.metric.Metric;
 
-import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -14,13 +13,11 @@ public class Base {
 
     protected boolean enableMeter = false;
     protected Meter meter;
-
-    public static final Watcher watcher = Watcher.getWatcher();
-
+    
     public Base(Map config) {
         if (config.containsKey("meter_name")) {
             this.enableMeter = true;
-            meter = watcher.setMetric((String) config.get("meter_name"));
+            meter = Metric.setMetric((String) config.get("meter_name"));
         }
     }
 

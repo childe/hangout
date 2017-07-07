@@ -1,0 +1,44 @@
+inputs:
+   - Stdin:
+        codec: plain
+        meter_name: stdin1
+        hostname: true # if add hostname to event; default false
+
+filters:
+    - Filters:
+        if:
+          - '<#if message??>true</#if>'
+          - '<#if message?contains("liu")>true<#elseif message?contains("warn")>true</#if>'
+        filters:
+            - Add:
+                fields:
+                    test: 'abcd'
+    - Add:
+          fields:
+              addfield1: 'field1content'
+    - Add:
+          fields:
+              addfield2: 'field2content'
+    - Grok:
+          match:
+            - '^(?<logtime>\S+) (?<user>.+) (-|(?<level>\w+)) %{DATA:msg}$'
+          remove_fields: ['message']
+          tag_on_failure: '' # do not add tags; deafult "grokfail"     addfield2: 'field2content'
+
+outputs:
+    - Stdout: {}
+
+metrics:
+    - Graphit:
+        port: 2004  # graphit port
+        host: 10.0.0.100  # graphit host
+        prefix: hangout
+        metrics:
+            com.codahale.metrics.JvmAttributeGaugeSet: [] # empty list will register all metrics in it
+            com.codahale.metrics.jvm.MemoryUsageGaugeSet: []
+            com.codahale.metrics.jvm.ThreadStatesGaugeSet: []
+            com.codahale.metrics.jvm.GarbageCollectorMetricSet: []
+
+    - Watcher:
+        host: 0.0.0.0
+        port: 8080
