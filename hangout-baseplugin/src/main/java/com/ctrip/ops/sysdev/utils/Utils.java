@@ -43,11 +43,11 @@ public class Utils {
                                 continue;
                             } else {
                                 log.error(e);
-                                System.exit(-1);
+                                System.exit(1);
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
-                            System.exit(-1);
+                            System.exit(1);
                         }
                     }
                 });

@@ -139,7 +139,7 @@ public class Grok extends BaseFilter {
             } catch (IOException e) {
                 log.error("failed to prepare patterns");
                 log.trace(e);
-                System.exit(-1);
+                System.exit(1);
             }
 
         } else { // Run with IDE
@@ -162,7 +162,7 @@ public class Grok extends BaseFilter {
             } catch (Exception e) {
                 log.error("failed to read pattern_path");
                 log.trace(e);
-                System.exit(-1);
+                System.exit(1);
             }
         }
 

@@ -32,7 +32,7 @@ public class Main {
             configs = HangoutConfig.parse(cm.getConfigFile());
         } catch (Exception e) {
             e.printStackTrace();
-            System.exit(-1);
+            System.exit(1);
         }
         log.debug(configs);
 
@@ -68,11 +68,11 @@ public class Main {
                                 continue;
                             } else {
                                 log.error(e);
-                                System.exit(-1);
+                                System.exit(1);
                             }
                         } catch (Exception e) {
                             log.error(e);
-                            System.exit(-1);
+                            System.exit(1);
                         }
                     }
                 });
@@ -115,11 +115,11 @@ public class Main {
                                     continue;
                                 } else {
                                     log.error(e);
-                                    System.exit(-1);
+                                    System.exit(1);
                                 }
                             } catch (Exception e) {
                                 log.error(e);
-                                System.exit(-1);
+                                System.exit(1);
                             }
                         }
                     });

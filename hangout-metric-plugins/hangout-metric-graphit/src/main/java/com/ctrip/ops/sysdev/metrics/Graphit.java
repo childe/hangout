@@ -52,7 +52,7 @@ public class Graphit extends BaseMetric {
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
                 log.error(e);
-                System.exit(-1);
+                System.exit(1);
             }
 
             Constructor<?> ctor = null;
@@ -61,7 +61,7 @@ public class Graphit extends BaseMetric {
             } catch (NoSuchMethodException e) {
                 e.printStackTrace();
                 log.error(e);
-                System.exit(-1);
+                System.exit(1);
             }
 
             final MetricSet metricInstance;
@@ -78,15 +78,15 @@ public class Graphit extends BaseMetric {
             } catch (InstantiationException e) {
                 e.printStackTrace();
                 log.error(e);
-                System.exit(-1);
+                System.exit(1);
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
                 log.error(e);
-                System.exit(-1);
+                System.exit(1);
             } catch (InvocationTargetException e) {
                 e.printStackTrace();
                 log.error(e);
-                System.exit(-1);
+                System.exit(1);
             }
 
         });

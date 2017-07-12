@@ -63,7 +63,7 @@ public class CommandLineValues {
         } catch (CmdLineException e) {
             System.err.println(e.getMessage());
             // print the list of available options
-            System.exit(-1);
+            System.exit(1);
         }
     }
 
