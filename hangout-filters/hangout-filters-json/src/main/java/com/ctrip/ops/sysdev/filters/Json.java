@@ -3,12 +3,11 @@ package com.ctrip.ops.sysdev.filters;
 import java.util.Map;
 
 import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.json.simple.JSONValue;
 
-@SuppressWarnings("ALL")
+@Log4j2
 public class Json extends BaseFilter {
-    private static final Logger logger = Logger.getLogger(Json.class.getName());
 
     public Json(Map config) {
         super(config);
@@ -18,7 +17,7 @@ public class Json extends BaseFilter {
 
     protected void prepare() {
         if (!config.containsKey("field")) {
-            logger.error("no field configured in Json");
+            log.error("no field configured in Json");
             System.exit(1);
         }
         this.field = (String) config.get("field");
@@ -45,7 +44,7 @@ public class Json extends BaseFilter {
                         .parseWithException((String) event.get(this.field));
                 success = true;
             } catch (Exception e) {
-                logger.debug("failed to json parse field: " + this.field);
+                log.debug("failed to json parse field: " + this.field);
             }
         }
 
@@ -55,7 +54,7 @@ public class Json extends BaseFilter {
                 try {
                     event.putAll((Map) obj);
                 } catch (Exception e) {
-                    logger.warn(this.field + " is not a map, you should set a target to save it");
+                    log.warn(this.field + " is not a map, you should set a target to save it");
                     success = false;
                 }
             } else {

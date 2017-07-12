@@ -7,12 +7,10 @@ import java.util.Map;
 import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
 import com.ctrip.ops.sysdev.fieldSetter.FieldSetter;
 import com.ctrip.ops.sysdev.render.TemplateRender;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
-@SuppressWarnings("ALL")
+@Log4j2
 public class Replace extends BaseFilter {
-    private static final Logger logger = Logger.getLogger(Replace.class
-            .getName());
 
     public Replace(Map config) {
         super(config);
@@ -28,7 +26,7 @@ public class Replace extends BaseFilter {
         try {
             this.srcTemplateRender = TemplateRender.getRender(src, false);
         } catch (IOException e) {
-            logger.fatal("could NOT build tempalte render from " + src);
+            log.fatal("could NOT build tempalte render from " + src);
             System.exit(1);
         }
 
@@ -36,7 +34,7 @@ public class Replace extends BaseFilter {
         try {
             this.templateRender = TemplateRender.getRender(value);
         } catch (IOException e) {
-            logger.fatal("could NOT build tempalte render from " + value);
+            log.fatal("could NOT build tempalte render from " + value);
             System.exit(1);
         }
     }

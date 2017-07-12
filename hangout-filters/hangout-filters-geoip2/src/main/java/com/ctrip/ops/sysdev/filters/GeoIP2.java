@@ -14,7 +14,7 @@ import java.util.Map;
 import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
 import com.maxmind.geoip2.model.CountryResponse;
 import com.maxmind.geoip2.record.Subdivision;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.model.CityResponse;
@@ -22,9 +22,8 @@ import com.maxmind.geoip2.record.City;
 import com.maxmind.geoip2.record.Country;
 import com.maxmind.geoip2.record.Location;
 
+@Log4j2
 public class GeoIP2 extends BaseFilter {
-    private static final Logger logger = Logger.getLogger(GeoIP2.class
-            .getName());
 
     public GeoIP2(Map config) {
         super(config);
@@ -37,7 +36,7 @@ public class GeoIP2 extends BaseFilter {
 
     protected void prepare() {
         if (!config.containsKey("source")) {
-            logger.error("no source configured in GeoIP");
+            log.error("no source configured in GeoIP");
             System.exit(1);
         }
         this.source = (String) config.get("source");
@@ -56,7 +55,7 @@ public class GeoIP2 extends BaseFilter {
 
         // A File object pointing to your GeoIP2 or GeoLite2 database
         if (!config.containsKey("database")) {
-            logger.error("no database configured in GeoIP");
+            log.error("no database configured in GeoIP");
             System.exit(1);
         }
 
@@ -76,7 +75,7 @@ public class GeoIP2 extends BaseFilter {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                logger.error("could not get/set " + fieldname + " as boolean value");
+                log.error("could not get/set " + fieldname + " as boolean value");
                 System.exit(1);
             }
         }
@@ -92,15 +91,15 @@ public class GeoIP2 extends BaseFilter {
                 connection.connect();
             } catch (IOException e) {
                 e.printStackTrace();
-                logger.error("failed to load " + databasePath);
+                log.error("failed to load " + databasePath);
                 System.exit(1);
             }
             // This creates the DatabaseReader object, which should be reused across lookups.
             try {
                 this.reader = new DatabaseReader.Builder(connection.getInputStream()).build();
             } catch (IOException e) {
-                logger.error("failed to prepare DatabaseReader for geoip");
-                logger.error(e);
+                log.error("failed to prepare DatabaseReader for geoip");
+                log.error(e);
                 System.exit(1);
             }
 
@@ -110,8 +109,8 @@ public class GeoIP2 extends BaseFilter {
             try {
                 this.reader = new DatabaseReader.Builder(database).build();
             } catch (IOException e) {
-                logger.error("failed to prepare DatabaseReader for geoip");
-                logger.error(e);
+                log.error("failed to prepare DatabaseReader for geoip");
+                log.error(e);
                 System.exit(1);
             }
         }
@@ -127,7 +126,7 @@ public class GeoIP2 extends BaseFilter {
             try {
                 ipAddress = InetAddress.getByName((String) event.get(source));
             } catch (UnknownHostException e) {
-                logger.debug("NOT a valid IP address");
+                log.debug("NOT a valid IP address");
                 this.postProcess(event, false);
                 return event;
             }
@@ -165,8 +164,8 @@ public class GeoIP2 extends BaseFilter {
                 this.postProcess(event, true);
                 return event;
             } catch (Exception e) {
-                logger.debug(e);
-                logger.debug("maybe your DB doesn't support city lelel.");
+                log.debug(e);
+                log.debug("maybe your DB doesn't support city lelel.");
             }
 
 
@@ -185,7 +184,7 @@ public class GeoIP2 extends BaseFilter {
                 if (this.city_name) ;
 
             } catch (Exception e) {
-                logger.debug(e);
+                log.debug(e);
                 this.postProcess(event, false);
                 return event;
             }

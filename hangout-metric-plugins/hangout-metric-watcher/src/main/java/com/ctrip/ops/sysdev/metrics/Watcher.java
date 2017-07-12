@@ -12,7 +12,7 @@ import io.undertow.server.handlers.PathHandler;
 import io.undertow.servlet.Servlets;
 import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.servlet.api.DeploymentManager;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
 
 import javax.servlet.ServletException;
@@ -23,8 +23,9 @@ import com.ctrip.ops.sysdev.metric.Metric;
 /**
  * Created by liujia on 17/7/4.
  */
+@Log4j2
 public class Watcher extends BaseMetric {
-    private static final Logger logger = Logger.getLogger(Watcher.class.getName());
+
 
     private final String host;
     private final int port;
@@ -56,7 +57,7 @@ public class Watcher extends BaseMetric {
             try {
                 path = Handlers.path().addPrefixPath("/", manager.start());
             } catch (ServletException e) {
-                logger.error("Admin Servlet error: ", e);
+                log.error("Admin Servlet error: ", e);
             }
 
             Undertow server = Undertow.builder()
@@ -66,7 +67,7 @@ public class Watcher extends BaseMetric {
             try {
                 server.start();
             } catch (RuntimeException e) {
-                logger.error("Admin server start error: ", e);
+                log.error("Admin server start error: ", e);
             }
         };
         task.run();

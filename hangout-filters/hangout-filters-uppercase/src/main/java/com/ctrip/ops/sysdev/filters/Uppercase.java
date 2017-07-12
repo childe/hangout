@@ -3,7 +3,7 @@ package com.ctrip.ops.sysdev.filters;
 import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
 import com.ctrip.ops.sysdev.fieldSetter.FieldSetter;
 import com.ctrip.ops.sysdev.render.TemplateRender;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import scala.Tuple2;
 
 import java.io.IOException;
@@ -11,8 +11,9 @@ import java.util.ArrayList;
 import java.util.Map;
 
 @SuppressWarnings("ALL")
+@Log4j2
 public class Uppercase extends BaseFilter {
-    private static final Logger logger = Logger.getLogger(Uppercase.class.getName());
+
 
     public Uppercase(Map config) {
         super(config);
@@ -26,7 +27,7 @@ public class Uppercase extends BaseFilter {
             try {
                 this.fields.add(new Tuple2(FieldSetter.getFieldSetter(field), TemplateRender.getRender(field, false)));
             } catch (IOException e) {
-                logger.error("could NOT build TemplateRender from " + field);
+                log.error("could NOT build TemplateRender from " + field);
                 System.exit(1);
             }
         }

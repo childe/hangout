@@ -8,13 +8,11 @@ import java.util.Map;
 
 import com.ctrip.ops.sysdev.fieldSetter.FieldSetter;
 import com.ctrip.ops.sysdev.render.TemplateRender;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import scala.Tuple2;
 
-@SuppressWarnings("ALL")
+@Log4j2
 public class Trim extends BaseFilter {
-    private static final Logger logger = Logger.getLogger(BaseFilter.class
-            .getName());
 
     public Trim(Map config) {
         super(config);
@@ -30,7 +28,7 @@ public class Trim extends BaseFilter {
             try {
                 templateRender = TemplateRender.getRender(field, false);
             } catch (IOException e) {
-                logger.fatal("could NOT build template render from " + field);
+                log.fatal("could NOT build template render from " + field);
             }
             this.fields.add(new Tuple2(FieldSetter.getFieldSetter(field), templateRender));
         }

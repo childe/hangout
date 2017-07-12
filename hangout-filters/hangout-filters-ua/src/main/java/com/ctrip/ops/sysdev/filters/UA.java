@@ -1,15 +1,16 @@
 package com.ctrip.ops.sysdev.filters;
 
 import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import ua_parser.Client;
 import ua_parser.Parser;
 
 import java.io.IOException;
 import java.util.Map;
 
+@Log4j2
 public class UA extends BaseFilter {
-	private static final Logger logger = Logger.getLogger(UA.class.getName());
+
 
 	public UA(Map config) {
 		super(config);
@@ -20,7 +21,7 @@ public class UA extends BaseFilter {
 
 	protected void prepare() {
 		if (!config.containsKey("source")) {
-			logger.error("no field configured in Json");
+			log.error("no field configured in Json");
 			System.exit(1);
 		}
 		this.source = (String) config.get("source");
@@ -28,7 +29,7 @@ public class UA extends BaseFilter {
 		try {
 			this.uaParser = new Parser();
 		} catch (IOException e) {
-			logger.error(e);
+			log.error(e);
 			e.printStackTrace();
 			System.exit(1);
 		}

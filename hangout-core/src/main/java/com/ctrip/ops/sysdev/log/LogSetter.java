@@ -38,7 +38,7 @@ public class LogSetter {
 //        appender.setLayout(patternLayout);
 //        appender.activateOptions();
 //        appender.setThreshold(cmdLine.customGetLogLevel());
-//        logger.setLevel(cmdLine.customGetLogLevel());
-//        logger.addAppender(appender);
+//        log.setLevel(cmdLine.customGetLogLevel());
+//        log.addAppender(appender);
 //    }
 }

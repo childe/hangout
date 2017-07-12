@@ -8,12 +8,13 @@ import java.util.Map;
 
 import com.ctrip.ops.sysdev.fieldSetter.FieldSetter;
 import com.ctrip.ops.sysdev.render.TemplateRender;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import scala.Tuple2;
 
 @SuppressWarnings("ALL")
+@Log4j2
 public class Lowercase extends BaseFilter {
-    private static final Logger logger = Logger.getLogger(Lowercase.class.getName());
+
 
     public Lowercase(Map config) {
         super(config);
@@ -27,7 +28,7 @@ public class Lowercase extends BaseFilter {
             try {
                 this.fields.add(new Tuple2(FieldSetter.getFieldSetter(field), TemplateRender.getRender(field, false)));
             } catch (IOException e) {
-                logger.error("could NOT build TemplateRender from " + field);
+                log.error("could NOT build TemplateRender from " + field);
                 System.exit(1);
             }
         }

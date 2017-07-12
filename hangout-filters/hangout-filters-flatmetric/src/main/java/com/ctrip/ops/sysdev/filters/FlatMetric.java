@@ -1,13 +1,11 @@
 package com.ctrip.ops.sysdev.filters;
 
+import lombok.extern.log4j.Log4j2;
+
 import java.util.*;
 
-
-import org.apache.log4j.Logger;
-
+@Log4j2
 public class FlatMetric extends Metric {
-    private static final Logger logger = Logger.getLogger(FlatMetric.class.getName());
-
     public FlatMetric(Map config) {
         super(config);
         this.metricToEmit = new HashMap<>();

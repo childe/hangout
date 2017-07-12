@@ -2,16 +2,14 @@ package com.ctrip.ops.sysdev.filters;
 
 import com.ctrip.ops.sysdev.utils.Utils;
 import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings("ALL")
+@Log4j2
 public class Filters extends BaseFilter {
-    private static final Logger logger = Logger.getLogger(Filters.class.getName());
-
     public Filters(Map config) {
         super(config);
     }

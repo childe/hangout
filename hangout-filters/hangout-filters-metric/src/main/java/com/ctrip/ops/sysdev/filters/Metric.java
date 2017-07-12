@@ -4,10 +4,11 @@ import java.util.*;
 
 import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
 
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 public class Metric extends BaseFilter {
-    private static final Logger logger = Logger.getLogger(Metric.class.getName());
+
 
     int windowSize;
     String key;

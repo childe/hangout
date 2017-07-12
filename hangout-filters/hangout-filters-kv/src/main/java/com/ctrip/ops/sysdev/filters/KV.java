@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 public class KV extends BaseFilter {
-    private static final Logger logger = Logger.getLogger(KV.class.getName());
 
     private String source;
     private String target;
@@ -115,7 +115,7 @@ public class KV extends BaseFilter {
                 event.put(this.target, targetObj);
             }
         } catch (Exception e) {
-            logger.warn(event + "kv faild");
+            log.warn(event + "kv faild");
             success = false;
         }
 

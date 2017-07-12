@@ -11,10 +11,11 @@ import com.ctrip.ops.sysdev.render.TemplateRender;
 import scala.Tuple2;
 
 import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 public class URLDecode extends BaseFilter {
-    private static final Logger logger = Logger.getLogger(URLDecode.class.getName());
+
 
     @SuppressWarnings("rawtypes")
     public URLDecode(Map config) {
@@ -32,7 +33,7 @@ public class URLDecode extends BaseFilter {
             try {
                 templateRender = TemplateRender.getRender(field, false);
             } catch (IOException e) {
-                logger.fatal("could NOT build template render from " + field);
+                log.fatal("could NOT build template render from " + field);
                 System.exit(1);
             }
             this.fields.add(new Tuple2(FieldSetter.getFieldSetter(field), templateRender));
@@ -61,7 +62,7 @@ public class URLDecode extends BaseFilter {
                 try {
                     ((FieldSetter) f2._1()).setField(event, URLDecoder.decode((String) value, this.enc));
                 } catch (Exception e) {
-                    logger.error("URLDecode failed", e);
+                    log.error("URLDecode failed", e);
                     success = false;
                 }
             }
