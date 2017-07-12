@@ -11,7 +11,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.jcodings.specific.UTF8Encoding;
 import org.joni.Matcher;
 import org.joni.NameEntry;
@@ -19,8 +19,8 @@ import org.joni.Option;
 import org.joni.Regex;
 import org.joni.Region;
 
+@Log4j2
 public class Grok extends BaseFilter {
-    private static final Logger logger = Logger.getLogger(Grok.class.getName());
 
     private String src;
     private String encoding;
@@ -105,6 +105,7 @@ public class Grok extends BaseFilter {
         final File jarFile = new File(getClass().getProtectionDomain()
                 .getCodeSource().getLocation().getPath());
 
+        //TODO NOT unzip to tmp
         if (jarFile.isFile()) { // Run with JAR file
             try {
                 JarFile jar = new JarFile(jarFile);
@@ -125,19 +126,20 @@ public class Grok extends BaseFilter {
                             os.close();
                             in.close();
                         } catch (Exception e) {
-                            logger.warn(e);
+                            log.warn(e);
                         }
                         try {
                             load_patterns(file);
                         } catch (Exception e) {
-                            logger.warn(e);
+                            log.warn(e);
                         }
                     }
                 }
                 jar.close();
             } catch (IOException e) {
-                logger.error("prepare patterns failed");
-                logger.trace(e);
+                log.error("failed to prepare patterns");
+                log.trace(e);
+                System.exit(-1);
             }
 
         } else { // Run with IDE
@@ -145,7 +147,7 @@ public class Grok extends BaseFilter {
                 load_patterns(new File(ClassLoader
                         .getSystemResource("patterns").getFile()));
             } catch (Exception e) {
-                logger.warn(e);
+                log.warn(e);
             }
         }
 
@@ -158,8 +160,9 @@ public class Grok extends BaseFilter {
                     load_patterns(new File(pattern_path));
                 }
             } catch (Exception e) {
-                logger.error("read pattern_path failed");
-                logger.warn(e);
+                log.error("failed to read pattern_path");
+                log.trace(e);
+                System.exit(-1);
             }
         }
 
@@ -174,7 +177,7 @@ public class Grok extends BaseFilter {
                         UTF8Encoding.INSTANCE);
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
-                logger.error("failed to compile match pattern.");
+                log.error("failed to compile match pattern.");
                 System.exit(1);
             }
 
@@ -212,7 +215,7 @@ public class Grok extends BaseFilter {
         try {
             bs = input.getBytes(this.encoding);
         } catch (UnsupportedEncodingException e) {
-            logger.error("input.getBytes error, maybe wrong encoding? try do NOT use encoding");
+            log.error("input.getBytes error, maybe wrong encoding? try do NOT use encoding");
             bs = input.getBytes();
         }
 
@@ -254,8 +257,8 @@ public class Grok extends BaseFilter {
                 }
 
             } catch (Exception e) {
-                logger.warn("grok failed:" + event);
-                logger.trace(e.getLocalizedMessage());
+                log.warn("grok failed:" + event);
+                log.trace(e.getLocalizedMessage());
                 success = false;
             }
         }

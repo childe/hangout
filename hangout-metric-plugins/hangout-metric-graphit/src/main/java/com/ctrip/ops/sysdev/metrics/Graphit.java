@@ -6,7 +6,7 @@ import com.codahale.metrics.MetricSet;
 import com.codahale.metrics.graphite.GraphiteReporter;
 import com.codahale.metrics.graphite.PickledGraphite;
 import com.ctrip.ops.sysdev.baseplugin.BaseMetric;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -23,8 +23,9 @@ import com.ctrip.ops.sysdev.metric.Metric;
 /**
  * Created by liujia on 17/7/4.
  */
+
+@Log4j2
 public class Graphit extends BaseMetric {
-    private static final Logger logger = Logger.getLogger(Graphit.class.getName());
 
     private final String host;
     private final int port;
@@ -50,7 +51,7 @@ public class Graphit extends BaseMetric {
                 metricClass = Class.forName(metricType);
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
-                logger.error(e);
+                log.error(e);
                 System.exit(-1);
             }
 
@@ -59,7 +60,7 @@ public class Graphit extends BaseMetric {
                 ctor = metricClass.getConstructor();
             } catch (NoSuchMethodException e) {
                 e.printStackTrace();
-                logger.error(e);
+                log.error(e);
                 System.exit(-1);
             }
 
@@ -76,15 +77,15 @@ public class Graphit extends BaseMetric {
                 }
             } catch (InstantiationException e) {
                 e.printStackTrace();
-                logger.error(e);
+                log.error(e);
                 System.exit(-1);
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
-                logger.error(e);
+                log.error(e);
                 System.exit(-1);
             } catch (InvocationTargetException e) {
                 e.printStackTrace();
-                logger.error(e);
+                log.error(e);
                 System.exit(-1);
             }
 

@@ -1,6 +1,5 @@
 package com.ctrip.ops.sysdev.config;
 
-
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
@@ -10,15 +9,12 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Map;
 
-
-@SuppressWarnings("rawtypes")
 public class HangoutConfig<T> {
     private static final String HTTP = "http://";
     private static final String HTTPS = "https://";
-//    private static final Logger logger = Logger.getLogger(HangoutConfig.class.getName());
 
     @SuppressWarnings("NestedMethodCall")
-    public static Map parse(String filename) throws Exception{
+    public static Map parse(String filename) throws Exception {
         Yaml yaml = new Yaml();
         InputStream is;
         if (filename.startsWith(HangoutConfig.HTTP) || filename.startsWith(HangoutConfig.HTTPS)) {
@@ -34,7 +30,7 @@ public class HangoutConfig<T> {
 
         Map configs = (Map) yaml.load(is);
 
-        if (configs.get("inputs")==null||configs.get("outputs")==null){
+        if (configs.get("inputs") == null || configs.get("outputs") == null) {
             System.err.println("Error: No inputs or outputs!");
             throw new Exception();
         }

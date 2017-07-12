@@ -3,7 +3,7 @@ package com.ctrip.ops.sysdev.filters;
 import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
 import com.ctrip.ops.sysdev.fieldSetter.FieldSetter;
 import com.ctrip.ops.sysdev.render.TemplateRender;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import scala.Tuple4;
 
 import java.util.HashMap;
@@ -11,11 +11,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-@SuppressWarnings("ALL")
+@Log4j2
 public class Convert extends BaseFilter {
-    private static final Logger logger = Logger.getLogger(Convert.class
-            .getName());
-
     private Map<FieldSetter, Tuple4> f;
 
     public Convert(Map config) {
@@ -65,7 +62,7 @@ public class Convert extends BaseFilter {
             try {
                 f.put(FieldSetter.getFieldSetter(field), new Tuple4(converter, TemplateRender.getRender(field, false), remove_if_fail, setto_if_fail));
             } catch (Exception e) {
-                logger.error("could not create filed render for '" + field + "'");
+                log.error("could not create filed render for '" + field + "'");
                 System.exit(1);
             }
         }

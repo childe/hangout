@@ -9,10 +9,10 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import org.json.simple.JSONValue;
 
-@Log4j
+@Log4j2
 public class Kafka extends BaseOutput {
 
     private Producer producer;

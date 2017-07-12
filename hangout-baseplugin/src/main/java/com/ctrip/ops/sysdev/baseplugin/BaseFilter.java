@@ -1,18 +1,17 @@
 package com.ctrip.ops.sysdev.baseplugin;
 
+
 import com.ctrip.ops.sysdev.fieldDeleter.FieldDeleter;
 import com.ctrip.ops.sysdev.fieldSetter.FieldSetter;
 import com.ctrip.ops.sysdev.render.FreeMarkerRender;
 import com.ctrip.ops.sysdev.render.TemplateRender;
-import freemarker.ext.beans.HashAdapter;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.util.*;
 
+@Log4j2
 public class BaseFilter {
-    private static final Logger logger = Logger.getLogger(BaseFilter.class
-            .getName());
 
     protected Map config;
     protected String tagOnFailure;
@@ -30,7 +29,7 @@ public class BaseFilter {
                 try {
                     IF.add(new FreeMarkerRender(c, c));
                 } catch (IOException e) {
-                    logger.fatal(e.getMessage());
+                    log.fatal(e.getMessage());
                     System.exit(1);
                 }
             }
@@ -65,7 +64,7 @@ public class BaseFilter {
                 try {
                     this.addFields.put(FieldSetter.getFieldSetter(field), TemplateRender.getRender(value));
                 } catch (IOException e) {
-                    logger.fatal(e.getMessage());
+                    log.fatal(e.getMessage());
                     System.exit(1);
                 }
             }

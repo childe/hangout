@@ -1,5 +1,8 @@
 package com.ctrip.ops.sysdev.core;
 
+import lombok.extern.log4j.Log4j2;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.ctrip.ops.sysdev.baseplugin.BaseInput;
 import com.ctrip.ops.sysdev.baseplugin.BaseMetric;
@@ -7,15 +10,12 @@ import com.ctrip.ops.sysdev.config.CommandLineValues;
 import com.ctrip.ops.sysdev.config.HangoutConfig;
 import com.ctrip.ops.sysdev.log.LogSetter;
 
-import org.apache.log4j.Logger;
-
 import java.lang.reflect.Constructor;
 import java.util.*;
 
+@Log4j2
 public class Main {
     private static LogSetter logSetter = new LogSetter();
-
-    private static final Logger logger = Logger.getLogger(Main.class.getName());
 
     public static void main(String[] args) {
 
@@ -24,7 +24,7 @@ public class Main {
         cm.parseCmd();
 
         //Set Log Level and appenders
-        logSetter.initLogger(cm);
+//        logSetter.initLogger(cm);
 
         // parse configure file
         Map configs = null;
@@ -34,7 +34,7 @@ public class Main {
             e.printStackTrace();
             System.exit(-1);
         }
-        logger.debug(configs);
+        log.debug(configs);
 
         final List<HashMap<String, Map>> inputConfigs = (ArrayList<HashMap<String, Map>>) configs.get("inputs");
         final List<HashMap<String, Map>> filterConfigs = (ArrayList<HashMap<String, Map>>) configs.get("filters");
@@ -44,7 +44,7 @@ public class Main {
         if (metricsConfigs != null) {
             metricsConfigs.forEach(metric -> {
                 metric.forEach((metricType, metricConfig) -> {
-                    logger.info("begin to build metric " + metricType);
+                    log.info("begin to build metric " + metricType);
 
                     Class<?> metricClass = null;
 
@@ -55,23 +55,23 @@ public class Main {
                             metricClass = Class.forName(className);
                             Constructor<?> ctor = metricClass.getConstructor(Map.class);
                             BaseMetric metricInstance = (BaseMetric) ctor.newInstance(metricConfig);
-                            logger.info("build metric " + metricType + " done");
+                            log.info("build metric " + metricType + " done");
 
                             metricInstance.register();
-                            logger.info("metric" + metricType + " started");
+                            log.info("metric" + metricType + " started");
 
                             break;
                         } catch (ClassNotFoundException e) {
                             if (tryCtrip == true) {
-                                logger.info("maybe a third party metric plugin. try to build " + metricType);
+                                log.info("maybe a third party metric plugin. try to build " + metricType);
                                 tryCtrip = false;
                                 continue;
                             } else {
-                                logger.error(e);
+                                log.error(e);
                                 System.exit(-1);
                             }
                         } catch (Exception e) {
-                            logger.error(e);
+                            log.error(e);
                             System.exit(-1);
                         }
                     }
@@ -83,7 +83,7 @@ public class Main {
         inputConfigs.forEach(
                 input -> {
                     input.forEach((inputType, inputConfig) -> {
-                        logger.info("begin to build input " + inputType);
+                        log.info("begin to build input " + inputType);
 
                         Class<?> inputClass = null;
 
@@ -103,22 +103,22 @@ public class Main {
                                         filterConfigs,
                                         outputConfigs);
 
-                                logger.info("build input " + inputType + " done");
+                                log.info("build input " + inputType + " done");
                                 //Start working,guy.
                                 inputInstance.emit();
-                                logger.info("input" + inputType + " started");
+                                log.info("input" + inputType + " started");
                                 break;
                             } catch (ClassNotFoundException e) {
                                 if (tryCtrip == true) {
-                                    logger.info("maybe a third party input plugin. try to build " + inputType);
+                                    log.info("maybe a third party input plugin. try to build " + inputType);
                                     tryCtrip = false;
                                     continue;
                                 } else {
-                                    logger.error(e);
+                                    log.error(e);
                                     System.exit(-1);
                                 }
                             } catch (Exception e) {
-                                logger.error(e);
+                                log.error(e);
                                 System.exit(-1);
                             }
                         }

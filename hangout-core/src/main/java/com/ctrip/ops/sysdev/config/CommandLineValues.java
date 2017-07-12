@@ -1,7 +1,7 @@
 package com.ctrip.ops.sysdev.config;
 
 import lombok.Data;
-import org.apache.log4j.Level;
+import org.apache.logging.log4j.*;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
@@ -68,7 +68,7 @@ public class CommandLineValues {
     }
 
     private void printVersion() {
-        if(getVersion()!=null){
+        if (getVersion() != null) {
             System.out.println("Hangout  Version:" + getVersion() + "  Copyright @Ctrip   Author : childe@github, gnuhpc@github");
         }
     }

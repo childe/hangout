@@ -2,7 +2,7 @@ package com.ctrip.ops.sysdev.inputs;
 
 
 import com.ctrip.ops.sysdev.baseplugin.BaseInput;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Map;
 
-@Log4j
+@Log4j2
 public class Stdin extends BaseInput {
 
     private boolean hostname;

@@ -9,14 +9,11 @@ import java.util.Map.Entry;
 import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
 
 import com.ctrip.ops.sysdev.fieldSetter.FieldSetter;
-import org.apache.log4j.Logger;
-import com.ctrip.ops.sysdev.render.FreeMarkerRender;
 import com.ctrip.ops.sysdev.render.TemplateRender;
+import lombok.extern.log4j.Log4j2;
 
-@SuppressWarnings("ALL")
+@Log4j2
 public class Add extends BaseFilter {
-    private static final Logger logger = Logger.getLogger(Add.class.getName());
-
     public Add(Map config) {
         super(config);
     }
@@ -37,7 +34,7 @@ public class Add extends BaseFilter {
             try {
                 this.f.put(FieldSetter.getFieldSetter(field), TemplateRender.getRender(value));
             } catch (IOException e) {
-                logger.fatal(e.getMessage());
+                log.fatal(e.getMessage());
                 System.exit(1);
             }
         }

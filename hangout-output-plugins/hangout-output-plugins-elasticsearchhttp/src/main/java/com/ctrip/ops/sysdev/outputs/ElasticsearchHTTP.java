@@ -3,10 +3,10 @@ package com.ctrip.ops.sysdev.outputs;
 import com.ctrip.ops.sysdev.baseplugin.BaseOutput;
 import com.ctrip.ops.sysdev.render.DateFormatter;
 import com.ctrip.ops.sysdev.render.TemplateRender;
+import lombok.extern.log4j.Log4j2;
 import org.apache.http.HttpHost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.nio.entity.NStringEntity;
-import org.apache.log4j.Logger;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.sniff.Sniffer;
@@ -20,10 +20,8 @@ import java.util.stream.Collectors;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 
+@Log4j2
 public class ElasticsearchHTTP extends BaseOutput {
-    private static final Logger logger = Logger.getLogger(ElasticsearchHTTP.class
-            .getName());
-
     private final static int BULKACTION = 20000;
 
     private String index;
@@ -50,7 +48,7 @@ public class ElasticsearchHTTP extends BaseOutput {
             this.hosts = (ArrayList<String>) getConfig(config, "hosts", null, true);
             this.isSniff = getConfig(config, "sniff", true, false);
         } catch (Exception e) {
-            logger.fatal("could not get correct config in ElasticsearchHTTP output:" + e);
+            log.fatal("could not get correct config in ElasticsearchHTTP output:" + e);
             System.exit(1);
         }
 
@@ -59,7 +57,7 @@ public class ElasticsearchHTTP extends BaseOutput {
             try {
                 this.idRender = TemplateRender.getRender(document_id);
             } catch (IOException e) {
-                logger.fatal("could not build tempalte from " + document_id);
+                log.fatal("could not build tempalte from " + document_id);
                 System.exit(1);
             }
         } else {
@@ -73,14 +71,14 @@ public class ElasticsearchHTTP extends BaseOutput {
         try {
             this.indexTypeRender = TemplateRender.getRender(index_type);
         } catch (IOException e) {
-            logger.fatal("could not build tempalte from " + index_type);
+            log.fatal("could not build tempalte from " + index_type);
             System.exit(1);
         }
 
         try {
             this.initESClient();
         } catch (UnknownHostException e) {
-            logger.fatal("could not init  es client");
+            log.fatal("could not init  es client");
             System.exit(1);
         }
     }
@@ -114,7 +112,7 @@ public class ElasticsearchHTTP extends BaseOutput {
             try {
 
                 requestBody = actionList.stream().map(JSONValue::toJSONString).collect(Collectors.joining("\n")) + "\n";
-                logger.info(requestBody);
+                log.info(requestBody);
                 response = restClient.performRequest(
                         "POST",
                         BULKPATH,
@@ -124,11 +122,11 @@ public class ElasticsearchHTTP extends BaseOutput {
                                 ContentType.APPLICATION_JSON
                         )
                 );
-                logger.info(response.toString());
+                log.info(response.toString());
             } catch (IOException e) {
-                logger.error("Bulk index es Error:", e);
+                log.error("Bulk index es Error:", e);
                 if (response != null)
-                    logger.error("Response Code is " + response.getStatusLine().toString());
+                    log.error("Response Code is " + response.getStatusLine().toString());
             } finally {
                 actionList.clear();
             }
@@ -150,7 +148,7 @@ public class ElasticsearchHTTP extends BaseOutput {
     }
 
     public void shutdown() {
-        logger.info("close restClient");
+        log.info("close restClient");
         try {
             sniffer.close();
             restClient.close();

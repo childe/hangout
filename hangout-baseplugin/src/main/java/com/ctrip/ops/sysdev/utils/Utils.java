@@ -1,7 +1,7 @@
 package com.ctrip.ops.sysdev.utils;
 
 import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -11,10 +11,8 @@ import java.util.Map;
 
 
 @SuppressWarnings("ALL")
+@Log4j2
 public class Utils {
-    private static final Logger logger = Logger.getLogger(Utils.class
-            .getName());
-
     public static List<BaseFilter> createFilterProcessors(List<Map> filters) {
         List<BaseFilter> filterProcessors = new ArrayList();
 
@@ -25,7 +23,7 @@ public class Utils {
                     String filterType = filter.getKey();
                     Map filterConfig = filter.getValue();
 
-                    logger.info("begin to build filter " + filterType);
+                    log.info("begin to build filter " + filterType);
 
                     Class<?> filterClass;
                     Constructor<?> ctor = null;
@@ -35,16 +33,16 @@ public class Utils {
                         try {
                             filterClass = Class.forName(className);
                             ctor = filterClass.getConstructor(Map.class);
-                            logger.info("build filter " + filterType + " done");
+                            log.info("build filter " + filterType + " done");
                             filterProcessors.add((BaseFilter) ctor.newInstance(filterConfig));
                             break;
                         } catch (ClassNotFoundException e) {
                             if (tryCtrip == true) {
-                                logger.info("maybe a third party output plugin. try to build " + filterType);
+                                log.info("maybe a third party output plugin. try to build " + filterType);
                                 tryCtrip = false;
                                 continue;
                             } else {
-                                logger.error(e);
+                                log.error(e);
                                 System.exit(-1);
                             }
                         } catch (Exception e) {

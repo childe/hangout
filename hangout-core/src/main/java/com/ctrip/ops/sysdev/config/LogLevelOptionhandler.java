@@ -1,6 +1,6 @@
 package com.ctrip.ops.sysdev.config;
 
-import org.apache.log4j.Level;
+import org.apache.logging.log4j.Level;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.OptionDef;

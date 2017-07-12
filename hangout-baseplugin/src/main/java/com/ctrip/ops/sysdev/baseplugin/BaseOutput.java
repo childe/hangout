@@ -1,15 +1,16 @@
 package com.ctrip.ops.sysdev.baseplugin;
 
+import lombok.extern.log4j.Log4j2;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import lombok.extern.log4j.Log4j;
 import com.ctrip.ops.sysdev.render.FreeMarkerRender;
 import com.ctrip.ops.sysdev.render.TemplateRender;
 
-@Log4j
+@Log4j2
 public abstract class BaseOutput extends Base {
     protected Map config;
     protected List<TemplateRender> IF;

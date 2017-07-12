@@ -2,13 +2,13 @@ package com.ctrip.ops.sysdev.render;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Map;
 
-@Log4j
+@Log4j2
 public class FreeMarkerRender implements TemplateRender {
     private Template t;
 

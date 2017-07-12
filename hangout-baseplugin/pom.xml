@@ -12,10 +12,16 @@
     <artifactId>hangout-baseplugin</artifactId>
     <dependencies>
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.7</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.7</version>
+        </dependency>
+        
         <!-- https://mvnrepository.com/artifact/org.freemarker/freemarker -->
         <dependency>
             <groupId>org.freemarker</groupId>
@@ -25,9 +31,9 @@
         <!-- https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
         <!-- dump data object bug -->
         <!--<dependency>-->
-            <!--<groupId>com.googlecode.json-simple</groupId>-->
-            <!--<artifactId>json-simple</artifactId>-->
-            <!--<version>1.1</version>-->
+        <!--<groupId>com.googlecode.json-simple</groupId>-->
+        <!--<artifactId>json-simple</artifactId>-->
+        <!--<version>1.1</version>-->
         <!--</dependency>-->
 
         <dependency>
