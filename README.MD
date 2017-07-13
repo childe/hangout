@@ -41,16 +41,9 @@ This product includes GeoLite2 data created by MaxMind, available from
 # 运行
 	bin/hangout -f app.yml
 
-记录日志到文件:
+日志库使用的[log4j2](https://logging.apache.org/log4j/2.x/). 默认的配置文件就是Hangout目录下的log4j2.xml  
+默认日志记录是info级别, 环境变量HO_LOG_LEVEL可以更改日志级别. `export HO_LOG_LEVEL=error`更改到error
 
-	bin/hangout -f app.yml -l /var/log/hangout/app.yml.log
-
-默认日志记录是warn级别, 详细日志:
-
-	bin/hangout -f app.yml -l /var/log/hangout/app.yml.log -vvvv
-
--v 是info , -vv 是debug , -vvvv 是Trace
-		
 
 # 配置
 配置在一定程度上也是模仿logstash, 但用的是通用的yaml格式.
