@@ -1,30 +1,23 @@
 package com.ctrip.ops.sysdev.core;
 
 import lombok.extern.log4j.Log4j2;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import com.ctrip.ops.sysdev.baseplugin.BaseInput;
 import com.ctrip.ops.sysdev.baseplugin.BaseMetric;
 import com.ctrip.ops.sysdev.config.CommandLineValues;
 import com.ctrip.ops.sysdev.config.HangoutConfig;
-import com.ctrip.ops.sysdev.log.LogSetter;
 
 import java.lang.reflect.Constructor;
 import java.util.*;
 
 @Log4j2
 public class Main {
-    private static LogSetter logSetter = new LogSetter();
 
     public static void main(String[] args) {
 
         //Parse CommandLine arguments
         CommandLineValues cm = new CommandLineValues(args);
         cm.parseCmd();
-
-        //Set Log Level and appenders
-//        logSetter.initLogger(cm);
 
         // parse configure file
         Map configs = null;
