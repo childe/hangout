@@ -8,4 +8,4 @@ export basedir=$(cd `dirname $0`/..; pwd)
 
 JAVA_OPTS="$JAVA_OPTS -Xmx${HO_HEAP_SIZE}"
 JAVA_OPTS="$JAVA_OPTS -Xms${HO_HEAP_SIZE}"
-exec java $JAVA_OPTS -cp $basedir:$basedir/conf:$basedir/libs/*:$basedir/modules/* com.ctrip.ops.sysdev.core.Main "$@"
+exec java $JAVA_OPTS -cp $basedir:$basedir/libs/*:$basedir/modules/* com.ctrip.ops.sysdev.core.Main "$@"

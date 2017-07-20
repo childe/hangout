@@ -1,17 +1,14 @@
 package com.ctrip.ops.sysdev.core;
 
+import lombok.extern.log4j.Log4j2;
+
 import com.ctrip.ops.sysdev.baseplugin.BaseInput;
 import com.ctrip.ops.sysdev.baseplugin.BaseMetric;
 import com.ctrip.ops.sysdev.config.CommandLineValues;
 import com.ctrip.ops.sysdev.config.HangoutConfig;
-import com.ctrip.ops.sysdev.exception.YamlConfigException;
-import lombok.extern.log4j.Log4j2;
 
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Log4j2
 public class Main {
@@ -22,18 +19,23 @@ public class Main {
         CommandLineValues cm = new CommandLineValues(args);
         cm.parseCmd();
 
-        //Parse Yaml Config
-        HangoutConfig config = HangoutConfig.getConfigInstance();
+        // parse configure file
+        Map configs = null;
         try {
-            config.parse(cm.getConfigFile());
-        } catch (YamlConfigException e) {
-            System.out.println(e.getMessage());
-            System.exit(-1);
+            configs = HangoutConfig.parse(cm.getConfigFile());
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
         }
+        log.debug(configs);
 
-        //Register Metrics config
-        if (config.getMetricsConfigs().size() != 0) {
-            config.getMetricsConfigs().forEach(metric -> {
+        final List<HashMap<String, Map>> inputConfigs = (ArrayList<HashMap<String, Map>>) configs.get("inputs");
+        final List<HashMap<String, Map>> filterConfigs = (ArrayList<HashMap<String, Map>>) configs.get("filters");
+        final List<HashMap<String, Map>> outputConfigs = (ArrayList<HashMap<String, Map>>) configs.get("outputs");
+        final List<HashMap<String, Map>> metricsConfigs = (ArrayList<HashMap<String, Map>>) configs.get("metrics");
+
+        if (metricsConfigs != null) {
+            metricsConfigs.forEach(metric -> {
                 metric.forEach((metricType, metricConfig) -> {
                     log.info("begin to build metric " + metricType);
 
@@ -71,7 +73,7 @@ public class Main {
         }
 
         // for input in all_inputs, Go through every input and emit immediately
-        config.getInputConfigs().forEach(
+        inputConfigs.forEach(
                 input -> {
                     input.forEach((inputType, inputConfig) -> {
                         log.info("begin to build input " + inputType);
@@ -91,11 +93,11 @@ public class Main {
                                 //instantiate the input,prepare() and registerShutdownHookForSelf() are called here.
                                 BaseInput inputInstance = (BaseInput) ctor.newInstance(
                                         inputConfig,
-                                        config.getFilterConfigs(),
-                                        config.getOutputConfigs());
+                                        filterConfigs,
+                                        outputConfigs);
 
                                 log.info("build input " + inputType + " done");
-                                //
+                                //Start working,guy.
                                 inputInstance.emit();
                                 log.info("input" + inputType + " started");
                                 break;
