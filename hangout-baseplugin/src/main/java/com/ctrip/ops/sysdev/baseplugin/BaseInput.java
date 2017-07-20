@@ -21,10 +21,10 @@ public abstract class BaseInput extends Base {
     protected Decode decoder;
     protected List<BaseFilter> filterProcessors;
     protected List<BaseOutput> outputProcessors;
-    protected ArrayList<Map> filters;
-    protected ArrayList<Map> outputs;
+    protected List<Map> filters;
+    protected List<Map> outputs;
 
-    public BaseInput(Map config, ArrayList<Map> filters, ArrayList<Map> outputs)
+    public BaseInput(Map config, List<Map> filters, List<Map> outputs)
             throws Exception {
         super(config);
 
