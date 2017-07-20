@@ -51,15 +51,6 @@
             <artifactId>snakeyaml</artifactId>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/ninja.leaping.configurate/configurate-yaml -->
-        <dependency>
-            <groupId>ninja.leaping.configurate</groupId>
-            <artifactId>configurate-yaml</artifactId>
-            <version>3.3</version>
-        </dependency>
-
-
-
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
