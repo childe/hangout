@@ -18,6 +18,7 @@ public class Kafka extends BaseOutput {
     private Producer producer;
     private String topic;
     private Properties props;
+    private TemplateRender topicRender;
 
     public Kafka(Map config) {
         super(config);
@@ -29,7 +30,12 @@ public class Kafka extends BaseOutput {
             System.exit(1);
         }
         this.topic = (String) this.config.get("topic");
-
+        try {
+            this.topicRender = TemplateRender.getRender(topic);
+        } catch (IOException e) {
+            log.fatal("could not build template from" + topic);
+            System.exit(1);
+        }
         props = new Properties();
 
         HashMap<String, String> producerSettings = (HashMap<String, String>) this.config.get("producer_settings");
@@ -62,7 +68,8 @@ public class Kafka extends BaseOutput {
     }
 
     protected void emit(Map event) {
-        producer.send(new ProducerRecord<String, String>(topic, JSONValue.toJSONString(event)));
+        String _topic = topicRender.render(event).toString();
+        producer.send(new ProducerRecord<String, String>(_topic, JSONValue.toJSONString(event)));
     }
 
     public void shutdown() {
