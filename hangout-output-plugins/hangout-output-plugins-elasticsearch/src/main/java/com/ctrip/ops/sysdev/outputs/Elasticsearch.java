@@ -43,6 +43,7 @@ public class Elasticsearch extends BaseOutput {
     private TemplateRender indexTypeRender;
     private TemplateRender idRender;
     private TemplateRender parentRender;
+    private TemplateRender routeRender;
 
     public Elasticsearch(Map config) {
         super(config);
@@ -92,8 +93,19 @@ public class Elasticsearch extends BaseOutput {
             this.parentRender = null;
         }
 
-        this.initESClient();
+        if (config.containsKey("route")) {
+            String route = config.get("route").toString();
+            try {
+                this.routeRender = TemplateRender.getRender(route);
+            } catch (IOException e) {
+                log.fatal("could not build tempalte from " + route);
+                System.exit(1);
+            }
+        } else {
+            this.parentRender = null;
+        }
 
+        this.initESClient();
     }
 
     private void initESClient() throws NumberFormatException {
@@ -215,6 +227,9 @@ public class Elasticsearch extends BaseOutput {
         }
         if (this.parentRender != null) {
             indexRequest.parent(parentRender.render(event).toString());
+        }
+        if (this.routeRender != null) {
+            indexRequest.routing(this.routeRender.render(event).toString());
         }
         this.bulkProcessor.add(indexRequest);
     }
