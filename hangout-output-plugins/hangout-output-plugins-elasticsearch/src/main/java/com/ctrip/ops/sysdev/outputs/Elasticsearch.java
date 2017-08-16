@@ -102,7 +102,7 @@ public class Elasticsearch extends BaseOutput {
                 System.exit(1);
             }
         } else {
-            this.parentRender = null;
+            this.routeRender = null;
         }
 
         this.initESClient();
