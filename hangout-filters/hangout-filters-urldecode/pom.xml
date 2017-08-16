@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>hangout-filters</artifactId>
-        <groupId>ctrip</groupId>
+        <groupId>com.github.codegerm</groupId>
         <version>0.3.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -12,7 +12,7 @@
     <artifactId>hangout-filters-urldecode</artifactId>
     <dependencies>
         <dependency>
-            <groupId>ctrip</groupId>
+            <groupId>com.github.codegerm</groupId>
             <artifactId>hangout-baseplugin</artifactId>
             <version>0.3.0</version>
         </dependency>
