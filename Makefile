@@ -17,7 +17,6 @@ build:
 	cp example.yml $(RELEASEPATH)
 	cp LICENSE $(RELEASEPATH)
 	cp bin/hangout $(RELEASEPATH)/bin
-	sed -i "" 's/\<elasticsearch-version\>[0-9.]*/<elasticsearch-version\>$(ESVERSION)/' pom.xml
 	git rev-parse --short HEAD > $(RELEASEPATH)/VERSION
 	mvn clean package
 	mvn dependency:copy-dependencies

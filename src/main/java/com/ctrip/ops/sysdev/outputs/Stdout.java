@@ -2,6 +2,7 @@ package com.ctrip.ops.sysdev.outputs;
 
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
+import org.json.simple.JSONValue;
 
 import org.apache.log4j.Logger;
 
@@ -20,6 +21,7 @@ public class Stdout extends BaseOutput {
 
 	@Override
 	protected void emit(Map event) {
-		System.out.println(event);
+		// System.out.println(event);
+		System.out.println(JSONValue.toJSONString(event));
 	}
 }
