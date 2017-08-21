@@ -160,7 +160,15 @@ public abstract class BaseInput extends Base {
                     }
                 }
             }
+        } catch (OutOfMemoryError e) {
+            e.printStackTrace();
+            log.error(e);
+            System.exit(1);
         } catch (Exception e) {
+            log.error("process event failed:" + message);
+            e.printStackTrace();
+            log.error(e);
+        } catch (Error e) {
             log.error("process event failed:" + message);
             e.printStackTrace();
             log.error(e);
