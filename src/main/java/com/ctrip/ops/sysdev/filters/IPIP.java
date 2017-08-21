@@ -1,6 +1,7 @@
 package com.ctrip.ops.sysdev.filters;
 
 import java.util.Map;
+import java.util.HashMap;
 import org.apache.log4j.Logger;
 import org.ipip.IPExt;
 
@@ -54,11 +55,24 @@ public class IPIP extends BaseFilter {
 	@Override
 	protected Map filter(final Map event) {
 		if (event.containsKey(this.source)) {
-
 			boolean success = true;
-			String[] ips;
+			String src = (String)event.get(this.source);
 			try {
-				ips = IPExt.find(this.source);
+				if (src.length() > 0) {
+					String[] ips;
+					ips = IPExt.find(src);
+					String country_name = ips[0];
+					String region_name = ips[1];
+					String city_name = ips[2];
+					String isp = ips[4];
+
+					Map targetObj = new HashMap();
+					event.put(this.target, targetObj);
+					targetObj.put("country_name", country_name);
+					targetObj.put("region_name", region_name);
+					targetObj.put("city_name", city_name);
+					targetObj.put("isp", isp);
+				}
 			} catch (Exception e) {
 				logger.error(e);
 				success = false;
