@@ -128,16 +128,23 @@ public class Elasticsearch extends BaseOutput {
         esclient = new PreBuiltTransportClient(settings.build());
 
         ArrayList<String> hosts = (ArrayList<String>) config.get("hosts");
+        final boolean[] atleastOneNode = {false};
         hosts.stream().map(host -> host.split(":")).forEach(parsedHost -> {
             try {
                 String host = parsedHost[0];
                 String port = parsedHost.length == 2 ? parsedHost[1] : "9300";
                 esclient.addTransportAddress(new InetSocketTransportAddress(
                         InetAddress.getByName(host), Integer.parseInt(port)));
+                atleastOneNode[0] = true;
             } catch (UnknownHostException e) {
                 e.printStackTrace();
             }
         });
+
+        if (!atleastOneNode[0]) {
+            log.fatal("none of the configured nodes are available");
+            System.exit(1);
+        }
 
         int bulkActions = config.containsKey("bulk_actions") ? (int) config.get("bulk_actions") : BULKACTION;
         int bulkSize = config.containsKey("bulk_size") ? (int) config.get("bulk_size") : BULKSIZE;
@@ -208,6 +215,20 @@ public class Elasticsearch extends BaseOutput {
                     @Override
                     public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
                         log.error("bulk got exception: " + failure.getMessage());
+                        if (failure.getClass().getName() == "org.elasticsearch.client.transport.NoNodeAvailableException") {
+                            List<DocWriteRequest> requests = request.requests();
+                            log.info("slept " + requests.size() / 2
+                                    + "millseconds after bulk exception");
+                            try {
+                                Thread.sleep(requests.size() / 2);
+                            } catch (InterruptedException e) {
+                                log.debug(e);
+                            }
+
+                            for (DocWriteRequest oneRequest : requests) {
+                                bulkProcessor.add(oneRequest);
+                            }
+                        }
                     }
                 }).setBulkActions(bulkActions)
                 .setBulkSize(new ByteSizeValue(bulkSize, ByteSizeUnit.MB))
