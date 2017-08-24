@@ -5,17 +5,14 @@ import com.ctrip.ops.sysdev.render.DateFormatter;
 import com.ctrip.ops.sysdev.render.TemplateRender;
 import lombok.extern.log4j.Log4j2;
 import org.elasticsearch.action.DocWriteRequest;
-import org.elasticsearch.action.bulk.BulkItemResponse;
-import org.elasticsearch.action.bulk.BulkProcessor;
-import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.bulk.*;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.common.unit.ByteSizeUnit;
-import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.common.util.concurrent.EsExecutors;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
 import java.io.IOException;
@@ -25,25 +22,40 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Log4j2
 public class Elasticsearch extends BaseOutput {
     private final static int BULKACTION = 20000;
     private final static int BULKSIZE = 15; //MB
     private final static int FLUSHINTERVAL = 10;
-    private final static int CONCURRENTREQSIZE = 0;
     private final static boolean DEFAULTSNIFF = true;
     private final static boolean DEFAULTCOMPRESS = false;
 
     private String index;
     private String indexTimezone;
-    private BulkProcessor bulkProcessor;
+    private BulkRequestBuilder bulkRequest;
     private TransportClient esclient;
     private TemplateRender indexTypeRender;
     private TemplateRender idRender;
     private TemplateRender parentRender;
     private TemplateRender routeRender;
+
+    private int bulkActions;
+    private int bulkSize;
+    private int flushInterval;
+    private int concurrentRequests;
+
+    private ScheduledThreadPoolExecutor scheduler;
+    private ScheduledFuture<?> scheduledFuture;
+
+
+    private final AtomicLong executionIdGen = new AtomicLong();
+
 
     public Elasticsearch(Map config) {
         super(config);
@@ -106,6 +118,16 @@ public class Elasticsearch extends BaseOutput {
         }
 
         this.initESClient();
+
+        this.flushInterval = config.containsKey("flush_interval") ? (int) config.get("flush_interval") : FLUSHINTERVAL;
+        this.scheduler = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(
+                1, EsExecutors.daemonThreadFactory(this.esclient.settings(), "bulk_processor"));
+        this.scheduler.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
+        this.scheduler.setContinueExistingPeriodicTasksAfterShutdownPolicy(false);
+        this.scheduledFuture = this.scheduler.scheduleWithFixedDelay(new Flush(),
+                TimeValue.timeValueSeconds(flushInterval).millis(),
+                TimeValue.timeValueSeconds(flushInterval).millis(),
+                TimeUnit.MILLISECONDS);
     }
 
     private void initESClient() throws NumberFormatException {
@@ -146,94 +168,113 @@ public class Elasticsearch extends BaseOutput {
             System.exit(1);
         }
 
-        int bulkActions = config.containsKey("bulk_actions") ? (int) config.get("bulk_actions") : BULKACTION;
-        int bulkSize = config.containsKey("bulk_size") ? (int) config.get("bulk_size") : BULKSIZE;
-        int flushInterval = config.containsKey("flush_interval") ? (int) config.get("flush_interval") : FLUSHINTERVAL;
-        int concurrentRequests = config.containsKey("concurrent_requests") ? (int) config.get("concurrent_requests") : CONCURRENTREQSIZE;
+        this.bulkActions = config.containsKey("bulk_actions") ? (int) config.get("bulk_actions") : BULKACTION;
+        this.bulkSize = config.containsKey("bulk_size") ? (int) config.get("bulk_size") : BULKSIZE;
+        this.bulkSize *= 1024 * 1024;
 
-        bulkProcessor = BulkProcessor.builder(
-                esclient,
-                new BulkProcessor.Listener() {
-                    @Override
-                    public void beforeBulk(long executionId, BulkRequest request) {
-                        log.info("executionId: " + executionId);
-                        log.info("numberOfActions: " + request.numberOfActions());
-                        log.debug("Hosts:" + esclient.transportAddresses().toString());
-                    }
+        if (config.containsKey("concurrent_requests")) {
+            log.warn("concurrent_requests is deprecated");
+        }
 
-                    @Override
-                    public void afterBulk(long executionId, BulkRequest request,
-                                          BulkResponse response) {
-                        log.info("bulk done with executionId: " + executionId);
-                        List<DocWriteRequest> requests = request.requests();
-                        int toBeTry = 0;
-                        int totalFailed = 0;
-                        for (BulkItemResponse item : response.getItems()) {
-                            if (item.isFailed()) {
-                                switch (item.getFailure().getStatus()) {
-                                    case TOO_MANY_REQUESTS:
-                                    case SERVICE_UNAVAILABLE:
-                                        if (toBeTry == 0) {
-                                            log.error("bulk has failed item which NEED to retry");
-                                            log.error(item.getFailureMessage());
-                                        }
-                                        toBeTry++;
-                                        bulkProcessor.add(requests.get(item.getItemId()));
-                                        break;
-                                    default:
-                                        if (totalFailed == 0) {
-                                            log.error("bulk has failed item which do NOT need to retry");
-                                            log.error(item.getFailureMessage());
-                                        }
-                                        break;
-                                }
+        this.bulkRequest = esclient.prepareBulk();
+    }
 
-                                totalFailed++;
-                            }
+    private void beforeBulk(long executionId) {
+        log.info("executionId: " + executionId);
+        log.info("numberOfActions: " + this.bulkRequest.numberOfActions());
+        log.debug("Hosts:" + esclient.transportAddresses().toString());
+    }
+
+
+    private void afterBulk(long executionId, BulkRequest request, BulkResponse bulkResponse) {
+        log.info("bulk done with executionId: " + executionId);
+        List<DocWriteRequest> requests = request.requests();
+        int toBeTry = 0;
+        int totalFailed = 0;
+        for (BulkItemResponse item : bulkResponse.getItems()) {
+            if (item.isFailed()) {
+                switch (item.getFailure().getStatus()) {
+                    case TOO_MANY_REQUESTS:
+                    case SERVICE_UNAVAILABLE:
+                        if (toBeTry == 0) {
+                            log.error("bulk has failed item which NEED to retry");
+                            log.error(item.getFailureMessage());
                         }
-
-                        if (totalFailed > 0) {
-                            log.info(totalFailed + " doc failed, " + toBeTry + " need to retry");
-                        } else {
-                            log.debug("no failed docs");
+                        toBeTry++;
+                        DocWriteRequest r = requests.get(item.getItemId());
+                        this.bulkRequest.add((IndexRequest) r);
+                        break;
+                    default:
+                        if (totalFailed == 0) {
+                            log.error("bulk has failed item which do NOT need to retry");
+                            log.error(item.getFailureMessage());
                         }
+                        break;
+                }
 
-                        if (toBeTry > 0) {
-                            try {
-                                Thread.sleep(toBeTry / 2);
-                                log.info("slept " + toBeTry / 2
-                                        + "millseconds after bulk failure");
-                            } catch (InterruptedException e) {
-                                log.debug(e);
-                            }
-                        } else {
-                            log.debug("no docs need to retry");
-                        }
+                totalFailed++;
+            }
+        }
 
-                    }
+        if (totalFailed > 0) {
+            log.info(totalFailed + " doc failed, " + toBeTry + " need to retry");
+        } else {
+            log.debug("no failed docs");
+        }
 
-                    @Override
-                    public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
-                        log.error("bulk got exception: " + failure.getMessage());
-                        if (failure.getClass().getName() == "org.elasticsearch.client.transport.NoNodeAvailableException") {
-                            List<DocWriteRequest> requests = request.requests();
-                            log.info("slept " + requests.size() / 2
-                                    + "millseconds after bulk exception");
-                            try {
-                                Thread.sleep(requests.size() / 2);
-                            } catch (InterruptedException e) {
-                                log.debug(e);
-                            }
+        if (toBeTry > 0) {
+            try {
+                Thread.sleep(toBeTry);
+                log.info("sleep " + toBeTry
+                        + " millseconds after bulk failure");
+            } catch (InterruptedException e) {
+                log.debug(e);
+            }
+        } else {
+            log.debug("no docs need to retry");
+        }
+    }
 
-                            for (DocWriteRequest oneRequest : requests) {
-                                bulkProcessor.add(oneRequest);
-                            }
-                        }
-                    }
-                }).setBulkActions(bulkActions)
-                .setBulkSize(new ByteSizeValue(bulkSize, ByteSizeUnit.MB))
-                .setFlushInterval(TimeValue.timeValueSeconds(flushInterval))
-                .setConcurrentRequests(concurrentRequests).build();
+
+    private void afterBulk(long executionId, Throwable failure) {
+        log.error("bulk " + executionId + " exception: " + failure);
+    }
+
+    private void add(IndexRequest indexRequest) {
+        // 其实在bulkActions+1条进来的时候才会触发Bulk请求, 为了更好的处理fail item和exception做的妥协
+        if (bulkRequest.numberOfActions() >= this.bulkActions || bulkRequest.request().estimatedSizeInBytes() >= bulkSize) {
+            this.execute();
+        }
+
+        this.bulkRequest.add(indexRequest);
+    }
+
+    private synchronized void execute() {
+        final long executionId = executionIdGen.incrementAndGet();
+
+        this.beforeBulk(executionId);
+
+        BulkRequest requests = this.bulkRequest.request();
+
+        try {
+            BulkResponse bulkResponse = bulkRequest.get();
+            this.bulkRequest = esclient.prepareBulk();
+            this.afterBulk(executionId, requests, bulkResponse);
+        } catch (NoNodeAvailableException e) {
+            log.info("sleep " + requests.requests().size()
+                    + " millseconds after bulk NoNodeAvailableException");
+            try {
+                Thread.sleep(requests.requests().size());
+            } catch (InterruptedException e2) {
+                log.debug(e2);
+            }
+
+            for (DocWriteRequest r : requests.requests()) {
+                this.bulkRequest.add((IndexRequest) r);
+            }
+        } catch (Throwable e) {
+            this.afterBulk(executionId, e);
+        }
     }
 
     protected void emit(final Map event) {
@@ -252,25 +293,24 @@ public class Elasticsearch extends BaseOutput {
         if (this.routeRender != null) {
             indexRequest.routing(this.routeRender.render(event).toString());
         }
-        this.bulkProcessor.add(indexRequest);
+
+        this.add(indexRequest);
     }
 
     public void shutdown() {
         log.info("flush docs and then shutdown");
+        this.bulkRequest.get("30s");
+    }
 
-        //flush immediately
-        this.bulkProcessor.flush();
-
-        // await for some time for rest data from input
-        int flushInterval = 10;
-        if (config.containsKey("flush_interval")) {
-            flushInterval = (int) config.get("flush_interval");
-        }
-        try {
-            this.bulkProcessor.awaitClose(flushInterval, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            log.info("failed to bulk docs before shutdown");
-            log.debug(e);
+    class Flush implements Runnable {
+        @Override
+        public void run() {
+            synchronized (Elasticsearch.this) {
+                if (bulkRequest.numberOfActions() == 0) {
+                    return;
+                }
+                execute();
+            }
         }
     }
 }
