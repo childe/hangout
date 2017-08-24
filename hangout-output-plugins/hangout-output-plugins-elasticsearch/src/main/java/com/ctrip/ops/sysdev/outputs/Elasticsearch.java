@@ -260,6 +260,9 @@ public class Elasticsearch extends BaseOutput {
             BulkResponse bulkResponse = bulkRequest.get();
             this.bulkRequest = esclient.prepareBulk();
             this.afterBulk(executionId, requests, bulkResponse);
+        } catch (OutOfMemoryError e) {
+            log.fatal("out of memory while bulking, exit..");
+            System.exit(1);
         } catch (NoNodeAvailableException e) {
             log.info("sleep " + requests.requests().size()
                     + " millseconds after bulk NoNodeAvailableException");
