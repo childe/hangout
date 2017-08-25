@@ -240,7 +240,7 @@ public class Elasticsearch extends BaseOutput {
         log.error("bulk " + executionId + " exception: " + failure);
     }
 
-    private void add(IndexRequest indexRequest) {
+    private synchronized void add(IndexRequest indexRequest) {
         // 其实在bulkActions+1条进来的时候才会触发Bulk请求, 为了更好的处理fail item和exception做的妥协
         if (bulkRequest.numberOfActions() >= this.bulkActions || bulkRequest.request().estimatedSizeInBytes() >= bulkSize) {
             this.execute();
@@ -249,7 +249,7 @@ public class Elasticsearch extends BaseOutput {
         this.bulkRequest.add(indexRequest);
     }
 
-    private synchronized void execute() {
+    private void execute() {
         final long executionId = executionIdGen.incrementAndGet();
 
         this.beforeBulk(executionId);
