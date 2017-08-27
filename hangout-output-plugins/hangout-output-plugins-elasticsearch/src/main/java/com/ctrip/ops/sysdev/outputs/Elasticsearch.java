@@ -258,7 +258,7 @@ public class Elasticsearch extends BaseOutput {
 
         try {
             BulkResponse bulkResponse = bulkRequest.get();
-            this.bulkRequest = esclient.prepareBulk();
+            this.bulkRequest = this.esclient.prepareBulk();
             this.afterBulk(executionId, requests, bulkResponse);
         } catch (OutOfMemoryError e) {
             log.fatal("out of memory while bulking, exit..");
@@ -271,12 +271,9 @@ public class Elasticsearch extends BaseOutput {
             } catch (InterruptedException e2) {
                 log.debug(e2);
             }
-
-            for (DocWriteRequest r : requests.requests()) {
-                this.bulkRequest.add((IndexRequest) r);
-            }
         } catch (Throwable e) {
             this.afterBulk(executionId, e);
+            this.bulkRequest = this.esclient.prepareBulk();
         }
     }
 
