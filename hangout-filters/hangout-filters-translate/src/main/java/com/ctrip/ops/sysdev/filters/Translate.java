@@ -87,7 +87,7 @@ public class Translate extends BaseFilter {
         } else {
             this.refreshInterval = 300 * 1000;
         }
-        nextLoadTime = System.currentTimeMillis() + refreshInterval * 1000;
+        nextLoadTime = System.currentTimeMillis() + refreshInterval;
     }
 
     @Override
