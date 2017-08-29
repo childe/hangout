@@ -41,9 +41,9 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                    <compilerVersion>1.7</compilerVersion>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <compilerVersion>1.8</compilerVersion>
                 </configuration>
             </plugin>
         </plugins>
@@ -62,6 +62,7 @@
         <commons-collections-version>3.2.2</commons-collections-version>
         <hamcrest-version>1.1</hamcrest-version>
         <snakeyaml-version>1.16</snakeyaml-version>
+        <opencsv-version>4.0</opencsv-version>
 
         <!-- test -->
         <mockito-version>1.10.19</mockito-version>
@@ -158,6 +159,12 @@
             <version>1.1</version>
             <scope>${hamcrest-version}</scope>
         </dependency>
+
+      <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>${opencsv-version}</version>
+      </dependency>
 
     </dependencies>
 </project>

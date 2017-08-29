@@ -60,6 +60,8 @@ public class IPIP extends BaseFilter {
 			try {
 				if (src.length() > 0) {
 					String[] ips;
+					String[] srcs = src.split(",");
+					src = srcs[0];
 					ips = IPExt.find(src);
 					String country_name = ips[0];
 					String region_name = ips[1];
