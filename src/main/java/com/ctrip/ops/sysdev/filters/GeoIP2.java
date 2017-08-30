@@ -75,7 +75,16 @@ public class GeoIP2 extends BaseFilter {
 
 			InetAddress ipAddress;
 			try {
-				ipAddress = InetAddress.getByName((String) event.get(source));
+				String src;
+				Object value = event.get(this.source);
+				if (value.getClass().isArray()) {
+					String[] ips = (String [])value;
+					src = ips[0];
+				} else {
+					src = (String)value;
+				}
+
+				ipAddress = InetAddress.getByName(src);
 
 				// Replace "city" with the appropriate method for your database,
 				// e.g.,

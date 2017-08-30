@@ -56,12 +56,18 @@ public class IPIP extends BaseFilter {
 	protected Map filter(final Map event) {
 		if (event.containsKey(this.source)) {
 			boolean success = true;
-			String src = (String)event.get(this.source);
+			String src;
+			Object value = event.get(this.source);
+			if (value.getClass().isArray()) {
+				String[] ips = (String [])value;
+				src = ips[0];
+			} else {
+				src = (String)value;
+			}
+
 			try {
 				if (src.length() > 0) {
 					String[] ips;
-					String[] srcs = src.split(",");
-					src = srcs[0];
 					ips = IPExt.find(src);
 					String country_name = ips[0];
 					String region_name = ips[1];
