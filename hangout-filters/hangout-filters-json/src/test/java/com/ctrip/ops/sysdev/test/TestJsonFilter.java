@@ -93,7 +93,6 @@ public class TestJsonFilter {
                 "{\"@timestamp\":\"2015-12-28T17:14:47.337+08:00\",\"a\":123}");
 
         event = Jsonfilter.process(event);
-        System.out.println(event);
 
         Assert.assertEquals(((Map) event.get("jsonobj")).get("a"), 123L);
         Assert.assertNull(event.get("a"));

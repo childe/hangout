@@ -20,7 +20,6 @@ public class Json extends BaseFilter {
     private FieldSetter fieldSetter;
 
     protected void prepare() {
-        System.out.println(this.config);
         if (!config.containsKey("field")) {
             log.error("no field configured in Json");
             System.exit(1);
