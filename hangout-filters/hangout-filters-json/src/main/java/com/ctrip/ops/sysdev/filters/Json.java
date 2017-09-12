@@ -3,6 +3,7 @@ package com.ctrip.ops.sysdev.filters;
 import java.util.Map;
 
 import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
+import com.ctrip.ops.sysdev.fieldSetter.FieldSetter;
 import com.ctrip.ops.sysdev.render.TemplateRender;
 import lombok.extern.log4j.Log4j2;
 import org.json.simple.JSONValue;
@@ -14,19 +15,23 @@ public class Json extends BaseFilter {
         super(config);
     }
 
-    private String field, target;
+    private String field;
     private TemplateRender templateRender;
+    private FieldSetter fieldSetter;
 
     protected void prepare() {
+        System.out.println(this.config);
         if (!config.containsKey("field")) {
             log.error("no field configured in Json");
             System.exit(1);
         }
         this.field = (String) config.get("field");
 
-        this.target = (String) config.get("target");
-        if (this.target != null && this.target.equals("")) {
-            this.target = null;
+        String target = (String) config.get("target");
+        if (target == null || target.equals("")) {
+            this.fieldSetter = null;
+        } else {
+            this.fieldSetter = FieldSetter.getFieldSetter(target);
         }
 
         if (config.containsKey("tag_on_failure")) {
@@ -60,7 +65,7 @@ public class Json extends BaseFilter {
         }
 
         if (obj != null) {
-            if (this.target == null) {
+            if (this.fieldSetter == null) {
                 try {
                     event.putAll((Map) obj);
                 } catch (Exception e) {
@@ -68,7 +73,7 @@ public class Json extends BaseFilter {
                     success = false;
                 }
             } else {
-                event.put(this.target, obj);
+                this.fieldSetter.setField(event, obj);
             }
         }
 
