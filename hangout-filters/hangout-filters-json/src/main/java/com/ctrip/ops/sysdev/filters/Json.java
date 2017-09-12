@@ -3,6 +3,7 @@ package com.ctrip.ops.sysdev.filters;
 import java.util.Map;
 
 import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
+import com.ctrip.ops.sysdev.render.TemplateRender;
 import lombok.extern.log4j.Log4j2;
 import org.json.simple.JSONValue;
 
@@ -14,6 +15,7 @@ public class Json extends BaseFilter {
     }
 
     private String field, target;
+    private TemplateRender templateRender;
 
     protected void prepare() {
         if (!config.containsKey("field")) {
@@ -32,22 +34,30 @@ public class Json extends BaseFilter {
         } else {
             this.tagOnFailure = "jsonfail";
         }
+
+        try {
+            this.templateRender = TemplateRender.getRender(field, false);
+        } catch (Exception e) {
+            log.error("could not render template: " + field);
+            System.exit(1);
+        }
     }
 
     @Override
     protected Map filter(final Map event) {
         Object obj = null;
         boolean success = false;
-        if (event.containsKey(this.field)) {
+
+        Object o = this.templateRender.render(event);
+        if (o != null) {
             try {
                 obj = JSONValue
-                        .parseWithException((String) event.get(this.field));
+                        .parseWithException((String) o);
                 success = true;
             } catch (Exception e) {
                 log.debug("failed to json parse field: " + this.field);
             }
         }
-
 
         if (obj != null) {
             if (this.target == null) {
