@@ -13,6 +13,7 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVParser;
+import com.opencsv.exceptions.CsvRuntimeException;
 
 
 public class CSV extends BaseFilter {
@@ -33,7 +34,6 @@ public class CSV extends BaseFilter {
 		super(config);
 	}
 
-	@SuppressWarnings("unchecked")
 	protected void prepare() {
 
 		if (this.config.containsKey("source")) {
@@ -69,9 +69,13 @@ public class CSV extends BaseFilter {
 		} else {
 			this.tagOnFailure = "csvfail";
         }
-        this.csvParser = new CSVParserBuilder().withSeparator(this.separator).withQuoteChar(this.quote_char).withEscapeChar(this.escape).build();
-
-	};
+        try {
+			this.csvParser = new CSVParserBuilder().withSeparator(this.separator).withQuoteChar(this.quote_char).withEscapeChar(this.escape).build();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			throw new CsvRuntimeException(e.getMessage());
+		}
+	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
