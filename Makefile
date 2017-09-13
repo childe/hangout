@@ -1,9 +1,9 @@
 VERSION := 0.1.7
 RELEASEPATH = release/$(FULLVERSION)
 
-default: 2.3
+default: 2.4
 
-all: 2.3 2.2 2.1 2.0 1.7 1.6 1.5
+all: 2.4 2.4 2.3 2.2 2.1 2.0 1.7 1.6 1.5
 
 clean:
 	rm -rf release
@@ -17,7 +17,6 @@ build:
 	cp example.yml $(RELEASEPATH)
 	cp LICENSE $(RELEASEPATH)
 	cp bin/hangout $(RELEASEPATH)/bin
-	sed -i "" 's/\<elasticsearch-version\>[0-9.]*/<elasticsearch-version\>$(ESVERSION)/' pom.xml
 	git rev-parse --short HEAD > $(RELEASEPATH)/VERSION
 	mvn clean package
 	mvn dependency:copy-dependencies
@@ -28,10 +27,13 @@ build:
 	git reset --hard
 
 test:
-	$(MAKE) build FULLVERSION=hangout-test GITBRANCH=$@ ESVERSION=2.3.0
+	$(MAKE) build FULLVERSION=hangout-test GITBRANCH=$@ ESVERSION=2.4.4
 
 dev:
-	$(MAKE) build FULLVERSION=hangout-dev GITBRANCH=$@ ESVERSION=2.3.0
+	$(MAKE) build FULLVERSION=hangout-dev GITBRANCH=$@ ESVERSION=2.4.4
+
+2.4:
+	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=es2.X ESVERSION=2.4.4
 
 2.3:
 	$(MAKE) build FULLVERSION=hangout-$(VERSION)-ES$@ GITBRANCH=es2.X ESVERSION=2.3.0
