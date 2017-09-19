@@ -17,6 +17,8 @@ import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
+import org.elasticsearch.client.transport.NoNodeAvailableException;
+
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -195,7 +197,7 @@ public class Elasticsearch extends BaseOutput {
                             try {
                                 Thread.sleep(toBeTry / 2);
                                 log.info("slept " + toBeTry / 2
-                                        + "millseconds after bulk failure");
+                                        + "milliseconds after bulk failure");
                             } catch (InterruptedException e) {
                                 log.debug(e);
                             }
@@ -207,6 +209,17 @@ public class Elasticsearch extends BaseOutput {
 
                     @Override
                     public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
+                        if (failure.getClass() == NoNodeAvailableException.class) {
+                            log.info("sleep 60s after bulk NoNodeAvailableException");
+                            try {
+                                Thread.sleep(60000);
+                            } catch (InterruptedException e2) {
+                                log.debug(e2);
+                            }
+                            for (DocWriteRequest r : request.requests()) {
+                                bulkProcessor.add(r);
+                            }
+                        }
                         log.error("bulk got exception: " + failure.getMessage());
                     }
                 }).setBulkActions(bulkActions)
