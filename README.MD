@@ -51,6 +51,13 @@ This product includes GeoLite2 data created by MaxMind, available from
 [可以参考一个配置的示例](https://github.com/childe/hangout/blob/master/conf/example.yml)
 
 ## Input
+
+input plugin中可以配置type, 会添加到每一条消息中
+
+```
+type: nginx
+```
+
 ### Stdin
 
     - Stdin:
@@ -61,7 +68,7 @@ This product includes GeoLite2 data created by MaxMind, available from
 从Kafka读数据. 下面示例是说, 开2个线程取app这个topic的数据, 编码格式为plain纯文本.  consumer_settings中的参数, 参考[kafka]官方文档](http://kafka.apache.org/documentation.html#consumerconfigs), 所有参数都可以在这里配置. 比较重要的是group.id, zookeeper.connect这两个, 一定要有.   zookeeper.connect的格式为 hostname1:port1,hostname2:port2,hostname3:port3.
 
     - Kafka:
-        topic: 
+        topic:
           app: 2
         consumer_settings:
           group.id: hangout

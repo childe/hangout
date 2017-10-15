@@ -2,6 +2,7 @@ inputs:
    - Stdin:
         codec: plain
         hostname: true # if add hostname to event; default false
+        type: stdin1
 
 filters:
     - Filters:
