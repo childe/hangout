@@ -124,6 +124,9 @@ public abstract class BaseInput extends Base {
         try {
             Map<String, Object> event = this.decoder
                     .decode(message);
+            if (this.config.containsKey("type")) {
+                event.put("type", this.config.get("type"));
+            }
             this.preprocess(event);
 
             ArrayList<Map<String, Object>> events = new ArrayList();
