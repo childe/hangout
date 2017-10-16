@@ -52,7 +52,7 @@ This product includes GeoLite2 data created by MaxMind, available from
 
 ## Input
 
-input plugin中可以配置type, 会添加到每一条消息中, 完整例子参考 [https://github.com/childe/hangout/blob/master/conf/simpletest.yml](https://github.com/childe/hangout/blob/master/conf/simpletest.yml)
+input plugin中可以配置type, 会添加到每一条消息中, 完整例子参考 [https://github.com/childe/hangout/blob/master/conf/simpletest.yml#L5](https://github.com/childe/hangout/blob/master/conf/simpletest.yml#L5)
 
 ```
 type: nginx
