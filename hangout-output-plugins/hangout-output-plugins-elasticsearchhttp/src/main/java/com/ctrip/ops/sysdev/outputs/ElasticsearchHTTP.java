@@ -38,7 +38,7 @@ public class ElasticsearchHTTP extends BaseOutput {
     private int bulkActions;
     private List<String> hosts;
     private List<Map> actionList = new ArrayList<>();
-    private static final String BULKPATH = "_bulk";
+    private static final String BULKPATH = "/_bulk";
     private Boolean isSniff;
     private Sniffer sniffer;
 

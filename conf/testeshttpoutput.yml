@@ -7,7 +7,9 @@ outputs:
    - ElasticsearchHTTP:
         cluster: elasticsearch
         hosts:
-          - 192.168.145.128
+            - 127.0.0.1
+        user: admin
+        password: 123456
         index: 'hangout-%{message}-%{+YYYY.MM.dd}'
         index_type: 'hangout-${message}'
         bulk_actions: 5 #default 20000
