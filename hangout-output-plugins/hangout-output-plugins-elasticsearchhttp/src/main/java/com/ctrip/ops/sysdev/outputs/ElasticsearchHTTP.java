@@ -5,10 +5,16 @@ import com.ctrip.ops.sysdev.render.DateFormatter;
 import com.ctrip.ops.sysdev.render.TemplateRender;
 import lombok.extern.log4j.Log4j2;
 import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.entity.ContentType;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.nio.entity.NStringEntity;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.sniff.Sniffer;
 import org.json.simple.JSONValue;
 
@@ -94,7 +100,24 @@ public class ElasticsearchHTTP extends BaseOutput {
         }).collect(toList());
         List<HttpHost> clusterHosts = unmodifiableList(httpHostList);
 
-        restClient = RestClient.builder(clusterHosts.toArray(new HttpHost[clusterHosts.size()])).build();
+        if (config.containsKey("user") && config.containsKey("password")) {
+            String user = config.get("user").toString();
+            String password = config.get("password").toString();
+            final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+            credentialsProvider.setCredentials(AuthScope.ANY,
+                    new UsernamePasswordCredentials(user, password));
+
+            restClient = RestClient.builder(clusterHosts.toArray(new HttpHost[clusterHosts.size()]))
+                    .setHttpClientConfigCallback(new RestClientBuilder.HttpClientConfigCallback() {
+                        @Override
+                        public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {
+                            return httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+                        }
+                    }).build();
+        } else {
+            restClient = RestClient.builder(clusterHosts.toArray(new HttpHost[clusterHosts.size()]))
+                    .build();
+        }
         if (this.isSniff) {
             sniffer = Sniffer.builder(restClient).build();
         }
