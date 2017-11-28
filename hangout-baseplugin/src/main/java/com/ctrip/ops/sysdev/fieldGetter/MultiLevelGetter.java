@@ -5,9 +5,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Created by huochen on 2017/11/6.
- */
 public class MultiLevelGetter implements FieldGetter {
     private ArrayList<String> fields = new ArrayList();
     final Pattern p = Pattern.compile("\\[(\\S+?)\\]+");
