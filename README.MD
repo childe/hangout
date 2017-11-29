@@ -50,6 +50,22 @@ This product includes GeoLite2 data created by MaxMind, available from
 因为能力有限, 不能实现logstash的那套语法, if是用了另外的格式.
 [可以参考一个配置的示例](https://github.com/childe/hangout/blob/master/conf/example.yml)
 
+嵌套字段举例:
+1. 将x.y的值赋值给name.first
+2. 将metadata.time 做Date Filter处理.
+
+```
+- Add:
+  fields:
+    '[name][first]': '[x][y]'
+
+- Date:
+    src: '[metadata][time]'
+    formats:
+        - 'ISO8601'
+    remove_fields: ['logtime']
+```
+
 ## Input
 
 input plugin中可以配置type, 会添加到每一条消息中, 完整例子参考 [https://github.com/childe/hangout/blob/master/conf/simpletest.yml#L5](https://github.com/childe/hangout/blob/master/conf/simpletest.yml#L5)

@@ -39,6 +39,7 @@ filters:
             - Add:
                 fields:
                     test: 'abcd'
+                    '[name][first]': '[x][y]'
             - Date:
                 src: logtime
                 formats:
@@ -58,7 +59,7 @@ filters:
           - '<#if message??>true</#if>'
           - '<#if message?contains("liu")>true<#elseif message?contains("warn")>true</#if>'
     - Date:
-        src: logtime
+        src: '[metadata][time]'
         formats:
             - 'ISO8601'
         remove_fields: ['logtime']
@@ -66,7 +67,7 @@ filters:
         fields: ['user']
     - Add:
         fields:
-          me: 'I am ${user}'
+          '[name][first]': '[x][y]'
     - Remove:
         fields:
           - logtime
