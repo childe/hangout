@@ -118,6 +118,10 @@ type: nginx
 ### Grok
 Grok是为了把一个字符串切割成多个field, 用的是[Joni库](https://github.com/jruby/joni), 不完全支持logstash里面的patterns语法,%{INT:bytes:int}这种语法不支持, 只支持%{INT:bytes},字段类型需要在ES中定义.
 
+具体文档可以参考logstash的文档[https://www.elastic.co/guide/en/logstash/current/plugins-filters-grok.html](https://www.elastic.co/guide/en/logstash/current/plugins-filters-grok.html)
+
+正则的语法可以参考 [https://www.elastic.co/guide/en/logstash/current/plugins-filters-grok.html](https://www.elastic.co/guide/en/logstash/current/plugins-filters-grok.html)
+
 会依次匹配match中的正则, 直到有一个成功的.
 
 **注意, 如果正则中的groupname和已有的字段一样, 原来的字段被覆盖**
