@@ -29,7 +29,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
-        <kafka-version>0.9.0.1</kafka-version>
+        <kafka-version>0.10.2.1</kafka-version>
         <elasticsearch-rest-version>5.0.0</elasticsearch-rest-version>
         <elasticsearch-transport-version>5.0.0</elasticsearch-transport-version>
         <jruby-version>2.1.6</jruby-version>
