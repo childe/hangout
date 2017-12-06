@@ -106,7 +106,9 @@ public class NewKafka extends BaseInput {
         public ConsumerThread(String topicName, Properties props, NewKafka kafka) {
             consumer = new KafkaConsumer<>(props);
             initConsumerThread(props,kafka);
-            this.consumer.subscribe(Arrays.asList(topicName));
+            Collection topics = new ArrayList<String>(Arrays.asList(topicName));
+            this.consumer.subscribe(topics);
+//            this.consumer.subscribe(Arrays.asList(topicName));
         }
 
         public ConsumerThread(Pattern topicPattern, Properties props, NewKafka kafka) {
