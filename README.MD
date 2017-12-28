@@ -340,7 +340,10 @@ metric count, 可以记录流经每个plugin的数据多少, 开发新的plugin�
 3. 对消息做聚合, 额外输出聚合后的新消息. 聚合访问日志,统计一定时间段内每个Url的响应时间(平均值,最小最大值,条数等信息), 然后输出给下游. [https://github.com/childe/hangout-filter-statmetric](https://github.com/childe/hangout-filter-statmetric)
 4. output.  示例3中的聚合数据如果需要告警, 比如Url的响应时间过高, 可以通过邮件发送出去. [https://github.com/childe/hangout-output-mail](https://github.com/childe/hangout-output-mail)
 5. input. TODO
-
+ 
+# 目前第三方插件：
+1. 使用Hangout将数据清洗写入ClickHouse
+https://github.com/RickyHuo/hangout-output-clickhouse
 # LICENSE
 The MIT License (MIT)
 
