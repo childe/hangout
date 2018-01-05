@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+
 public interface TemplateRender {
     Pattern p = Pattern.compile("\\[\\S+\\]+");
 
@@ -41,6 +42,10 @@ public interface TemplateRender {
 
 
     static public TemplateRender getRender(String template, String timezone) throws IOException {
-        return new DateFormatter(template, timezone);
+        Pattern p = Pattern.compile("\\%\\{\\+.*?\\}");
+        if (p.matcher(template).find()) {
+            return new DateFormatter(template, timezone);
+        }
+        return getRender(template);
     }
 }
