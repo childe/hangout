@@ -38,4 +38,9 @@ public interface TemplateRender {
         }
         return new OneLevelRender(template);
     }
+
+
+    static public TemplateRender getRender(String template, String timezone) throws IOException {
+        return new DateFormatter(template, timezone);
+    }
 }

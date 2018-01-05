@@ -38,7 +38,7 @@ public class Elasticsearch extends BaseOutput {
     private final static boolean DEFAULTSNIFF = true;
     private final static boolean DEFAULTCOMPRESS = false;
 
-    private String index;
+    private TemplateRender indexRender;
     private String indexTimezone;
     private BulkProcessor bulkProcessor;
     private TransportClient esclient;
@@ -52,12 +52,18 @@ public class Elasticsearch extends BaseOutput {
     }
 
     protected void prepare() {
-        this.index = (String) config.get("index");
-
         if (config.containsKey("timezone")) {
             this.indexTimezone = (String) config.get("timezone");
         } else {
             this.indexTimezone = "UTC";
+        }
+
+        String index = (String) config.get("index");
+        try {
+            this.indexRender = TemplateRender.getRender(index, this.indexTimezone);
+        } catch (IOException e) {
+            log.fatal("could not build tempalte from " + index);
+            System.exit(1);
         }
 
         if (config.containsKey("document_id")) {
@@ -229,7 +235,7 @@ public class Elasticsearch extends BaseOutput {
     }
 
     protected void emit(final Map event) {
-        String _index = DateFormatter.format(event, index, indexTimezone);
+        String _index = (String) this.indexRender.render(event);
         String _indexType = indexTypeRender.render(event).toString();
         IndexRequest indexRequest;
         if (this.idRender == null) {
