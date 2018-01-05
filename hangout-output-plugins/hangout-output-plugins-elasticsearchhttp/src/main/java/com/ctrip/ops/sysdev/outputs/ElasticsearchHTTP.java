@@ -30,7 +30,7 @@ import static java.util.stream.Collectors.toList;
 public class ElasticsearchHTTP extends BaseOutput {
     private final static int BULKACTION = 20000;
 
-    private String index;
+    private TemplateRender indexRender;
     private String indexTimezone;
     private RestClient restClient;
     private TemplateRender indexTypeRender;
@@ -48,7 +48,15 @@ public class ElasticsearchHTTP extends BaseOutput {
 
     protected void prepare() {
         try {
-            this.index = getConfig(config, "index", null, true);
+            if (config.containsKey("timezone")) {
+                this.indexTimezone = (String) config.get("timezone");
+            } else {
+                this.indexTimezone = "UTC";
+            }
+            String index = (String) config.get("index");
+            this.indexRender = TemplateRender.getRender(index, this.indexTimezone);
+
+
             this.bulkActions = getConfig(config, "bulk_actions", BULKACTION, false);
             this.indexTimezone = getConfig(config, "timezone", "UTC", false);
             this.hosts = (ArrayList<String>) getConfig(config, "hosts", null, true);
@@ -125,7 +133,7 @@ public class ElasticsearchHTTP extends BaseOutput {
     }
 
     protected void emit(final Map event) {
-        String _index = DateFormatter.format(event, index, indexTimezone);
+        String _index = (String) this.indexRender.render(event);
         String _indexType = (String) indexTypeRender.render(event);
         String requestBody;
         Response response = null;
