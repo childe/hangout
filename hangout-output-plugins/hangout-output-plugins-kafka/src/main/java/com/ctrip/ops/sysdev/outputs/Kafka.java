@@ -19,6 +19,7 @@ public class Kafka extends BaseOutput {
 
     private Producer producer;
     private String topic;
+    private String field;
     private Properties props;
     private TemplateRender topicRender;
 
@@ -37,6 +38,9 @@ public class Kafka extends BaseOutput {
         } catch (IOException e) {
             log.fatal("could not build template from" + topic);
             System.exit(1);
+        }
+        if (this.config.containsKey("field")) {
+            this.field = (String) this.config.get("field");
         }
         props = new Properties();
 
@@ -71,7 +75,13 @@ public class Kafka extends BaseOutput {
 
     protected void emit(Map event) {
         String _topic = topicRender.render(event).toString();
-        producer.send(new ProducerRecord<String, String>(_topic, JSONValue.toJSONString(event)));
+        if (this.field == null) {
+            producer.send(new ProducerRecord<String, String>(_topic, JSONValue.toJSONString(event)));
+        } else {
+            if (event.containsKey(this.field)) {
+                producer.send(new ProducerRecord<String, String>(_topic, (String) event.get(this.field)));
+            }
+        }
     }
 
     public void shutdown() {
