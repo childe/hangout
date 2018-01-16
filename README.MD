@@ -297,10 +297,21 @@ sniff设置为true的话, 会把hosts当做一个入口, 然后去寻找真正�
 	bootstrap_servers: 192.168.1.100:9092 # required
 	topic: test # required
 
+可以设置输出格式, 参考上面的嵌套字段写法:
+	#bootstrap_servers format is host1:port1,host2:port2, and the list can be a subset of brokers or a VIP pointing to a subset of brokers.
+	bootstrap_servers: 192.168.1.100:9092 # required
+	topic: test # required
+	format: '[message]'
+
 ### Stdout
 主要测试用吧. 因为配置是yml格式, 所以没有其它条件的话, 需要写成 
 
     - Stdout: {}
+
+也可以参考上面的嵌套字段写法:
+
+    - Stdout:
+        format: '[message]'
 
 ## Metrics
 为了实现对各个agent的统一性能和运行情况监控，在input/filter/output之外又提供了种叫Metrics的plugin, 用来监控应用的指标, 目前(0.3.0)提供了两种插件, 一种写一些性能数据到Graphit, 一种是restful接口提供性能监控、探活.
