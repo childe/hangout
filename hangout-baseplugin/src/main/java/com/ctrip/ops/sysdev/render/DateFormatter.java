@@ -27,9 +27,10 @@ public class DateFormatter implements TemplateRender {
         while (m.find()) {
             String match = m.group();
             String dateFormat = match.substring(3, match.length() - 1);
-            log.info("date format:" + dateFormat);
             this.formatter = DateTimeFormat.forPattern(dateFormat).withZone(DateTimeZone.forID(timezone));
+            log.info("date format:" + this.formatter);
             this.valueFormat = this.format.substring(0, m.start()) + "%s" + this.format.substring(m.end());
+            log.info("date format:" + this.valueFormat);
             return;
         }
 
