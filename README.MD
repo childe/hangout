@@ -298,6 +298,7 @@ sniff设置为true的话, 会把hosts当做一个入口, 然后去寻找真正�
 	topic: test # required
 
 可以设置输出格式, 参考上面的嵌套字段写法:
+
 	#bootstrap_servers format is host1:port1,host2:port2, and the list can be a subset of brokers or a VIP pointing to a subset of brokers.
 	bootstrap_servers: 192.168.1.100:9092 # required
 	topic: test # required
