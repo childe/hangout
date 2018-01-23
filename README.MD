@@ -356,6 +356,9 @@ metric count, 可以记录流经每个plugin的数据多少, 开发新的plugin�
 # 目前第三方插件：
 1. 使用Hangout将数据清洗写入ClickHouse
 https://github.com/RickyHuo/hangout-output-clickhouse
+2. 流式聚合https://github.com/childe/hangout-filter-linkmetric
+
+
 # LICENSE
 The MIT License (MIT)
 
