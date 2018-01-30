@@ -62,7 +62,7 @@ public class URLDecode extends BaseFilter {
                 try {
                     ((FieldSetter) f2._1()).setField(event, URLDecoder.decode((String) value, this.enc));
                 } catch (Exception e) {
-                    log.error("URLDecode failed", e);
+                    log.debug("URLDecode failed", e);
                     success = false;
                 }
             }
