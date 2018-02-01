@@ -267,17 +267,30 @@ concurrent_requests设置成大于0的数, 意思着多线程处理, 以我应�
 
 sniff设置为true的话, 会把hosts当做一个入口, 然后去寻找真正的data nodes写数据. 如果设置成false,数据就直接写在配置的hosts列表机器上,可以缓解data node上面的流量压力和小部分CPU压力.
 
-	cluster: prod # cluster name, required
-	hosts: # required
-		- 192.168.1.100
-		- 192.168.1.200:9301
-	index: 'hangout-%{+YYYY.MM.dd}'
-	index_type: logs # default logs
-	bulk_actions: 20000 # default 20000
-	bulk_size: 15	#default 15
-	flush_interval: 10	#default 10
-	concurrent_requests: 0	#default 0
-    sniff: false #default true
+```
+cluster: prod # cluster name, required
+hosts: # required
+  - 192.168.1.100
+  - 192.168.1.200:9301
+index: 'hangout-%{+YYYY.MM.dd}'
+index_type: logs # default logs
+bulk_actions: 20000 # default 20000
+bulk_size: 15	#default 15
+flush_interval: 10	#default 10
+concurrent_requests: 0	#default 0
+sniff: false #default true
+```
+
+注意: index的配置**部分**兼容logstash配置, 但是如果需要使用`@timestamp`之外的字段做渲染, 需要如下配置:
+
+  index: '${topicindex}-${@timestamp.toString("YYYY")}'
+
+一些高级写法:
+
+```
+index_type: ${EsIndexType!"logs"}  # 使用EsIndexType字段, 如果没有, 刚使用logs. 这个是freemarker的渲染模板
+document_id: '[id]'
+```
 
 ### ElasticsearchHTTP
 使用[rest api](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html) 批量将数据写入ES.
