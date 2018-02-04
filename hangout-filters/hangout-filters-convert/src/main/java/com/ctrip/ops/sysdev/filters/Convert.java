@@ -42,9 +42,9 @@ public class Convert extends BaseFilter {
             } else if (((String) value.get("to")).equalsIgnoreCase("integer")) {
                 converter = new IntegerConverter();
             } else if (((String) value.get("to")).equalsIgnoreCase("double")) {
-                converter = new DoubleConverter();
+                converter = new DoubleConverter(value);
             } else if (((String) value.get("to")).equalsIgnoreCase("float")) {
-                converter = new FloatConverter();
+                converter = new FloatConverter(value);
             } else if (((String) value.get("to")).equalsIgnoreCase("string")) {
                 converter = new StringConverter();
             } else if (((String) value.get("to")).equalsIgnoreCase("boolean")) {
@@ -77,11 +77,15 @@ public class Convert extends BaseFilter {
             Map.Entry<FieldSetter, Tuple4> entry = it.next();
             FieldSetter fieldSetter = entry.getKey();
             Tuple4 t4 = entry.getValue();
+            Object d = null;
             try {
                 TemplateRender tr = (TemplateRender) t4._2();
-                fieldSetter.setField(event, ((ConverterI) t4._1()).convert(tr.render(event)));
+                d = ((ConverterI) t4._1()).convert(tr.render(event));
             } catch (Exception e) {
                 success = false;
+            }
+
+            if (!success || d == null) {
                 if ((Boolean) t4._3()) {
                     fieldSetter.setField(event, null);
                 } else {
@@ -89,6 +93,8 @@ public class Convert extends BaseFilter {
                         fieldSetter.setField(event, t4._4());
                     }
                 }
+            } else {
+                fieldSetter.setField(event, d);
             }
         }
 

@@ -1,5 +1,7 @@
 package com.ctrip.ops.sysdev.filters;
 
+import java.util.Map;
+
 public class LongConverter implements ConverterI {
 
 	public Object convert(Object from) {

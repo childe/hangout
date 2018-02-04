@@ -113,5 +113,54 @@ public class TestConvertFilter {
         event = convertFilter.process(event);
         Assert.assertNull((ArrayList) event.get("tags"));
         Assert.assertEquals(1200, ((Map) event.get("metric")).get("a"));
+
+        // test infinity
+        c = String.format("%s\n%s\n%s\n%s",
+                "tag_on_failure: null",
+                "fields:",
+                "  time_taken: ",
+                "    to: double");
+        yaml = new Yaml();
+        config = (Map) yaml.load(c);
+
+        convertFilter = new Convert(config);
+        event = new HashMap();
+        event.put("time_taken", "723E095012");
+        event = convertFilter.process(event);
+        Assert.assertEquals(event.get("time_taken"), Double.POSITIVE_INFINITY);
+
+        c = String.format("%s\n%s\n%s\n%s\n%s",
+                "tag_on_failure: null",
+                "fields:",
+                "  time_taken: ",
+                "    to: double",
+                "    allow_infinity: false"
+        );
+        yaml = new Yaml();
+        config = (Map) yaml.load(c);
+
+        convertFilter = new Convert(config);
+        event = new HashMap();
+        event.put("time_taken", "723E095012");
+        event = convertFilter.process(event);
+        Assert.assertEquals(event.get("time_taken"), "723E095012");
+
+
+        c = String.format("%s\n%s\n%s\n%s\n%s\n%s",
+                "tag_on_failure: null",
+                "fields:",
+                "  time_taken: ",
+                "    to: double",
+                "    allow_infinity: false",
+                "    remove_if_fail: true"
+        );
+        yaml = new Yaml();
+        config = (Map) yaml.load(c);
+
+        convertFilter = new Convert(config);
+        event = new HashMap();
+        event.put("time_taken", "723E095012");
+        event = convertFilter.process(event);
+        Assert.assertNull(event.get("time_taken"));
     }
 }
