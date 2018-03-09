@@ -1,7 +1,6 @@
 package com.ctrip.ops.sysdev.outputs;
 
 import com.ctrip.ops.sysdev.baseplugin.BaseOutput;
-import com.ctrip.ops.sysdev.render.DateFormatter;
 import com.ctrip.ops.sysdev.render.TemplateRender;
 import lombok.extern.log4j.Log4j2;
 import org.elasticsearch.action.DocWriteRequest;
@@ -12,7 +11,7 @@ import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.common.transport.TransportAddress;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
@@ -130,7 +129,7 @@ public class Elasticsearch extends BaseOutput {
 
 
         if (config.containsKey("settings")) {
-            HashMap<String, Object> otherSettings = (HashMap<String, Object>) this.config.get("settings");
+            HashMap<String, String> otherSettings = (HashMap<String, String>) this.config.get("settings");
             otherSettings.entrySet().stream().forEach(entry -> settings.put(entry.getKey(), entry.getValue()));
         }
         esclient = new PreBuiltTransportClient(settings.build());
@@ -140,7 +139,7 @@ public class Elasticsearch extends BaseOutput {
             try {
                 String host = parsedHost[0];
                 String port = parsedHost.length == 2 ? parsedHost[1] : "9300";
-                esclient.addTransportAddress(new InetSocketTransportAddress(
+                esclient.addTransportAddress(new TransportAddress(
                         InetAddress.getByName(host), Integer.parseInt(port)));
             } catch (UnknownHostException e) {
                 e.printStackTrace();
