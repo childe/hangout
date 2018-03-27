@@ -301,8 +301,9 @@ document_id: '[id]'
             hosts:
               - 192.168.145.128
             index: 'myindex'
-	    user: admin
-            password: 123456
+            # set user & password for basic auth
+	          # user: admin
+            # password: 123456
             index_type: "mytype" # default logs
             bulk_actions: 5 #default 20000
             sniff: false #default true
