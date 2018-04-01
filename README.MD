@@ -97,7 +97,9 @@ type: nginx
 
     - topic_pattern: #pattern has high priority,if specified, topic will be ignored
         test.*: 3
-        
+
+目前引用的 kafka 客户端版本是0.9.0.1,如果和服务端的kafka版本不一致可能会导致消费不正常. 可以尝试手动下载相应版本的kafka_${version}-${version}.jar以及kafka-clients-${version}.jar替换jar包。
+
 ### newKafka
 新的kafka api.[http://kafka.apache.org/documentation.html#newconsumerapi](http://kafka.apache.org/documentation.html#newconsumerapi)
 
