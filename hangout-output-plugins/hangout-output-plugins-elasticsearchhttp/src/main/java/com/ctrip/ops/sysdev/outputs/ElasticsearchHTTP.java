@@ -101,10 +101,7 @@ public class ElasticsearchHTTP extends BaseOutput {
             UnknownHostException {
 
         List<HttpHost> httpHostList = hosts.stream().map(hostString -> {
-            String[] parsedHost = hostString.split(":");
-            String host = parsedHost[0];
-            int port = parsedHost.length == 2 ? Integer.valueOf(parsedHost[1]) : 9200;
-            return new HttpHost(host, port);
+            return HttpHost.create(hostString);
         }).collect(toList());
         List<HttpHost> clusterHosts = unmodifiableList(httpHostList);
 
