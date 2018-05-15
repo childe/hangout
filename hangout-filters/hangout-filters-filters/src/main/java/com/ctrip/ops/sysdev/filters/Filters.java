@@ -7,6 +7,7 @@ import lombok.extern.log4j.Log4j2;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 @Log4j2
 public class Filters extends BaseFilter {
@@ -15,6 +16,7 @@ public class Filters extends BaseFilter {
     }
 
     protected List<BaseFilter> filterProcessors;
+    private Map<String, Object> event;
 
     protected void prepare() {
         ArrayList<Map> filters = (ArrayList<Map>) config.get("filters");
@@ -31,6 +33,7 @@ public class Filters extends BaseFilter {
     protected Map filter(Map event) {
         if (this.processExtraEventsFunc == true) {
             //will prcess the event in filterExtraEvents
+            this.event = event;
             return event;
         }
         if (this.filterProcessors != null) {
@@ -45,26 +48,21 @@ public class Filters extends BaseFilter {
     }
 
     @Override
-    protected List<Map<String, Object>> filterExtraEvents(Map event) {
-        ArrayList<Map<String, Object>> events = new ArrayList<Map<String, Object>>();
-        events.add(event);
+    protected void filterExtraEvents(Stack<Map<String, Object>> to_st) {
+        Stack<Map<String, Object>> from_st = new Stack<Map<String, Object>>();
+        from_st.push(event);
+
         for (BaseFilter bf : filterProcessors) {
-            if (events == null) {
-                break;
-            }
-            for (int i = 0; i < events.size(); i++) {
-                events.set(i, bf.process(events.get(i)));
-            }
-            if (bf.processExtraEventsFunc == true) {
-                int originEventSize = events.size();
-                for (int i = 0; i < originEventSize; i++) {
-                    List rst = bf.processExtraEvents(events.get(i));
-                    if (rst != null) {
-                        events.addAll(rst);
-                    }
+            while (!from_st.empty()) {
+                Map rst = bf.process(from_st.pop());
+                if (rst != null) {
+                    to_st.push(rst);
                 }
             }
+            if (bf.processExtraEventsFunc == true) {
+                bf.processExtraEvents(to_st);
+            }
         }
-        return events;
+        return;
     }
 }

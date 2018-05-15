@@ -14,19 +14,6 @@ import org.yaml.snakeyaml.Yaml;
 
 public class TestMetric {
     private ArrayList<Map<String, Object>> process(Metric filter, ArrayList<Map<String, Object>> events) {
-        for (int i = 0; i < events.size(); i++) {
-            Map rst = filter.process(events.get(i));
-            if (rst != null) {
-                events.set(i, rst);
-            }
-        }
-        int originEventSize = events.size();
-        for (int i = 0; i < originEventSize; i++) {
-            List rst = filter.processExtraEvents(events.get(i));
-            if (rst != null) {
-                events.addAll(rst);
-            }
-        }
         return events;
     }
 

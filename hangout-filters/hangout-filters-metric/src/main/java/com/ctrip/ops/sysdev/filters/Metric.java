@@ -59,16 +59,15 @@ public class Metric extends BaseFilter {
     }
 
     @Override
-    public List<Map<String, Object>> filterExtraEvents(Map event) {
+    public void filterExtraEvents(Stack<Map<String, Object>> to_st) {
         if (metricToEmit.size() == 0) {
-            return null;
+            return;
         }
-        List<Map<String, Object>> events = new ArrayList<Map<String, Object>>();
         this.metricToEmit.put("@timestamp", this.lastEmitTime);
         this.postProcess(this.metricToEmit, true);
-        events.add(this.metricToEmit);
+        to_st.add(this.metricToEmit);
         this.metricToEmit = new HashMap();
         this.lastEmitTime = System.currentTimeMillis();
-        return events;
+        return;
     }
 }

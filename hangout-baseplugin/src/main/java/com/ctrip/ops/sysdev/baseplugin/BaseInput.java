@@ -8,10 +8,7 @@ import lombok.extern.log4j.Log4j2;
 
 
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import java.util.Map.Entry;
 
@@ -127,46 +124,37 @@ public abstract class BaseInput extends Base {
             if (this.config.containsKey("type")) {
                 event.put("type", this.config.get("type"));
             }
-            this.preprocess(event);
+            event = this.preprocess(event);
 
-            ArrayList<Map<String, Object>> events = new ArrayList();
-            events.add(event);
+            Stack<Map<String, Object>> tmp;
+            Stack<Map<String, Object>> from_st = new Stack<Map<String, Object>>();
+            from_st.push(event);
+            Stack<Map<String, Object>> to_st = new Stack<Map<String, Object>>();
 
             if (filterProcessors != null) {
                 for (BaseFilter bf : filterProcessors) {
-                    for (int i = 0; i < events.size(); i++) {
-                        Map rst = bf.process(events.get(i));
-                        events.set(i, rst);
+                    while (!from_st.empty()) {
+                        Map rst = bf.process(from_st.pop());
+                        if (rst != null) {
+                            to_st.push(rst);
+                        }
                     }
                     if (bf.processExtraEventsFunc == true) {
-                        int originEventSize = events.size();
-                        for (int i = 0; i < originEventSize; i++) {
-                            List rst = bf.processExtraEvents(events.get(i));
-                            if (rst != null) {
-                                events.addAll(rst);
-                            }
-                        }
+                        bf.processExtraEvents(to_st);
                     }
+
+                    tmp = to_st;
+                    to_st = from_st;
+                    from_st = tmp;
                 }
             }
 
-//            for (int i = 0; i < events.size(); i++) {
-//                events.set(i, this.postprocess(events.get(i)));
-//            }
-
-            if (events != null) {
+            while (!from_st.empty()) {
                 for (BaseOutput bo : outputProcessors) {
-                    for (Map<String, Object> theevent : events) {
-                        if (theevent != null) {
-                            bo.process(theevent);
-                        }
-                    }
+                    bo.process(from_st.pop());
                 }
             }
-        } catch (OutOfMemoryError e) {
-            e.printStackTrace();
-            log.error(e);
-            System.exit(1);
+
         } catch (Exception e) {
             log.error("process event failed:" + message);
             e.printStackTrace();

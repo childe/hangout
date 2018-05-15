@@ -12,11 +12,11 @@ public class FlatMetric extends Metric {
     }
 
     @Override
-    public List<Map<String, Object>> filterExtraEvents(Map event) {
+    public void filterExtraEvents(Stack<Map<String, Object>> to_st) {
         if (metricToEmit.size() == 0) {
-            return null;
+            return;
         }
-        List<Map<String, Object>> events = new ArrayList<Map<String, Object>>();
+
         Iterator<Map.Entry<String, Object>> it = this.metricToEmit.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<String, Object> o = it.next();
@@ -33,13 +33,11 @@ public class FlatMetric extends Metric {
                     this.put("@timestamp", lastEmitTime);
                 }};
                 this.postProcess(e, true);
-                events.add(e);
+                to_st.add(e);
             }
-
         }
         this.metricToEmit.clear();
         this.lastEmitTime = System.currentTimeMillis();
-
-        return events;
+        return;
     }
 }

@@ -101,20 +101,16 @@ public class BaseFilter {
         return event;
     }
 
-    public List<Map<String, Object>> processExtraEvents(Map event) {
-        if (this.processExtraEventsFunc == false || event == null || this.needProcess(event) == false) {
-            return null;
-        }
-
-        return this.filterExtraEvents(event);
+    public void processExtraEvents(Stack<Map<String, Object>> to_st) {
+        this.filterExtraEvents(to_st);
     }
 
     protected Map filter(Map event) {
         return event;
     }
 
-    protected List<Map<String, Object>> filterExtraEvents(Map event) {
-        return null;
+    protected void filterExtraEvents(Stack<Map<String, Object>> to_stt) {
+        return;
     }
 
     public void postProcess(Map event, boolean ifSuccess) {
