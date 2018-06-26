@@ -149,9 +149,11 @@ public abstract class BaseInput extends Base {
                 }
             }
 
+           Map<String, Object> v;
             while (!from_st.empty()) {
+                v = from_st.pop();
                 for (BaseOutput bo : outputProcessors) {
-                    bo.process(from_st.pop());
+                    bo.process(v);
                 }
             }
 
