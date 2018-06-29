@@ -74,6 +74,7 @@ public class Convert extends BaseFilter {
         Iterator<Entry<FieldSetter, Tuple4>> it = f.entrySet().iterator();
         boolean success = true;
         while (it.hasNext()) {
+            boolean flag = true;
             Map.Entry<FieldSetter, Tuple4> entry = it.next();
             FieldSetter fieldSetter = entry.getKey();
             Tuple4 t4 = entry.getValue();
@@ -82,10 +83,11 @@ public class Convert extends BaseFilter {
                 TemplateRender tr = (TemplateRender) t4._2();
                 d = ((ConverterI) t4._1()).convert(tr.render(event));
             } catch (Exception e) {
+                flag = false;
                 success = false;
             }
 
-            if (!success || d == null) {
+            if (!flag || d == null) {
                 if ((Boolean) t4._3()) {
                     fieldSetter.setField(event, null);
                 } else {
