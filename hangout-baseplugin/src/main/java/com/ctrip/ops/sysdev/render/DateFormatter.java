@@ -13,47 +13,56 @@ import org.joda.time.format.ISODateTimeFormat;
 
 @Log4j2
 public class DateFormatter implements TemplateRender {
-    private static Pattern p = Pattern.compile("(\\%\\{\\+.*?\\})");
+    private static Pattern p = Pattern.compile("(\\%\\{.*?\\})");
     private static DateTimeFormatter ISOformatter = ISODateTimeFormat
             .dateTimeParser().withOffsetParsed();
 
-    private DateTimeFormatter formatter;
-    private String format;
-    private String valueFormat;
+    DateTimeZone tz;
+    String format;
 
     public DateFormatter(String format, String timezone) {
         this.format = format;
-        Matcher m = p.matcher(format);
-        while (m.find()) {
-            String match = m.group();
-            String dateFormat = match.substring(3, match.length() - 1);
-            this.formatter = DateTimeFormat.forPattern(dateFormat).withZone(DateTimeZone.forID(timezone));
-            log.info("date format:" + this.formatter);
-            this.valueFormat = this.format.substring(0, m.start()) + "%s" + this.format.substring(m.end());
-            log.info("date format:" + this.valueFormat);
-            return;
-        }
-
-        log.fatal("could not create date format correctly from " + this.format);
+        this.tz = DateTimeZone.forID(timezone);
     }
 
     public Object render(Map event) {
-        DateTime timestamp = null;
-        Object o = event.get("@timestamp");
-        if (o == null) {
-            timestamp = new DateTime();
-        } else {
-            if (o.getClass() == DateTime.class) {
-                timestamp = (DateTime) o;
-            } else if (o.getClass() == Long.class) {
-                timestamp = new DateTime((Long) o);
-            } else if (o.getClass() == String.class) {
-                timestamp = ISOformatter.parseDateTime((String) o);
+        Matcher m = p.matcher(this.format);
+        StringBuffer sb = new StringBuffer();
+        while (m.find()) {
+            String match = m.group();
+            String key = match.substring(2, match.length() - 1);
+            if (key.equalsIgnoreCase("+s")) {
+                Object o = event.get("@timestamp");
+                if (o.getClass() == Long.class) {
+                    m.appendReplacement(sb, o.toString());
+                }
+            } else if (key.startsWith("+")) {
+                DateTimeFormatter formatter = DateTimeFormat.forPattern(
+                        key.substring(1, key.length())).withZone(this.tz);
+                Object o = event.get("@timestamp");
+                if (o == null) {
+                    DateTime timestamp = new DateTime();
+                    m.appendReplacement(sb, timestamp.toString(formatter));
+                } else {
+                    if (o.getClass() == DateTime.class) {
+                        m.appendReplacement(sb,
+                                ((DateTime) o).toString(formatter));
+                    } else if (o.getClass() == Long.class) {
+                        DateTime timestamp = new DateTime((Long) o);
+                        m.appendReplacement(sb, timestamp.toString(formatter));
+                    } else if (o.getClass() == String.class) {
+                        DateTime timestamp = ISOformatter
+                                .parseDateTime((String) o);
+                        m.appendReplacement(sb, timestamp.toString(formatter));
+                    }
+                }
+            } else if (event.containsKey(key)) {
+                m.appendReplacement(sb, (String) event.get(key));
             }
+
         }
-        if (timestamp == null) {
-            return this.format;
-        }
-        return String.format(this.valueFormat, timestamp.toString(this.formatter));
+        m.appendTail(sb);
+
+        return sb.toString();
     }
 }
