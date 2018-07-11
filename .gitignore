@@ -2,70 +2,7 @@
 .project
 .settings
 target
-Test.java
 build/
 release/
 .idea/
 *.iml
-将删除 conf/
-将删除 hangout-baseplugin/src/main/resources/
-将删除 hangout-baseplugin/src/test/
-将删除 hangout-config/src/main/resources/
-将删除 hangout-config/src/test/
-将删除 hangout-core/src/main/resources/
-将删除 hangout-decoders/hangout-decoders-base/src/main/resources/
-将删除 hangout-decoders/hangout-decoders-base/src/test/
-将删除 hangout-decoders/hangout-decoders-jsondecoder/src/main/resources/
-将删除 hangout-decoders/hangout-decoders-jsondecoder/src/test/
-将删除 hangout-decoders/hangout-decoders-plaindecoder/src/main/resources/
-将删除 hangout-decoders/hangout-decoders-plaindecoder/src/test/
-将删除 hangout-filters/hangout-filters-add/src/main/resources/
-将删除 hangout-filters/hangout-filters-add/src/test/
-将删除 hangout-filters/hangout-filters-convert/src/main/resources/
-将删除 hangout-filters/hangout-filters-date/src/main/resources/
-将删除 hangout-filters/hangout-filters-date/src/test/
-将删除 hangout-filters/hangout-filters-drop/src/main/resources/
-将删除 hangout-filters/hangout-filters-drop/src/test/
-将删除 hangout-filters/hangout-filters-filters/src/main/resources/
-将删除 hangout-filters/hangout-filters-geoip2/src/main/resources/
-将删除 hangout-filters/hangout-filters-gsub/src/main/resources/
-将删除 hangout-filters/hangout-filters-json/src/main/resources/
-将删除 hangout-filters/hangout-filters-kv/src/main/resources/
-将删除 hangout-filters/hangout-filters-lowercase/src/main/resources/
-将删除 hangout-filters/hangout-filters-lowercase/src/test/
-将删除 hangout-filters/hangout-filters-remove/src/main/resources/
-将删除 hangout-filters/hangout-filters-remove/src/test/
-将删除 hangout-filters/hangout-filters-rename/src/main/resources/
-将删除 hangout-filters/hangout-filters-rename/src/test/
-将删除 hangout-filters/hangout-filters-replace/src/main/resources/
-将删除 hangout-filters/hangout-filters-replace/src/test/
-将删除 hangout-filters/hangout-filters-translate/src/main/resources/
-将删除 hangout-filters/hangout-filters-translate/src/test/
-将删除 hangout-filters/hangout-filters-trim/src/main/resources/
-将删除 hangout-filters/hangout-filters-trim/src/test/
-将删除 hangout-filters/hangout-filters-ua/src/main/resources/
-将删除 hangout-filters/hangout-filters-uppercase/src/main/resources/
-将删除 hangout-filters/hangout-filters-uppercase/src/test/
-将删除 hangout-filters/hangout-filters-urldecode/src/main/resources/
-将删除 hangout-input-plugins/hangout-input-plugins-kafka/src/main/resources/
-将删除 hangout-input-plugins/hangout-input-plugins-kafka/src/test/
-将删除 hangout-input-plugins/hangout-input-plugins-newkafka/src/main/resources/
-将删除 hangout-input-plugins/hangout-input-plugins-newkafka/src/test/
-将删除 hangout-input-plugins/hangout-input-plugins-stdin/src/main/resources/
-将删除 hangout-input-plugins/hangout-input-plugins-stdin/src/test/
-将删除 hangout-output-plugins/hangout-output-plugins-elasticsearch/src/main/resources/
-将删除 hangout-output-plugins/hangout-output-plugins-elasticsearch/src/test/
-将删除 hangout-output-plugins/hangout-output-plugins-elasticsearchhttp/src/main/resources/
-将删除 hangout-output-plugins/hangout-output-plugins-elasticsearchhttp/src/test/
-将删除 hangout-output-plugins/hangout-output-plugins-kafka/src/main/resources/
-将删除 hangout-output-plugins/hangout-output-plugins-kafka/src/test/
-将删除 hangout-output-plugins/hangout-output-plugins-null/src/main/resources/
-将删除 hangout-output-plugins/hangout-output-plugins-null/src/test/
-将删除 hangout-output-plugins/hangout-output-plugins-stdout/src/main/resources/
-将删除 hangout-output-plugins/hangout-output-plugins-stdout/src/test/
-将删除 hangout-utils/hangout-utils-converter/src/main/resources/
-将删除 hangout-utils/hangout-utils-converter/src/test/
-将删除 hangout-utils/hangout-utils-dateparser/src/main/resources/
-将删除 hangout-utils/hangout-utils-dateparser/src/test/
-将删除 hangout-utils/hangout-utils-jsonutil/src/main/resources/
-将删除 hangout-utils/hangout-utils-utiltools/src/
