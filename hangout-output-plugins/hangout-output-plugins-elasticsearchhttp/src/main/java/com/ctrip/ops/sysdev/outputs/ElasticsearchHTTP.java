@@ -137,6 +137,7 @@ public class ElasticsearchHTTP extends BaseOutput {
 
         addActionList(event, _index, _indexType);
         if (this.actionList.size() / 2 >= this.bulkActions) {
+            log.info("bulk %d docs" , this.actionList.size() / 2);
             try {
 
                 requestBody = actionList.stream().map(JSONValue::toJSONString).collect(Collectors.joining("\n")) + "\n";
@@ -150,6 +151,8 @@ public class ElasticsearchHTTP extends BaseOutput {
                                 ContentType.APPLICATION_JSON
                         )
                 );
+
+            log.info("bulk returned");
 
             } catch (IOException e) {
                 log.error("Bulk index es Error:", e);
