@@ -140,7 +140,7 @@ public class ElasticsearchHTTP extends BaseOutput {
             try {
 
                 requestBody = actionList.stream().map(JSONValue::toJSONString).collect(Collectors.joining("\n")) + "\n";
-                log.info(requestBody);
+
                 response = restClient.performRequest(
                         "POST",
                         BULKPATH,
@@ -150,7 +150,7 @@ public class ElasticsearchHTTP extends BaseOutput {
                                 ContentType.APPLICATION_JSON
                         )
                 );
-                log.info(response.toString());
+
             } catch (IOException e) {
                 log.error("Bulk index es Error:", e);
                 if (response != null)
