@@ -13,7 +13,7 @@
     <dependencies>
         <dependency>
             <groupId>ctrip</groupId>
-            <artifactId>hangout-baseplugin</artifactId>
+            <artifactId>hangout-core</artifactId>
             <version>0.3.0</version>
         </dependency>
     </dependencies>
