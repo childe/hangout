@@ -3,9 +3,13 @@ inputs:
         codec: plain
         hostname: true # if add hostname to event; default false
         type: stdin1
+        to:
+        - o1
+        - f1
 
 filters:
     - Filters:
+        id: 'f1'
         if:
           - '<#if message??>true</#if>'
           - '<#if message?contains("liu")>true<#elseif message?contains("warn")>true</#if>'
@@ -26,4 +30,5 @@ filters:
           tag_on_failure: '' # do not add tags; deafult "grokfail"     addfield2: 'field2content'
 
 outputs:
-    - Stdout: {}
+    - Stdout:
+        id: 'o1'
