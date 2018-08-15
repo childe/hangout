@@ -1,5 +1,7 @@
 package com.ctrip.ops.sysdev.core;
 
+import com.ctrip.ops.sysdev.baseplugin.Base;
+import com.ctrip.ops.sysdev.baseplugin.TopologyBuilder;
 import lombok.extern.log4j.Log4j2;
 
 import com.ctrip.ops.sysdev.baseplugin.BaseInput;
@@ -71,51 +73,13 @@ public class Main {
             });
         }
 
-        // for input in all_inputs, Go through every input and emit immediately
-        inputConfigs.forEach(
-                input -> {
-                    input.forEach((inputType, inputConfig) -> {
-                        log.info("begin to build input " + inputType);
+        TopologyBuilder tb = new TopologyBuilder(inputConfigs, filterConfigs, outputConfigs);
+        List<BaseInput> inputs = tb.buildTopology();
 
-                        Class<?> inputClass = null;
-
-                        List<String> classNames = Arrays.asList("com.ctrip.ops.sysdev.inputs." + inputType, inputType);
-                        boolean tryCtrip = true;
-                        for (String className : classNames) {
-                            try {
-                                inputClass = Class.forName(className);
-                                //Get Constructor for each input
-                                Constructor<?> ctor = inputClass.getConstructor(
-                                        Map.class,
-                                        ArrayList.class,
-                                        ArrayList.class);
-                                //instantiate the input,prepare() and registerShutdownHookForSelf() are called here.
-                                BaseInput inputInstance = (BaseInput) ctor.newInstance(
-                                        inputConfig,
-                                        filterConfigs,
-                                        outputConfigs);
-
-                                log.info("build input " + inputType + " done");
-                                //Start working,guy.
-                                inputInstance.emit();
-                                log.info("input" + inputType + " started");
-                                break;
-                            } catch (ClassNotFoundException e) {
-                                if (tryCtrip == true) {
-                                    log.info("maybe a third party input plugin. try to build " + inputType);
-                                    tryCtrip = false;
-                                    continue;
-                                } else {
-                                    log.error(e);
-                                    System.exit(1);
-                                }
-                            } catch (Exception e) {
-                                log.error(e);
-                                System.exit(1);
-                            }
-                        }
-                    });
-                });
+        for (BaseInput input : inputs
+        ) {
+            input.emit();
+        }
     }
 }
 

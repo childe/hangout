@@ -228,10 +228,17 @@ public class TopologyBuilder {
                 inputs
         ) {
             setDestToInput(input, filters, outputs);
+            log.info("input " + input.getClass().getName() + " filters and outputs:");
+            log.debug(input.nextFilters);
+            log.debug(input.nextOutputs);
         }
 
         for (int i = 0; i < filters.size(); i++) {
+            BaseFilter filter = filters.get(i);
             setDestToFilter(filters.get(i), i, filters, outputs);
+            log.info("filter " + filter.getClass().getName() + " filters and outputs:");
+            log.debug(filter.nextFilters);
+            log.debug(filter.nextOutputs);
         }
 
         return inputs;
