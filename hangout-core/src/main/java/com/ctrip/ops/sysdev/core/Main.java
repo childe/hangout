@@ -12,6 +12,18 @@ import com.ctrip.ops.sysdev.config.HangoutConfig;
 import java.lang.reflect.Constructor;
 import java.util.*;
 
+class InputEmitThread extends Thread {
+    private BaseInput input;
+
+    public InputEmitThread(BaseInput input) {
+        this.input = input;
+    }
+
+    public void run() {
+        this.input.emit();
+    }
+}
+
 @Log4j2
 public class Main {
     public static void main(String[] args) {
@@ -78,7 +90,8 @@ public class Main {
 
         for (BaseInput input : inputs
         ) {
-            input.emit();
+            InputEmitThread t = new InputEmitThread(input);
+            t.start();
         }
     }
 }
