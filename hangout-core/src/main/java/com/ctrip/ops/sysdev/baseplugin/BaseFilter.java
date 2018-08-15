@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.*;
 
 @Log4j2
-public class BaseFilter {
+public class BaseFilter extends Base{
 
     protected Map config;
     protected String tagOnFailure;
@@ -23,7 +23,7 @@ public class BaseFilter {
     protected List<BaseOutput> outputs;
 
     public BaseFilter(Map config) {
-
+        super(config);
         this.config = config;
 
         if (this.config.containsKey("if")) {
