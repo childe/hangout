@@ -21,7 +21,7 @@ filters:
               addfield2: 'field2content'
     - Grok:
           match:
-            - '^(?<logtime>\S+) (?<user>.+) (-|(?<level>\w+)) %{DATA:msg}$'
+            - '^(?<logtime>\S+) (?<user>\w+) (-|(?<level>\w+)) %{DATA:msg}$'
           remove_fields: ['message']
           tag_on_failure: '' # do not add tags; deafult "grokfail"     addfield2: 'field2content'
 
