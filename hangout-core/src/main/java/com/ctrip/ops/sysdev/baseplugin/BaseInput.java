@@ -16,18 +16,18 @@ import java.util.Map.Entry;
 public abstract class BaseInput extends Base {
     protected Map<String, Object> config;
     protected Decode decoder;
-    protected List<BaseFilter> filterProcessors;
-    protected List<BaseOutput> outputProcessors;
-    protected ArrayList<Map> filters;
-    protected ArrayList<Map> outputs;
+
+    protected List<BaseFilter> nextFilters;
+    protected List<BaseOutput> nextOutputs;
 
     public BaseInput(Map config, ArrayList<Map> filters, ArrayList<Map> outputs)
             throws Exception {
         super(config);
 
+        this.nextFilters = new ArrayList<BaseFilter>();
+        this.nextOutputs = new ArrayList<BaseOutput>();
+
         this.config = config;
-        this.filters = filters;
-        this.outputs = outputs;
         this.createDecoder();
 
         this.prepare();
@@ -58,65 +58,7 @@ public abstract class BaseInput extends Base {
         }
     }
 
-    // some input plugin like kafka has more than one thread, and each thread must own their filter/output instance.
-    // so we should call createFilterProcessors and return filters in each thread.
-    public List<BaseFilter> createFilterProcessors() {
-        this.filterProcessors = Utils.createFilterProcessors(this.filters);
-        return this.filterProcessors;
-    }
-
-    // some input plugin like kafka has more than one thread, and each thread must own their filter/output instance.
-    // so we should call createFilterProcessors and return filters in each thread.
-    public List<BaseOutput> createOutputProcessors() {
-        List<BaseOutput> outputProcessors = new ArrayList<>();
-        if (outputs != null) {
-            outputs.stream().forEach((Map outputMap) -> {
-                outputMap.entrySet().stream().forEach(entry -> {
-                    Entry<String, Map> output = (Entry<String, Map>) entry;
-                    String outputType = output.getKey();
-                    Map outputConfig = output.getValue();
-
-                    log.info("begin to build output " + outputType);
-
-                    Class<?> outputClass;
-                    Constructor<?> ctor = null;
-                    List<String> classNames = Arrays.asList("com.ctrip.ops.sysdev.outputs." + outputType, outputType);
-                    boolean tryCtrip = true;
-
-                    for (String className : classNames) {
-                        try {
-                            outputClass = Class.forName(className);
-                            ctor = outputClass.getConstructor(Map.class);
-                            log.info("build output " + outputType + " done");
-                            outputProcessors.add((BaseOutput) ctor.newInstance(outputConfig));
-                            break;
-                        } catch (ClassNotFoundException e) {
-                            if (tryCtrip == true) {
-                                log.info("maybe a third party output plugin. try to build " + outputType);
-                                tryCtrip = false;
-                                continue;
-                            } else {
-                                log.error(e);
-                                System.exit(1);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            System.exit(1);
-                        }
-                    }
-                });
-            });
-        } else {
-            log.error("Error: At least One output should be set.");
-            System.exit(1);
-        }
-
-
-        this.registerShutdownHook(outputProcessors);
-        return outputProcessors;
-    }
-
-    public void process(String message, List<BaseFilter> filterProcessors, List<BaseOutput> outputProcessors) {
+    public void process(String message) {
         try {
             Map<String, Object> event = this.decoder
                     .decode(message);
@@ -125,37 +67,14 @@ public abstract class BaseInput extends Base {
             }
             event = this.preprocess(event);
 
-            Stack<Map<String, Object>> tmp;
-            Stack<Map<String, Object>> from_st = new Stack<Map<String, Object>>();
-            from_st.push(event);
-            Stack<Map<String, Object>> to_st = new Stack<Map<String, Object>>();
-
-            if (filterProcessors != null) {
-                for (BaseFilter bf : filterProcessors) {
-                    while (!from_st.empty()) {
-                        Map rst = bf.process(from_st.pop());
-                        if (rst != null) {
-                            to_st.push(rst);
-                        }
-                    }
-                    if (bf.processExtraEventsFunc == true) {
-                        bf.processExtraEvents(to_st);
-                    }
-
-                    tmp = to_st;
-                    to_st = from_st;
-                    from_st = tmp;
-                }
+            for (BaseFilter f : this.nextFilters
+            ) {
+                f.process(event);
             }
-
-            Map<String, Object> v;
-            while (!from_st.empty()) {
-                v = from_st.pop();
-                for (BaseOutput bo : outputProcessors) {
-                    bo.process(v);
-                }
+            for (BaseOutput o : this.nextOutputs
+            ) {
+                o.process(event);
             }
-
         } catch (Exception e) {
             log.error("process event failed:" + message);
             e.printStackTrace();
@@ -171,16 +90,7 @@ public abstract class BaseInput extends Base {
         }
     }
 
-    public void process(String message, List<BaseFilter> filterProcessors) {
-        this.process(message, filterProcessors, this.outputProcessors);
-    }
-
-    public void process(String message) {
-        this.process(message, this.filterProcessors, this.outputProcessors);
-    }
-
     public abstract void shutdown();
-
 
     private void registerShutdownHookForSelf() {
         final Object inputClass = this;

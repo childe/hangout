@@ -20,6 +20,7 @@ public abstract class BaseOutput extends Base {
 
         this.config = config;
 
+
         if (this.config.containsKey("if")) {
             IF = new ArrayList<TemplateRender>();
             for (String c : (List<String>) this.config.get("if")) {

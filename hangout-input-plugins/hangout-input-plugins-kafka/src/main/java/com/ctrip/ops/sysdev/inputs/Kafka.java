@@ -101,19 +101,15 @@ public class Kafka extends BaseInput {
 
     private class ConsumerThread implements Runnable {
         private KafkaStream<String, String> kafkaStream;
-        private List<BaseFilter> filterProcessors;
-        private List<BaseOutput> outputProcessors;
 
         public ConsumerThread(KafkaStream<String, String> kafkaStream, Kafka kafka) {
             this.kafkaStream = kafkaStream;
-            this.filterProcessors = kafka.createFilterProcessors();
-            this.outputProcessors = kafka.createOutputProcessors();
         }
 
         public void run() {
             ConsumerIterator<String, String> it = kafkaStream.iterator();
             while (it.hasNext()) {
-                process(it.next().message(), this.filterProcessors, this.outputProcessors);
+                process(it.next().message());
             }
         }
     }

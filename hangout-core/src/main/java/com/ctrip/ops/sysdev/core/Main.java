@@ -12,7 +12,6 @@ import java.util.*;
 
 @Log4j2
 public class Main {
-
     public static void main(String[] args) {
 
         //Parse CommandLine arguments

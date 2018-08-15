@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.*;
 
 @Log4j2
-public class BaseFilter extends Base{
+public class BaseFilter extends Base {
 
     protected Map config;
     protected String tagOnFailure;
@@ -20,11 +20,14 @@ public class BaseFilter extends Base{
     private List<TemplateRender> IF;
     public boolean processExtraEventsFunc;
     protected List<BaseFilter> nextFilters;
-    protected List<BaseOutput> outputs;
+    protected List<BaseOutput> nextOutputs;
 
     public BaseFilter(Map config) {
         super(config);
         this.config = config;
+
+        this.nextFilters = new ArrayList<BaseFilter>();
+        this.nextOutputs = new ArrayList<BaseOutput>();
 
         if (this.config.containsKey("if")) {
             IF = new ArrayList<TemplateRender>();
@@ -112,8 +115,8 @@ public class BaseFilter extends Base{
             return event;
         }
 
-        if (this.outputs != null) {
-            for (BaseOutput o : this.outputs) {
+        if (this.nextOutputs != null) {
+            for (BaseOutput o : this.nextOutputs) {
                 o.process(event);
             }
         }

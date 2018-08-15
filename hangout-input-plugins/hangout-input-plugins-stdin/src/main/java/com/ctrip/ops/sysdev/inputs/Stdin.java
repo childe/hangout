@@ -25,9 +25,6 @@ public class Stdin extends BaseInput {
 
     @Override
     protected void prepare() {
-        createFilterProcessors();
-        createOutputProcessors();
-
         if (config.containsKey("hostname")) {
             this.hostname = (Boolean) config.get("hostname");
         } else {

@@ -100,8 +100,6 @@ public class NewKafka extends BaseInput {
     private class ConsumerThread implements Runnable {
 
         private KafkaConsumer<String, String> consumer;
-        private List<BaseFilter> filterProcessors;
-        private List<BaseOutput> outputProcessors;
 
         public ConsumerThread(String topicName, Properties props, NewKafka kafka) {
             consumer = new KafkaConsumer<>(props);
@@ -127,15 +125,13 @@ public class NewKafka extends BaseInput {
 
         public void initConsumerThread(Properties prop, NewKafka kafka){
             this.consumer = new KafkaConsumer<>(props);
-            this.filterProcessors = kafka.createFilterProcessors();
-            this.outputProcessors = kafka.createOutputProcessors();
         }
 
         public void run() {
             while (true) {
                 ConsumerRecords<String, String> records = consumer.poll(10000);
                 for (ConsumerRecord<String, String> record : records)
-                    process(record.value(), this.filterProcessors, this.outputProcessors);
+                    process(record.value());
             }
         }
 
