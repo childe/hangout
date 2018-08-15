@@ -161,7 +161,7 @@ public class TopologyBuilder {
 
     private void setDestToInput(BaseInput input, List<BaseFilter> filters, List<BaseOutput> outputs) {
         if (input.config.get("to") == null) {
-            if (this.filterConfigs.size() != 0) {
+            if (filters.size() != 0) {
                 input.nextFilters.add(filters.get(0));
             } else {
                 input.nextOutputs.addAll(outputs);
@@ -228,7 +228,7 @@ public class TopologyBuilder {
                 inputs
         ) {
             setDestToInput(input, filters, outputs);
-            log.info("input " + input.getClass().getName() + " filters and outputs:");
+            log.debug("input " + input.getClass().getName() + " filters and outputs:");
             log.debug(input.nextFilters);
             log.debug(input.nextOutputs);
         }
@@ -236,7 +236,7 @@ public class TopologyBuilder {
         for (int i = 0; i < filters.size(); i++) {
             BaseFilter filter = filters.get(i);
             setDestToFilter(filters.get(i), i, filters, outputs);
-            log.info("filter " + filter.getClass().getName() + " filters and outputs:");
+            log.debug("filter " + filter.getClass().getName() + " filters and outputs:");
             log.debug(filter.nextFilters);
             log.debug(filter.nextOutputs);
         }
