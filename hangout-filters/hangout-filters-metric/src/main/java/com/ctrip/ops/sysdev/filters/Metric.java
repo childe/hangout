@@ -4,6 +4,7 @@ import java.util.*;
 
 import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
 
+import com.ctrip.ops.sysdev.baseplugin.BaseOutput;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
@@ -37,6 +38,15 @@ public class Metric extends BaseFilter {
         if (System.currentTimeMillis() >= this.windowSize + this.lastEmitTime) {
             this.metricToEmit = this.metric;
             this.metric = new HashMap();
+
+            for (BaseFilter f : this.nextFilters
+            ) {
+                f.process(metricToEmit);
+            }
+            for (BaseOutput o : this.nextOutputs
+            ) {
+                o.process(metricToEmit);
+            }
         }
         if (event.containsKey(this.key) && event.containsKey(this.value)) {
             String keyValue = event.get(this.key).toString();
@@ -56,18 +66,5 @@ public class Metric extends BaseFilter {
             this.metric.put(keyValue, set);
         }
         return event;
-    }
-
-    @Override
-    public void filterExtraEvents(Stack<Map<String, Object>> to_st) {
-        if (metricToEmit.size() == 0) {
-            return;
-        }
-        this.metricToEmit.put("@timestamp", this.lastEmitTime);
-        this.postProcess(this.metricToEmit, true);
-        to_st.add(this.metricToEmit);
-        this.metricToEmit = new HashMap();
-        this.lastEmitTime = System.currentTimeMillis();
-        return;
     }
 }
