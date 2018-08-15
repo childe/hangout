@@ -19,8 +19,11 @@ public class BaseFilter {
     protected Map<FieldSetter, TemplateRender> addFields;
     private List<TemplateRender> IF;
     public boolean processExtraEventsFunc;
+    protected List<BaseFilter> nextFilters;
+    protected List<BaseOutput> outputs;
 
     public BaseFilter(Map config) {
+
         this.config = config;
 
         if (this.config.containsKey("if")) {
@@ -98,6 +101,22 @@ public class BaseFilter {
             event = this.filter(event);
         }
 
+        if (event == null) {
+            return null;
+        }
+
+        if (this.nextFilters != null) {
+            for (BaseFilter f : this.nextFilters) {
+                event = f.process(event);
+            }
+            return event;
+        }
+
+        if (this.outputs != null) {
+            for (BaseOutput o : this.outputs) {
+                o.process(event);
+            }
+        }
         return event;
     }
 
