@@ -108,17 +108,12 @@ public class BaseFilter extends Base {
             return null;
         }
 
-        if (this.nextFilters != null) {
-            for (BaseFilter f : this.nextFilters) {
-                event = f.process(event);
-            }
-            return event;
+        for (BaseFilter f : this.nextFilters) {
+            event = f.process(event);
         }
 
-        if (this.nextOutputs != null) {
-            for (BaseOutput o : this.nextOutputs) {
-                o.process(event);
-            }
+        for (BaseOutput o : this.nextOutputs) {
+            o.process(event);
         }
         return event;
     }
