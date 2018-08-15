@@ -68,9 +68,8 @@ public abstract class BaseInput extends Base {
     // some input plugin like kafka has more than one thread, and each thread must own their filter/output instance.
     // so we should call createFilterProcessors and return filters in each thread.
     public List<BaseOutput> createOutputProcessors() {
-
+        List<BaseOutput> outputProcessors = new ArrayList<>();
         if (outputs != null) {
-            outputProcessors = new ArrayList<>();
             outputs.stream().forEach((Map outputMap) -> {
                 outputMap.entrySet().stream().forEach(entry -> {
                     Entry<String, Map> output = (Entry<String, Map>) entry;
@@ -149,7 +148,7 @@ public abstract class BaseInput extends Base {
                 }
             }
 
-           Map<String, Object> v;
+            Map<String, Object> v;
             while (!from_st.empty()) {
                 v = from_st.pop();
                 for (BaseOutput bo : outputProcessors) {
