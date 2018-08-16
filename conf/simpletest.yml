@@ -3,9 +3,6 @@ inputs:
         codec: plain
         hostname: true # if add hostname to event; default false
         type: stdin1
-        to:
-        - o1
-        - f1
 
 filters:
     - Filters:
@@ -30,5 +27,4 @@ filters:
           tag_on_failure: '' # do not add tags; deafult "grokfail"     addfield2: 'field2content'
 
 outputs:
-    - Stdout:
-        id: 'o1'
+    - Stdout: {}
