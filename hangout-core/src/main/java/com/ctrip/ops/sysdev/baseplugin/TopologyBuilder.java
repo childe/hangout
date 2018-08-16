@@ -160,62 +160,18 @@ public class TopologyBuilder {
     }
 
     private void setDestToInput(BaseInput input, List<BaseFilter> filters, List<BaseOutput> outputs) {
-        if (input.config.get("to") == null) {
-            if (filters.size() != 0) {
-                input.nextFilters.add(filters.get(0));
-            } else {
-                input.nextOutputs.addAll(outputs);
-            }
-            return;
-        }
-
-        for (String dest : (ArrayList<String>) input.config.get("to")) {
-            for (BaseFilter f : filters) {
-                if (f.config.containsKey("id")) {
-                    String ID = (String) f.config.get("id");
-                    if (ID.equals(dest)) {
-                        input.nextFilters.add(f);
-                    }
-                }
-            }
-            for (BaseOutput o : outputs) {
-                if (o.config.containsKey("id")) {
-                    String ID = (String) o.config.get("id");
-                    if (ID.equals(dest)) {
-                        input.nextOutputs.add(o);
-                    }
-                }
-            }
+        if (filters.size() != 0) {
+            input.nextFilter = filters.get(0);
+        } else {
+            input.outputs.addAll(outputs);
         }
     }
 
     private void setDestToFilter(BaseFilter filter, int i, List<BaseFilter> filters, List<BaseOutput> outputs) {
-        if (filter.config.get("to") == null) {
-            if (filters.size() == i + 1) {
-                filter.nextOutputs.addAll(outputs);
-            } else {
-                filter.nextFilters.add(filters.get(i + 1));
-            }
-            return;
-        }
-
-        for (String dest : (ArrayList<String>) filter.config.get("to")) {
-            for (BaseFilter f : filters) {
-                if (f.config.containsKey("id")) {
-                    String ID = (String) f.config.get("id");
-                    if (ID.equals(dest)) {
-                        filter.nextFilters.add(f);
-                    }
-                }
-            }
-            for (BaseOutput o : outputs) {
-                if (o.config.containsKey("id")) {
-                    String ID = (String) o.config.get("id");
-                    if (ID.equals(dest)) {
-                        filter.nextOutputs.add(o);
-                    }
-                }
-            }
+        if (filters.size() == i + 1) {
+            filter.outputs.addAll(outputs);
+        } else {
+            filter.nextFilter = filters.get(i + 1);
         }
     }
 
@@ -228,17 +184,11 @@ public class TopologyBuilder {
                 inputs
         ) {
             setDestToInput(input, filters, outputs);
-            log.debug("input " + input.getClass().getName() + " filters and outputs:");
-            log.debug(input.nextFilters);
-            log.debug(input.nextOutputs);
         }
 
         for (int i = 0; i < filters.size(); i++) {
             BaseFilter filter = filters.get(i);
             setDestToFilter(filters.get(i), i, filters, outputs);
-            log.debug("filter " + filter.getClass().getName() + " filters and outputs:");
-            log.debug(filter.nextFilters);
-            log.debug(filter.nextOutputs);
         }
 
         return inputs;

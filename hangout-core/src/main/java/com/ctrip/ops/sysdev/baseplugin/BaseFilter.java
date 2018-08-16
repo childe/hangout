@@ -19,15 +19,15 @@ public class BaseFilter extends Base {
     protected Map<FieldSetter, TemplateRender> addFields;
     private List<TemplateRender> IF;
     public boolean processExtraEventsFunc;
-    protected List<BaseFilter> nextFilters;
-    protected List<BaseOutput> nextOutputs;
+    protected BaseFilter nextFilter;
+    protected List<BaseOutput> outputs;
 
     public BaseFilter(Map config) {
         super(config);
         this.config = config;
 
-        this.nextFilters = new ArrayList<BaseFilter>();
-        this.nextOutputs = new ArrayList<BaseOutput>();
+        this.nextFilter = null;
+        this.outputs = new ArrayList<BaseOutput>();
 
         if (this.config.containsKey("if")) {
             IF = new ArrayList<TemplateRender>();
@@ -108,12 +108,12 @@ public class BaseFilter extends Base {
             return null;
         }
 
-        for (BaseFilter f : this.nextFilters) {
-            event = f.process(event);
-        }
-
-        for (BaseOutput o : this.nextOutputs) {
-            o.process(event);
+        if (this.nextFilter != null) {
+            event = this.nextFilter.process(event);
+        } else {
+            for (BaseOutput o : this.outputs) {
+                o.process(event);
+            }
         }
         return event;
     }

@@ -17,15 +17,15 @@ public abstract class BaseInput extends Base {
     protected Map<String, Object> config;
     protected Decode decoder;
 
-    protected List<BaseFilter> nextFilters;
-    protected List<BaseOutput> nextOutputs;
+    protected BaseFilter nextFilter;
+    protected List<BaseOutput> outputs;
 
     public BaseInput(Map config, ArrayList<Map> filters, ArrayList<Map> outputs)
             throws Exception {
         super(config);
 
-        this.nextFilters = new ArrayList<BaseFilter>();
-        this.nextOutputs = new ArrayList<BaseOutput>();
+        this.nextFilter = null;
+        this.outputs = new ArrayList<BaseOutput>();
 
         this.config = config;
         this.createDecoder();
@@ -67,13 +67,13 @@ public abstract class BaseInput extends Base {
             }
             event = this.preprocess(event);
 
-            for (BaseFilter f : this.nextFilters
-            ) {
-                f.process(event);
-            }
-            for (BaseOutput o : this.nextOutputs
-            ) {
-                o.process(event);
+            if (this.nextFilter != null) {
+                event = this.nextFilter.process(event);
+            } else {
+                for (BaseOutput o : this.outputs
+                ) {
+                    o.process(event);
+                }
             }
         } catch (Exception e) {
             log.error("process event failed:" + message);
