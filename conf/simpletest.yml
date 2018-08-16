@@ -5,26 +5,37 @@ inputs:
         type: stdin1
 
 filters:
-    - Filters:
-        id: 'f1'
-        if:
-          - '<#if message??>true</#if>'
-          - '<#if message?contains("liu")>true<#elseif message?contains("warn")>true</#if>'
-        filters:
-            - Add:
-                fields:
-                    test: 'abcd'
-    - Add:
-          fields:
-              addfield1: 'field1content'
-    - Add:
-          fields:
-              addfield2: 'field2content'
-    - Grok:
-          match:
-            - '^(?<logtime>\S+) (?<user>\w+) (-|(?<level>\w+)) %{DATA:msg}$'
-          remove_fields: ['message']
-          tag_on_failure: '' # do not add tags; deafult "grokfail"     addfield2: 'field2content'
+- Filters:
+    id: 'f1'
+    if:
+      - '<#if message??>true</#if>'
+      - '<#if message?contains("liu")>true<#elseif message?contains("warn")>true</#if>'
+    filters:
+        - Add:
+            fields:
+                test: 'abcd'
+- Add:
+      fields:
+          addfield1: 'field1content'
+- Add:
+      fields:
+          addfield2: 'field2content'
+- Grok:
+      match:
+        - '^(?<logtime>\S+) (?<user>\w+) (-|(?<level>\w+)) %{DATA:msg}$'
+      remove_fields: ['message']
+      tag_on_failure: '' # do not add tags; deafult "grokfail"     addfield2: 'field2content'
+#- Date:
+    #src: logtime
+    #formats:
+    #- UNIX
+- LinkMetric:
+    fieldsLink: 'user->level'
+    timestamp: '@timestamp'
+    reserveWindow: 1200 #20m
+    batchWindow: 5
+    add_fields:
+        filtertype: metric
 
 outputs:
     - Stdout: {}
