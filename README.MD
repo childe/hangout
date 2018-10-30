@@ -1,4 +1,4 @@
-模仿[logstash](https://www.elastic.co/products/logstash)做的一个应用.
+模仿[logstash](https://www.elastic.co/products/logstash)做的一个应用.  现在我们迁移到了 [https://github.com/childe/gohangout](https://github.com/childe/gohangout) , 这个项目基本上停止更新了.
 
 最近在将部分内容进行代码上的优化。
 
