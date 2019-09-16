@@ -11,7 +11,7 @@
 
     <artifactId>hangout-core</artifactId>
     <dependencies>
-        <!--下列的dependency并非这个core都需要，大部分是Iead多项目调试需要-->
+        <!--下列的dependency并非这个core都需要，大部分是Idea多项目调试需要-->
 
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
@@ -36,7 +36,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.16.10</version>
+            <version>1.16.22</version>
         </dependency>
         <dependency>
             <groupId>io.dropwizard.metrics</groupId>
@@ -63,16 +63,11 @@
             <artifactId>args4j</artifactId>
             <version>2.33</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok-maven -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.16.18</version>
-        </dependency>
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
         </dependency>
+
 
         <dependency>
             <groupId>org.testng</groupId>
