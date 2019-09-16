@@ -1,4 +1,4 @@
-package com.ctrip.ops.sysdev.config;
+package config;
 
 import org.yaml.snakeyaml.Yaml;
 

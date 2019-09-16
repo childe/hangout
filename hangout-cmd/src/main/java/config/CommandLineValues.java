@@ -1,4 +1,4 @@
-package com.ctrip.ops.sysdev.config;
+package config;
 
 import lombok.Data;
 import org.kohsuke.args4j.CmdLineException;
@@ -59,7 +59,7 @@ public class CommandLineValues {
     private String getVersion() {
         InputStream resourceAsStream =
                 this.getClass().getResourceAsStream(
-                        "/META-INF/maven/ctrip/hangout-core/pom.properties"
+                        "/META-INF/maven/ctrip/hangout-cmd/pom.properties"
                 );
         Properties prop = new Properties();
         try {

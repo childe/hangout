@@ -19,8 +19,8 @@ public class BaseFilter extends Base {
     protected Map<FieldSetter, TemplateRender> addFields;
     private List<TemplateRender> IF;
     public boolean processExtraEventsFunc;
-    protected BaseFilter nextFilter;
-    protected List<BaseOutput> outputs;
+    public BaseFilter nextFilter;
+    public List<BaseOutput> outputs;
 
     public BaseFilter(Map config) {
         super(config);

@@ -1,13 +1,11 @@
-package com.ctrip.ops.sysdev.core;
+package cmd;
 
-import com.ctrip.ops.sysdev.baseplugin.Base;
-import com.ctrip.ops.sysdev.baseplugin.TopologyBuilder;
+import config.CommandLineValues;
+import config.HangoutConfig;
 import lombok.extern.log4j.Log4j2;
 
 import com.ctrip.ops.sysdev.baseplugin.BaseInput;
 import com.ctrip.ops.sysdev.baseplugin.BaseMetric;
-import com.ctrip.ops.sysdev.config.CommandLineValues;
-import com.ctrip.ops.sysdev.config.HangoutConfig;
 
 import java.lang.reflect.Constructor;
 import java.util.*;
@@ -19,11 +17,15 @@ class InputEmitThread extends Thread {
         this.input = input;
     }
 
+    @Override
     public void run() {
         this.input.emit();
     }
 }
 
+/**
+ * @author liujia
+ */
 @Log4j2
 public class Main {
     public static void main(String[] args) {
