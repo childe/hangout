@@ -188,7 +188,6 @@ public class TopologyBuilder {
         }
 
         for (int i = 0; i < filters.size(); i++) {
-            BaseFilter filter = filters.get(i);
             setDestToFilter(filters.get(i), i, filters, outputs);
         }
 
