@@ -4,10 +4,7 @@ import com.ctrip.ops.sysdev.baseplugin.BaseOutput;
 import com.ctrip.ops.sysdev.render.TemplateRender;
 import lombok.extern.log4j.Log4j2;
 import org.elasticsearch.action.DocWriteRequest;
-import org.elasticsearch.action.bulk.BulkItemResponse;
-import org.elasticsearch.action.bulk.BulkProcessor;
-import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.bulk.*;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
@@ -28,6 +25,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @author liujia
+ */
 @Log4j2
 public class Elasticsearch extends BaseOutput {
     private final static int BULKACTION = 20000;
@@ -50,6 +50,7 @@ public class Elasticsearch extends BaseOutput {
         super(config);
     }
 
+    @Override
     protected void prepare() {
         if (config.containsKey("timezone")) {
             this.indexTimezone = (String) config.get("timezone");
@@ -61,7 +62,7 @@ public class Elasticsearch extends BaseOutput {
         try {
             this.indexRender = TemplateRender.getRender(index, this.indexTimezone);
         } catch (IOException e) {
-            log.fatal("could not build tempalte from " + index);
+            log.fatal("could not build template from " + index);
             System.exit(1);
         }
 
@@ -70,7 +71,7 @@ public class Elasticsearch extends BaseOutput {
             try {
                 this.idRender = TemplateRender.getRender(document_id);
             } catch (IOException e) {
-                log.fatal("could not build tempalte from " + document_id);
+                log.fatal("could not build template from " + document_id);
                 System.exit(1);
             }
         } else {
@@ -84,7 +85,7 @@ public class Elasticsearch extends BaseOutput {
         try {
             this.indexTypeRender = TemplateRender.getRender(index_type);
         } catch (IOException e) {
-            log.fatal("could not build tempalte from " + index_type);
+            log.fatal("could not build template from " + index_type);
             System.exit(1);
         }
 
@@ -93,7 +94,7 @@ public class Elasticsearch extends BaseOutput {
             try {
                 this.parentRender = TemplateRender.getRender(document_parent);
             } catch (IOException e) {
-                log.fatal("could not build tempalte from " + document_parent);
+                log.fatal("could not build template from " + document_parent);
                 System.exit(1);
             }
         } else {
@@ -105,7 +106,7 @@ public class Elasticsearch extends BaseOutput {
             try {
                 this.routeRender = TemplateRender.getRender(route);
             } catch (IOException e) {
-                log.fatal("could not build tempalte from " + route);
+                log.fatal("could not build template from " + route);
                 System.exit(1);
             }
         } else {
@@ -168,6 +169,8 @@ public class Elasticsearch extends BaseOutput {
                         List<DocWriteRequest> requests = request.requests();
                         int toBeTry = 0;
                         int totalFailed = 0;
+
+                        List<DocWriteRequest> retryList = new ArrayList<>();
                         for (BulkItemResponse item : response.getItems()) {
                             if (item.isFailed()) {
                                 switch (item.getFailure().getStatus()) {
@@ -178,7 +181,7 @@ public class Elasticsearch extends BaseOutput {
                                             log.error(item.getFailureMessage());
                                         }
                                         toBeTry++;
-                                        bulkProcessor.add(requests.get(item.getItemId()));
+                                        retryList.add(requests.get(item.getItemId()));
                                         break;
                                     default:
                                         if (totalFailed == 0) {
@@ -203,6 +206,7 @@ public class Elasticsearch extends BaseOutput {
                                 Thread.sleep(toBeTry / 2);
                                 log.info("slept " + toBeTry / 2
                                         + "milliseconds after bulk failure");
+                                retry(retryList);
                             } catch (InterruptedException e) {
                                 log.debug(e);
                             }
@@ -233,6 +237,27 @@ public class Elasticsearch extends BaseOutput {
                 .setConcurrentRequests(concurrentRequests).build();
     }
 
+    private void retry(List<DocWriteRequest> retryList) {
+        if (retryList.size() == 0) {
+            return;
+        }
+
+        log.info("retry bulk {} docs", retryList.size());
+
+        BulkRequestBuilder bulkRequest = esclient.prepareBulk();
+        retryList.forEach(f -> {
+                    bulkRequest.add((IndexRequest) f);
+                }
+        );
+        BulkResponse bulkResponse = bulkRequest.get();
+        if (bulkResponse.hasFailures()) {
+            log.info("retry bulk request has failures");
+        } else {
+            log.info("retry bulk request done");
+        }
+    }
+
+    @Override
     protected void emit(final Map event) {
         String _index = (String) this.indexRender.render(event);
         String _indexType = indexTypeRender.render(event).toString();
@@ -252,6 +277,7 @@ public class Elasticsearch extends BaseOutput {
         this.bulkProcessor.add(indexRequest);
     }
 
+    @Override
     public void shutdown() {
         log.info("flush docs and then shutdown");
 
