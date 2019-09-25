@@ -8,6 +8,7 @@
     <packaging>pom</packaging>
     <name>hangout</name>
     <modules>
+        <module>hangout-cmd</module>
         <module>hangout-core</module>
         <module>hangout-input-plugins</module>
         <module>hangout-output-plugins</module>

@@ -1,11 +1,12 @@
-package com.ctrip.ops.sysdev.baseplugin;
+package com.ctrip.ops.sysdev.cmd;
 
+import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
+import com.ctrip.ops.sysdev.baseplugin.BaseInput;
+import com.ctrip.ops.sysdev.baseplugin.BaseOutput;
 import lombok.extern.log4j.Log4j2;
 
 import java.lang.reflect.Constructor;
 import java.util.*;
-
-import static com.ctrip.ops.sysdev.utils.Utils.createFilterProcessors;
 
 @Log4j2
 public class TopologyBuilder {

@@ -17,8 +17,8 @@ public abstract class BaseInput extends Base {
     protected Map<String, Object> config;
     protected Decode decoder;
 
-    protected BaseFilter nextFilter;
-    protected List<BaseOutput> outputs;
+    public BaseFilter nextFilter;
+    public List<BaseOutput> outputs;
 
     public BaseInput(Map config, ArrayList<Map> filters, ArrayList<Map> outputs)
             throws Exception {
