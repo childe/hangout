@@ -1,11 +1,10 @@
-package cmd;
-
-import config.CommandLineValues;
-import config.HangoutConfig;
-import lombok.extern.log4j.Log4j2;
+package com.ctrip.ops.sysdev.cmd;
 
 import com.ctrip.ops.sysdev.baseplugin.BaseInput;
 import com.ctrip.ops.sysdev.baseplugin.BaseMetric;
+import config.CommandLineValues;
+import config.HangoutConfig;
+import lombok.extern.log4j.Log4j2;
 
 import java.lang.reflect.Constructor;
 import java.util.*;
@@ -97,4 +96,3 @@ public class Main {
         }
     }
 }
-

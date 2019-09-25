@@ -1,4 +1,4 @@
-package cmd;
+package com.ctrip.ops.sysdev.cmd;
 
 import com.ctrip.ops.sysdev.baseplugin.BaseFilter;
 import com.ctrip.ops.sysdev.baseplugin.BaseInput;
