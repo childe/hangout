@@ -48,18 +48,33 @@ public class Main {
         final List<HashMap<String, Map>> outputConfigs = (ArrayList<HashMap<String, Map>>) configs.get("outputs");
         final List<HashMap<String, Map>> metricsConfigs = (ArrayList<HashMap<String, Map>>) configs.get("metrics");
 
+        initMetrics(metricsConfigs);
+
+        TopologyBuilder tb = new TopologyBuilder(inputConfigs, filterConfigs, outputConfigs);
+        List<BaseInput> inputs = tb.buildTopology();
+
+        for (BaseInput input : inputs
+        ) {
+            InputEmitThread t = new InputEmitThread(input);
+            t.start();
+        }
+    }
+
+    /**
+     * init  Metrics
+     * @param metricsConfigs
+     */
+    private static void initMetrics(List<HashMap<String, Map>> metricsConfigs) {
         if (metricsConfigs != null) {
             metricsConfigs.forEach(metric -> {
                 metric.forEach((metricType, metricConfig) -> {
                     log.info("begin to build metric " + metricType);
 
-                    Class<?> metricClass = null;
-
                     List<String> classNames = Arrays.asList("com.ctrip.ops.sysdev.metrics." + metricType, metricType);
                     boolean tryCtrip = true;
                     for (String className : classNames) {
                         try {
-                            metricClass = Class.forName(className);
+                            Class<?> metricClass  = Class.forName(className);
                             Constructor<?> ctor = metricClass.getConstructor(Map.class);
                             BaseMetric metricInstance = (BaseMetric) ctor.newInstance(metricConfig);
                             log.info("build metric " + metricType + " done");
@@ -84,15 +99,6 @@ public class Main {
                     }
                 });
             });
-        }
-
-        TopologyBuilder tb = new TopologyBuilder(inputConfigs, filterConfigs, outputConfigs);
-        List<BaseInput> inputs = tb.buildTopology();
-
-        for (BaseInput input : inputs
-        ) {
-            InputEmitThread t = new InputEmitThread(input);
-            t.start();
         }
     }
 }
