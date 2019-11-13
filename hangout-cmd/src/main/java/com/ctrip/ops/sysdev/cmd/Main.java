@@ -38,10 +38,13 @@ public class Main {
         try {
             configs = HangoutConfig.parse(cm.getConfigFile());
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("failed to pares config file : " + cm.getConfigFile(), e);
             System.exit(1);
         }
-        log.debug(configs);
+
+        if (log.isDebugEnabled()) {
+            log.debug(configs);
+        }
 
         final List<HashMap<String, Map>> inputConfigs = (ArrayList<HashMap<String, Map>>) configs.get("inputs");
         final List<HashMap<String, Map>> filterConfigs = (ArrayList<HashMap<String, Map>>) configs.get("filters");
