@@ -3,6 +3,7 @@ package com.ctrip.ops.sysdev.baseplugin;
 import com.codahale.metrics.Meter;
 import com.ctrip.ops.sysdev.exception.YamlConfigException;
 import com.ctrip.ops.sysdev.metric.Metric;
+import lombok.NonNull;
 
 import java.util.Map;
 
@@ -14,7 +15,7 @@ public class Base {
     protected boolean enableMeter = false;
     protected Meter meter;
     
-    public Base(Map config) {
+    public Base(@NonNull Map config) {
         if (config.containsKey("meter_name")) {
             this.enableMeter = true;
             meter = Metric.setMetric((String) config.get("meter_name"));
