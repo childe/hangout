@@ -11,9 +11,9 @@ import java.util.*;
 @Log4j2
 public class TopologyBuilder {
 
-    List<HashMap<String, Map>> inputConfigs;
-    List<HashMap<String, Map>> filterConfigs;
-    List<HashMap<String, Map>> outputConfigs;
+    private final List<HashMap<String, Map>> inputConfigs;
+    private final List<HashMap<String, Map>> filterConfigs;
+    private final List<HashMap<String, Map>> outputConfigs;
 
     public TopologyBuilder(List<HashMap<String, Map>> inputConfigs,
                            List<HashMap<String, Map>> filterConfigs,
@@ -24,7 +24,7 @@ public class TopologyBuilder {
     }
 
     private List<BaseInput> buildInputs() {
-        List<BaseInput> inputs = new ArrayList<BaseInput>();
+        List<BaseInput> inputs = new ArrayList<BaseInput>(inputConfigs.size());
         inputConfigs.forEach(
                 input -> {
                     input.forEach((inputType, inputConfig) -> {
@@ -69,93 +69,94 @@ public class TopologyBuilder {
     }
 
     private List<BaseFilter> buildFilters() {
-        List<BaseFilter> filterProcessors = new ArrayList();
-        if (filterConfigs != null) {
-            filterConfigs.stream().forEach((Map filterMap) -> {
-                filterMap.entrySet().stream().forEach(entry -> {
-                    Map.Entry<String, Map> filter = (Map.Entry<String, Map>) entry;
-                    String filterType = filter.getKey();
-                    Map filterConfig = filter.getValue();
+        if (filterConfigs == null) {
+            return new ArrayList<>(0);
+        }
 
-                    log.info("begin to build filter " + filterType);
+        final List<BaseFilter> filterProcessors = new ArrayList(filterConfigs.size());
+        filterConfigs.stream().forEach((Map filterMap) -> {
+            filterMap.entrySet().stream().forEach(entry -> {
+                Map.Entry<String, Map> filter = (Map.Entry<String, Map>) entry;
+                String filterType = filter.getKey();
+                Map filterConfig = filter.getValue();
 
-                    Class<?> filterClass;
-                    Constructor<?> ctor = null;
-                    List<String> classNames = Arrays.asList("com.ctrip.ops.sysdev.filters." + filterType, filterType);
-                    boolean tryCtrip = true;
-                    for (String className : classNames) {
-                        try {
-                            filterClass = Class.forName(className);
-                            ctor = filterClass.getConstructor(Map.class);
-                            log.info("build filter " + filterType + " done");
-                            filterProcessors.add((BaseFilter) ctor.newInstance(filterConfig));
-                            break;
-                        } catch (ClassNotFoundException e) {
-                            if (tryCtrip == true) {
-                                log.info("maybe a third party output plugin. try to build " + filterType);
-                                tryCtrip = false;
-                                continue;
-                            } else {
-                                log.error(e);
-                                System.exit(1);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                log.info("begin to build filter " + filterType);
+
+                Class<?> filterClass;
+                Constructor<?> ctor = null;
+                List<String> classNames = Arrays.asList("com.ctrip.ops.sysdev.filters." + filterType, filterType);
+                boolean tryCtrip = true;
+                for (String className : classNames) {
+                    try {
+                        filterClass = Class.forName(className);
+                        ctor = filterClass.getConstructor(Map.class);
+                        log.info("build filter " + filterType + " done");
+                        filterProcessors.add((BaseFilter) ctor.newInstance(filterConfig));
+                        break;
+                    } catch (ClassNotFoundException e) {
+                        if (tryCtrip == true) {
+                            log.info("maybe a third party output plugin. try to build " + filterType);
+                            tryCtrip = false;
+                            continue;
+                        } else {
+                            log.error(e);
                             System.exit(1);
                         }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        System.exit(1);
                     }
-                });
+                }
             });
-        }
+        });
 
         return filterProcessors;
     }
 
 
     private List<BaseOutput> buildOutputs() {
-        List<BaseOutput> outputProcessors = new ArrayList<BaseOutput>();
-        if (outputConfigs != null) {
-
-            outputConfigs.stream().forEach((Map outputMap) -> {
-                outputMap.entrySet().stream().forEach(entry -> {
-                    Map.Entry<String, Map> output = (Map.Entry<String, Map>) entry;
-                    String outputType = output.getKey();
-                    Map outputConfig = output.getValue();
-
-                    log.info("begin to build output " + outputType);
-
-                    Class<?> outputClass;
-                    Constructor<?> ctor = null;
-                    List<String> classNames = Arrays.asList("com.ctrip.ops.sysdev.outputs." + outputType, outputType);
-                    boolean tryCtrip = true;
-
-                    for (String className : classNames) {
-                        try {
-                            outputClass = Class.forName(className);
-                            ctor = outputClass.getConstructor(Map.class);
-                            log.info("build output " + outputType + " done");
-                            outputProcessors.add((BaseOutput) ctor.newInstance(outputConfig));
-                            break;
-                        } catch (ClassNotFoundException e) {
-                            if (tryCtrip == true) {
-                                log.info("maybe a third party output plugin. try to build " + outputType);
-                                tryCtrip = false;
-                                continue;
-                            } else {
-                                log.error(e);
-                                System.exit(1);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            System.exit(1);
-                        }
-                    }
-                });
-            });
-        } else {
+        if (outputConfigs == null) {
             log.error("Error: At least One output should be set.");
             System.exit(1);
         }
+
+        final List<BaseOutput> outputProcessors = new ArrayList<BaseOutput>(outputConfigs.size());
+        outputConfigs.stream().forEach((Map outputMap) -> {
+            outputMap.entrySet().stream().forEach(entry -> {
+                Map.Entry<String, Map> output = (Map.Entry<String, Map>) entry;
+                String outputType = output.getKey();
+                Map outputConfig = output.getValue();
+
+                log.info("begin to build output " + outputType);
+
+                Class<?> outputClass;
+                Constructor<?> ctor = null;
+                List<String> classNames = Arrays.asList("com.ctrip.ops.sysdev.outputs." + outputType, outputType);
+                boolean tryCtrip = true;
+
+                for (String className : classNames) {
+                    try {
+                        outputClass = Class.forName(className);
+                        ctor = outputClass.getConstructor(Map.class);
+                        log.info("build output " + outputType + " done");
+                        outputProcessors.add((BaseOutput) ctor.newInstance(outputConfig));
+                        break;
+                    } catch (ClassNotFoundException e) {
+                        if (tryCtrip == true) {
+                            log.info("maybe a third party output plugin. try to build " + outputType);
+                            tryCtrip = false;
+                            continue;
+                        } else {
+                            log.error(e);
+                            System.exit(1);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        System.exit(1);
+                    }
+                }
+            });
+        });
 
         return outputProcessors;
     }
@@ -187,7 +188,7 @@ public class TopologyBuilder {
             setDestToInput(input, filters, outputs);
         }
 
-        for (int i = 0; i < filters.size(); i++) {
+        for (int i = 0, size = filters.size(); i < size; i++) {
             setDestToFilter(filters.get(i), i, filters, outputs);
         }
 
