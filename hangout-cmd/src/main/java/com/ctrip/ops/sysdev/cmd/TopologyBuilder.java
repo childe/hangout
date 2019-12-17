@@ -187,7 +187,7 @@ public class TopologyBuilder {
             setDestToInput(input, filters, outputs);
         }
 
-        for (int i = 0; i < filters.size(); i++) {
+        for (int i = 0, size = filters.size(); i < size; i++) {
             setDestToFilter(filters.get(i), i, filters, outputs);
         }
 
