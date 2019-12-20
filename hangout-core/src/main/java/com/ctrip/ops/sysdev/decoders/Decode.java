@@ -9,7 +9,7 @@ public interface Decode {
     Map<String, Object> decode(String message);
 
     default Map<String, Object> createDefaultEvent(String message) {
-        return new HashMap<String, Object>() {
+        return new HashMap<String, Object>(2) {
             {
                 put("message", message);
                 put("@timestamp", DateTime.now());
