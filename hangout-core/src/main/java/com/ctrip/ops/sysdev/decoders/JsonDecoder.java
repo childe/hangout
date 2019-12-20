@@ -14,7 +14,7 @@ public class JsonDecoder implements Decode {
         try {
             event = (HashMap) JSONValue.parseWithException(message);
         } catch (Exception e) {
-            log.debug("failed to json parse message to event", e);
+            log.warn("failed to json parse message to event", e);
         } finally {
             if (event == null) {
                 event = createDefaultEvent(message);
