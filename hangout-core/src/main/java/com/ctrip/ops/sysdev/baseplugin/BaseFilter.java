@@ -29,38 +29,33 @@ public class BaseFilter extends Base {
         this.nextFilter = null;
         this.outputs = new ArrayList<BaseOutput>();
 
-        if (this.config.containsKey("if")) {
-            IF = new ArrayList<TemplateRender>();
-            for (String c : (List<String>) this.config.get("if")) {
+        final List<String> ifConditions = (List<String>) this.config.get("if");
+        if (ifConditions != null) {
+            IF = new ArrayList<TemplateRender>(ifConditions.size());
+            for (String c : ifConditions) {
                 try {
                     IF.add(new FreeMarkerRender(c, c));
                 } catch (IOException e) {
-                    log.fatal(e.getMessage());
+                    log.fatal(e.getMessage(),e);
                     System.exit(1);
                 }
             }
-        } else {
-            IF = null;
         }
 
-        if (config.containsKey("tag_on_failure")) {
-            this.tagOnFailure = (String) config.get("tag_on_failure");
-        } else {
-            this.tagOnFailure = null;
-        }
+        this.tagOnFailure = (String) config.get("tag_on_failure");
 
-        if (config.containsKey("remove_fields")) {
-            this.removeFields = new ArrayList<>();
-            for (String field : (ArrayList<String>) config.get("remove_fields")) {
+        final List<String> remove_fields = (ArrayList<String>) config.get("remove_fields");
+        if (remove_fields != null) {
+            this.removeFields = new ArrayList<>(remove_fields.size());
+            for (String field : remove_fields) {
                 this.removeFields.add(FieldDeleter.getFieldDeleter(field));
             }
-        } else {
-            this.removeFields = null;
         }
-        if (config.containsKey("add_fields")) {
-            this.addFields = new HashMap<>();
-            Map<String, String> fields = (Map<String, String>) config.get("add_fields");
-            Iterator<Map.Entry<String, String>> it = fields.entrySet().iterator();
+
+        final Map<String, String> add_fields = (Map<String, String>) config.get("add_fields");
+        if (add_fields != null) {
+            this.addFields = new HashMap<>(add_fields.size());
+            final Iterator<Map.Entry<String, String>> it = add_fields.entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry<String, String> entry = it.next();
 
@@ -74,8 +69,6 @@ public class BaseFilter extends Base {
                     System.exit(1);
                 }
             }
-        } else {
-            this.addFields = null;
         }
 
         this.prepare();
