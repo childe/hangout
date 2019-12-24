@@ -17,8 +17,8 @@ public class DateFormatter implements TemplateRender {
     private static DateTimeFormatter ISOformatter = ISODateTimeFormat
             .dateTimeParser().withOffsetParsed();
 
-    DateTimeZone tz;
-    String format;
+    private DateTimeZone tz;
+    private String format;
 
     public DateFormatter(String format, String timezone) {
         this.format = format;

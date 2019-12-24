@@ -25,14 +25,12 @@ public class Utils {
 
                     log.info("begin to build filter " + filterType);
 
-                    Class<?> filterClass;
-                    Constructor<?> ctor = null;
                     List<String> classNames = Arrays.asList("com.ctrip.ops.sysdev.filters." + filterType, filterType);
                     boolean tryCtrip = true;
                     for (String className : classNames) {
                         try {
-                            filterClass = Class.forName(className);
-                            ctor = filterClass.getConstructor(Map.class);
+                            Class<?> filterClass = Class.forName(className);
+                            Constructor<?>  ctor = filterClass.getConstructor(Map.class);
                             log.info("build filter " + filterType + " done");
                             filterProcessors.add((BaseFilter) ctor.newInstance(filterConfig));
                             break;

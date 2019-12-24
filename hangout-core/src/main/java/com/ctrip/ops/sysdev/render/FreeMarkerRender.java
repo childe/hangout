@@ -30,7 +30,7 @@ public class FreeMarkerRender implements TemplateRender {
         try {
             sw.close();
         } catch (IOException e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(),e);
         }
         return sw.toString();
     }

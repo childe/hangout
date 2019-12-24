@@ -13,6 +13,7 @@ class InputEmitThread extends Thread {
     private BaseInput input;
 
     public InputEmitThread(BaseInput input) {
+        this.setName(this.getName() + "-" + input.getClass().getSimpleName());
         this.input = input;
     }
 

@@ -15,7 +15,7 @@ public class OneLevelDeleter implements FieldDeleter {
     }
 
     @Override
-    public Map delete(Map event) {
+    public Map delete(final Map event) {
         event.remove(field);
         return event;
     }

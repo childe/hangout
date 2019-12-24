@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 @Log4j2
 public class FieldRender implements TemplateRender {
     private ArrayList<String> fields = new ArrayList();
-    final Pattern p = Pattern.compile("\\[(\\S+?)\\]+");
+    static final Pattern p = Pattern.compile("\\[(\\S+?)\\]+");
 
     public FieldRender(String template) {
         Matcher m = p.matcher(template);

@@ -67,21 +67,16 @@ public abstract class BaseInput extends Base {
             if (this.nextFilter != null) {
                 event = this.nextFilter.process(event);
             } else {
-                for (BaseOutput o : this.outputs
-                ) {
+                for (BaseOutput o : this.outputs) {
                     o.process(event);
                 }
             }
         } catch (Exception e) {
-            log.error("process event failed:" + message);
-            e.printStackTrace();
-            log.error(e);
+            log.error("process event failed:" + message,e);
         } catch (Error e) {
-            log.error("process event failed:" + message);
-            e.printStackTrace();
-            log.error(e);
+            log.error("process event failed:" + message,e);
         } finally {
-            if (this.enableMeter == true) {
+            if (this.enableMeter) {
                 this.meter.mark();
             }
         }
