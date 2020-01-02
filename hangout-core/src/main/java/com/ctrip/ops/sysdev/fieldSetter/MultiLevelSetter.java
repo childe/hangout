@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  */
 public class MultiLevelSetter implements FieldSetter {
     private ArrayList<String> fields = new ArrayList();
-    final Pattern p = Pattern.compile("\\[(\\S+?)\\]+");
+    private static final Pattern p = Pattern.compile("\\[(\\S+?)\\]+");
 
     public MultiLevelSetter(String template) {
         Matcher m = p.matcher(template);

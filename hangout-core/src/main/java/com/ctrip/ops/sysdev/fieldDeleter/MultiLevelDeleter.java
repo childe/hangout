@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
  */
 public class MultiLevelDeleter implements FieldDeleter {
     private ArrayList<String> fields = new ArrayList();
-    final Pattern p = Pattern.compile("\\[(\\S+?)\\]+");
+    final static Pattern p = Pattern.compile("\\[(\\S+?)\\]+");
 
     public MultiLevelDeleter(String template) {
         Matcher m = p.matcher(template);

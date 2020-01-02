@@ -58,7 +58,7 @@ public abstract class BaseOutput extends Base {
         }
         if (ifSuccess) {
             this.emit(event);
-            if (this.enableMeter == true) {
+            if (this.enableMeter) {
                 this.meter.mark();
             }
         }
