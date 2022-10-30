@@ -39,7 +39,7 @@
         <commons-collections-version>3.2.2</commons-collections-version>
         <commons-collections4-version>4.1</commons-collections4-version>
         <hamcrest-version>1.1</hamcrest-version>
-        <snakeyaml-version>1.26</snakeyaml-version>
+        <snakeyaml-version>1.32</snakeyaml-version>
 
         <!-- test -->
         <mockito-version>1.10.19</mockito-version>
